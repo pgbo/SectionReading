@@ -66,6 +66,11 @@ class ReadingRecordsVC: UICollectionViewController {
             
         }
     }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        newRecordButtonWindow?.hidden = true
+    }
 
     /*
     // MARK: - Navigation
@@ -160,6 +165,8 @@ class ReadingRecordsVC: UICollectionViewController {
     }
     
     @objc private func addNewRecord() {
-        // TODO: Go to add new record page
+        
+        self.showViewController(NewRecordVC(), sender: nil)
+        
     }
 }

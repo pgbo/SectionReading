@@ -52,6 +52,11 @@ class RSProgressView: UIView {
     }
     
     var progressLineWidth: CGFloat = 4 /** 进度线的宽度 */
+        {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
     
     private (set) var progressLabel: UILabel? /** 进度文字视图 */
     
@@ -60,7 +65,7 @@ class RSProgressView: UIView {
         setupProgressView()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setupProgressView()
     }
@@ -78,7 +83,7 @@ class RSProgressView: UIView {
             startAngle:ToRadian(-90.0),
             endAngle:(ToRadian(-90.0) + RSProgressView.rotateRadianWithProgress(progress)),
             clockwise: true)
-        arcPath.lineCapStyle = CGLineCap.Round
+        arcPath.lineCapStyle = kCGLineCapRound
         arcPath.lineWidth = progressLineWidth
         tintColor.setStroke()
         arcPath.stroke()

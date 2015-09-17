@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		59BD23F61BAAB11200AB27FB /* RecordButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */; };
-		59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */; settings = {ASSET_TAGS = (); }; };
+		59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */; };
 		86FFDDD31BA9B346004DFCD5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD11BA9B346004DFCD5 /* Main.storyboard */; };
 		86FFDDD51BA9B346004DFCD5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD41BA9B346004DFCD5 /* Images.xcassets */; };
 		86FFDDD81BA9B346004DFCD5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD61BA9B346004DFCD5 /* LaunchScreen.xib */; };
@@ -17,6 +17,7 @@
 		86FFDDF71BA9B45C004DFCD5 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDEF1BA9B45C004DFCD5 /* Info.plist */; };
 		86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDF81BA9B4B4004DFCD5 /* ReadingRecordsVC.swift */; };
 		86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDFA1BA9B576004DFCD5 /* ReadingRecordCell.swift */; };
+		86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDFC1BAB052B004DFCD5 /* NewRecordVC.swift */; };
 		A1BCBC8D8A3E764A7AD58FC5 /* Pods_SectionReading.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F694485C302FA27B255B35 /* Pods_SectionReading.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -46,6 +47,7 @@
 		86FFDDEF1BA9B45C004DFCD5 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86FFDDF81BA9B4B4004DFCD5 /* ReadingRecordsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingRecordsVC.swift; sourceTree = "<group>"; };
 		86FFDDFA1BA9B576004DFCD5 /* ReadingRecordCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingRecordCell.swift; sourceTree = "<group>"; };
+		86FFDDFC1BAB052B004DFCD5 /* NewRecordVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewRecordVC.swift; sourceTree = "<group>"; };
 		F12EFC1093923600127EFC25 /* Pods-SectionReading.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SectionReading.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SectionReading/Pods-SectionReading.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -190,6 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				86FFDDF81BA9B4B4004DFCD5 /* ReadingRecordsVC.swift */,
+				86FFDDFC1BAB052B004DFCD5 /* NewRecordVC.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 			files = (
 				86FFDDF61BA9B45C004DFCD5 /* AppDelegate.swift in Sources */,
 				86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */,
+				86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */,
 				86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */,
 				59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */,
 				59BD23F61BAAB11200AB27FB /* RecordButtonView.swift in Sources */,

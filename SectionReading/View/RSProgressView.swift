@@ -18,6 +18,10 @@ func ToDegree(radian: CGFloat) -> CGFloat {
     return CGFloat(Double(radian * 180.0)/M_PI)
 }
 
+func min(x1:CGFloat = 0, x2: CGFloat = 0) -> CGFloat {
+    return x1 < x2 ? x1:x2
+}
+
 class RSProgressView: UIView {
 
     var progress: CGFloat = 0 /** 进度，0 - 1 之间 */
@@ -33,6 +37,7 @@ class RSProgressView: UIView {
                         label.backgroundColor = UIColor.clearColor()
                         label.textColor = self.tintColor
                         label.font = UIFont.systemFontOfSize(10)
+                        label.textAlignment = NSTextAlignment.Center
                         
                         progressLabel = label
                         self.addSubview(progressLabel!)
@@ -41,11 +46,15 @@ class RSProgressView: UIView {
                 
                 // 转动角度
                 
-                let (arcCenter, radius) = RSProgressView.yieldArcAtRect(bounds)
+                let radius = min((CGRectGetWidth(self.bounds) - progressLineWidth)/2, (CGRectGetHeight(self.bounds) - progressLineWidth)/2)
+                
+                let arcCenter = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds))
+                
                 
                 let rotateRadian = RSProgressView.rotateRadianWithProgress(progress)
-                let labelCenterX = arcCenter.x + (radius + 15.0) * CGFloat(sinf(Float(rotateRadian)))
-                let labelCenterY = arcCenter.y + (radius + 15.0) * CGFloat(cosf(Float(rotateRadian)))
+                let locateRadian = ToRadian(-90.0) + rotateRadian
+                let labelCenterX = arcCenter.x + (radius + 15.0) * CGFloat(cosf(Float(locateRadian)))
+                let labelCenterY = arcCenter.y + (radius + 15.0) * CGFloat(sinf(Float(locateRadian)))
                 
                 progressLabel?.center = CGPointMake(labelCenterX, labelCenterY)
             }
@@ -66,7 +75,7 @@ class RSProgressView: UIView {
     }
     
     required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(coder: aDecoder)!
         setupProgressView()
     }
 
@@ -76,14 +85,18 @@ class RSProgressView: UIView {
     
     override func drawRect(rect: CGRect) {
         
-        let (arcCenter, radius) = RSProgressView.yieldArcAtRect(rect)
+        let radius = min((CGRectGetWidth(rect) - progressLineWidth)/2, (CGRectGetHeight(rect) - progressLineWidth)/2)
+        
+        // 局中
+        
+        let arcCenter = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect))
         
         let arcPath = UIBezierPath(arcCenter:arcCenter,
             radius:radius,
             startAngle:ToRadian(-90.0),
             endAngle:(ToRadian(-90.0) + RSProgressView.rotateRadianWithProgress(progress)),
             clockwise: true)
-        arcPath.lineCapStyle = kCGLineCapRound
+        arcPath.lineCapStyle = CGLineCap.Round
         arcPath.lineWidth = progressLineWidth
         tintColor.setStroke()
         arcPath.stroke()
@@ -102,12 +115,5 @@ class RSProgressView: UIView {
             mProgress = 1
         }
         return CGFloat(2.0*M_PI*Double(mProgress))
-    }
-    
-    private static func yieldArcAtRect(rect: CGRect) -> (CGPoint, CGFloat) {
-        let halfWidth = rect.size.width/2
-        let halfHeight = rect.size.height/2
-        let radius = halfWidth > halfHeight ? halfHeight:halfWidth
-        return (CGPointMake(halfWidth, halfHeight), radius)
     }
 }

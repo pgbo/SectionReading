@@ -95,7 +95,7 @@ class ReadingRecordsVC: UICollectionViewController {
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UICollectionViewCell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath)
     
         return cell
     }
@@ -145,7 +145,7 @@ class ReadingRecordsVC: UICollectionViewController {
             
             newRecordButtonWindow = UIWindow(frame: CGRectMake((CGRectGetWidth(screenBounds) - imageSize)/2, CGRectGetHeight(screenBounds) - imageSize - 4, imageSize, imageSize))
             
-            let mButn = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
+            let mButn = UIButton(type: UIButtonType.Custom)
             
             mButn.frame = newRecordButtonWindow!.bounds
             

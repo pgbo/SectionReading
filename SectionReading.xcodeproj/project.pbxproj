@@ -9,12 +9,13 @@
 /* Begin PBXBuildFile section */
 		59BD23F61BAAB11200AB27FB /* RecordButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */; };
 		59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */; };
+		59C3C93C1BABAA7500CC6200 /* RAQRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */; settings = {ASSET_TAGS = (); }; };
+		59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */; settings = {ASSET_TAGS = (); }; };
 		86FFDDD31BA9B346004DFCD5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD11BA9B346004DFCD5 /* Main.storyboard */; };
 		86FFDDD51BA9B346004DFCD5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD41BA9B346004DFCD5 /* Images.xcassets */; };
 		86FFDDD81BA9B346004DFCD5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD61BA9B346004DFCD5 /* LaunchScreen.xib */; };
 		86FFDDE41BA9B346004DFCD5 /* SectionReadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDE31BA9B346004DFCD5 /* SectionReadingTests.swift */; };
 		86FFDDF61BA9B45C004DFCD5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDEE1BA9B45C004DFCD5 /* AppDelegate.swift */; };
-		86FFDDF71BA9B45C004DFCD5 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDEF1BA9B45C004DFCD5 /* Info.plist */; };
 		86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDF81BA9B4B4004DFCD5 /* ReadingRecordsVC.swift */; };
 		86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDFA1BA9B576004DFCD5 /* ReadingRecordCell.swift */; };
 		86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDFC1BAB052B004DFCD5 /* NewRecordVC.swift */; };
@@ -36,6 +37,10 @@
 		4053C007867448B952FFA698 /* Pods-SectionReading.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SectionReading.release.xcconfig"; path = "Pods/Target Support Files/Pods-SectionReading/Pods-SectionReading.release.xcconfig"; sourceTree = "<group>"; };
 		59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordButtonView.swift; sourceTree = "<group>"; };
 		59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSProgressView.swift; sourceTree = "<group>"; };
+		59C3C93A1BABAA7500CC6200 /* RAQRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAQRecorder.h; sourceTree = "<group>"; };
+		59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RAQRecorder.m; sourceTree = "<group>"; };
+		59C3C93E1BABAB4100CC6200 /* SectionReading-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SectionReading-Bridging-Header.h"; sourceTree = "<group>"; };
+		59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipleArcTracksView.swift; sourceTree = "<group>"; };
 		86FFDDC81BA9B346004DFCD5 /* SectionReading.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SectionReading.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		86FFDDD21BA9B346004DFCD5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		86FFDDD41BA9B346004DFCD5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -87,9 +92,27 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		59C3C9381BABAA7500CC6200 /* Vender */ = {
+			isa = PBXGroup;
+			children = (
+				59C3C9391BABAA7500CC6200 /* RAQRecorder */,
+			);
+			path = Vender;
+			sourceTree = "<group>";
+		};
+		59C3C9391BABAA7500CC6200 /* RAQRecorder */ = {
+			isa = PBXGroup;
+			children = (
+				59C3C93A1BABAA7500CC6200 /* RAQRecorder.h */,
+				59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */,
+			);
+			path = RAQRecorder;
+			sourceTree = "<group>";
+		};
 		86FFDDBF1BA9B346004DFCD5 = {
 			isa = PBXGroup;
 			children = (
+				59C3C93E1BABAB4100CC6200 /* SectionReading-Bridging-Header.h */,
 				86FFDDCA1BA9B346004DFCD5 /* SectionReading */,
 				86FFDDE01BA9B346004DFCD5 /* SectionReadingTests */,
 				86FFDDC91BA9B346004DFCD5 /* Products */,
@@ -110,6 +133,7 @@
 		86FFDDCA1BA9B346004DFCD5 /* SectionReading */ = {
 			isa = PBXGroup;
 			children = (
+				59C3C9381BABAA7500CC6200 /* Vender */,
 				86FFDDED1BA9B45C004DFCD5 /* Application */,
 				86FFDDF01BA9B45C004DFCD5 /* Helper */,
 				86FFDDF11BA9B45C004DFCD5 /* Model */,
@@ -184,6 +208,7 @@
 				86FFDDFA1BA9B576004DFCD5 /* ReadingRecordCell.swift */,
 				59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */,
 				59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */,
+				59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -245,7 +270,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0640;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = pengguangbo;
 				TargetAttributes = {
 					86FFDDC71BA9B346004DFCD5 = {
@@ -281,7 +306,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86FFDDF71BA9B45C004DFCD5 /* Info.plist in Resources */,
 				86FFDDD31BA9B346004DFCD5 /* Main.storyboard in Resources */,
 				86FFDDD81BA9B346004DFCD5 /* LaunchScreen.xib in Resources */,
 				86FFDDD51BA9B346004DFCD5 /* Images.xcassets in Resources */,
@@ -350,7 +374,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				59C3C93C1BABAA7500CC6200 /* RAQRecorder.m in Sources */,
 				86FFDDF61BA9B45C004DFCD5 /* AppDelegate.swift in Sources */,
+				59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */,
 				86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */,
 				86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */,
 				86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */,
@@ -418,6 +444,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -488,7 +515,9 @@
 				INFOPLIST_FILE = "$(SRCROOT)/SectionReading/Application/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pengguangbo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "SectionReading-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -500,7 +529,9 @@
 				INFOPLIST_FILE = "$(SRCROOT)/SectionReading/Application/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pengguangbo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "SectionReading-Bridging-Header.h";
 			};
 			name = Release;
 		};
@@ -518,6 +549,7 @@
 				);
 				INFOPLIST_FILE = SectionReadingTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pengguangbo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SectionReading.app/SectionReading";
 			};
@@ -533,6 +565,7 @@
 				);
 				INFOPLIST_FILE = SectionReadingTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pengguangbo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SectionReading.app/SectionReading";
 			};

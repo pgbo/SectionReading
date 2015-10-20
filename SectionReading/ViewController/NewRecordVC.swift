@@ -19,6 +19,7 @@ enum RecordAudioState {
 
 let LimitMinutesPerRecord = 3 /** 每个录音的限制时长，单位：分钟 */
 let StopRecordButtonTopSpacing = CGFloat(24)
+let PlayRecordButtonTopSpacing = CGFloat(12)
 
 class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
     
@@ -26,6 +27,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
     private var recordButtonViewCenterY: NSLayoutConstraint?
     
     private var stopRecordButn: UIButton?
+    private var playRecordButn: UIButton?
     private var finishedRecordCollectionView: UICollectionView?
     
 //    private var audioRecorder: RAQRecorder?
@@ -88,6 +90,28 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
         stopRecordButn!.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 38))
         
         
+        // 设置 playRecordButn
+        
+        playRecordButn = UIButton(type: UIButtonType.Custom)
+        self.view.addSubview(playRecordButn!)
+        
+        playRecordButn?.alpha = 0
+        playRecordButn?.setTitle("播放", forState: UIControlState.Normal)
+        playRecordButn?.backgroundColor = UIColor.clearColor()
+        playRecordButn?.addTarget(self, action: "playRecord", forControlEvents: UIControlEvents.TouchUpInside)
+        playRecordButn?.setTitleColor(UIColor(red:0x6f/255.0, green: 0xa9/255.0, blue: 0xaf/255.0, alpha: 1), forState: UIControlState.Normal)
+        borderActionButton(playRecordButn, color: playRecordButn!.currentTitleColor)
+        
+        playRecordButn?.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.view.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: stopRecordButn!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: PlayRecordButtonTopSpacing))
+        
+        self.view.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
+        
+        playRecordButn!.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 100))
+        
+        playRecordButn!.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 38))
+        
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -103,14 +127,18 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
     }
 
     
-    override func layoutSublayersOfLayer(layer: CALayer) {
-        super.layoutSublayersOfLayer(layer)
-        if layer == stopRecordButn?.layer {
-            if stopRecordButn != nil {
-                stopRecordButtonDisabled(stopRecordButn!.enabled == false)
-            }
-        }
-    }
+//    override func layoutSublayersOfLayer(layer: CALayer) {
+//        super.layoutSublayersOfLayer(layer)
+//        if layer == stopRecordButn?.layer {
+//            stopRecordButtonDisabled(stopRecordButn!.enabled == false)
+//            return
+//        }
+//        
+//        if layer == playRecordButn?.layer {
+//            borderActionButton(playRecordButn, color: playRecordButn!.currentTitleColor)
+//            return
+//        }
+//    }
     
     @objc private func recordButtonViewButtonClick() {
         switch recordAudioState {
@@ -166,10 +194,14 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
             stopRecordButn?.setTitleColor(tintColor!, forState: UIControlState.Normal)
         }
         
-        stopRecordButn?.layer.borderColor = tintColor!.CGColor
-        stopRecordButn?.layer.borderWidth = 1.0
-        stopRecordButn?.layer.cornerRadius = 8.0
-        stopRecordButn?.layer.masksToBounds = true
+        borderActionButton(stopRecordButn, color: tintColor!)
+    }
+    
+    private func borderActionButton(button: UIButton?, color: UIColor) {
+        button?.layer.borderColor = color.CGColor
+        button?.layer.borderWidth = 1.0
+        button?.layer.cornerRadius = 8.0
+        button?.layer.masksToBounds = true
     }
     
     private func stopRecordButtonTintColorWithState(state: UIControlState) -> UIColor {
@@ -298,8 +330,27 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
     
     private func recordPaused() {
         recordProcessDisplayLink?.invalidate()
-        recordButtonView?.titleLabel?.text = "点击继续"
+//        recordButtonView?.titleLabel?.text = "点击继续"
         recordButtonView?.iconView?.tintColor = recordButtonView?.iconView?.tintColor.colorWithAlphaComponent(1)
+        
+        // 显示出播放按钮
+        if self.playRecordButn?.alpha == 0 {
+            
+            self.view.layoutIfNeeded()
+            UIView.animateWithDuration(0.4, animations: { () -> Void in
+                
+                self.recordButtonViewCenterY?.constant = -(CGRectGetHeight(self.stopRecordButn!.bounds) + StopRecordButtonTopSpacing + CGRectGetHeight(self.playRecordButn!.bounds) + PlayRecordButtonTopSpacing)/2
+                
+                self.playRecordButn?.alpha = 1.0
+                
+                self.view.layoutIfNeeded()
+                
+                },
+                completion: { (finished) -> Void in
+                    self.recordButtonView?.titleLabel?.text = "点击继续"
+            })
+            
+        }
     }
     
     @objc private func stopRecord() {
@@ -339,8 +390,8 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
         }
     }
     
-    private func playRecordAudio() {
-    
+    @objc                                                                                                                                                                                             private func playRecord() {
+        // TODO: 到播放页面
     }
     
     private func pauseRecordAudioPlay() {

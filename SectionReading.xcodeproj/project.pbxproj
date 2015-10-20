@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		591609A41BD65ECF00F14523 /* PlayRecordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A31BD65ECF00F14523 /* PlayRecordVC.swift */; settings = {ASSET_TAGS = (); }; };
 		59BD23F61BAAB11200AB27FB /* RecordButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */; };
 		59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */; };
 		59C3C93C1BABAA7500CC6200 /* RAQRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */; settings = {ASSET_TAGS = (); }; };
@@ -35,6 +36,7 @@
 /* Begin PBXFileReference section */
 		29F694485C302FA27B255B35 /* Pods_SectionReading.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SectionReading.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4053C007867448B952FFA698 /* Pods-SectionReading.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SectionReading.release.xcconfig"; path = "Pods/Target Support Files/Pods-SectionReading/Pods-SectionReading.release.xcconfig"; sourceTree = "<group>"; };
+		591609A31BD65ECF00F14523 /* PlayRecordVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayRecordVC.swift; sourceTree = "<group>"; };
 		59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordButtonView.swift; sourceTree = "<group>"; };
 		59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSProgressView.swift; sourceTree = "<group>"; };
 		59C3C93A1BABAA7500CC6200 /* RAQRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAQRecorder.h; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 			children = (
 				86FFDDF81BA9B4B4004DFCD5 /* ReadingRecordsVC.swift */,
 				86FFDDFC1BAB052B004DFCD5 /* NewRecordVC.swift */,
+				591609A31BD65ECF00F14523 /* PlayRecordVC.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -376,6 +379,7 @@
 			files = (
 				59C3C93C1BABAA7500CC6200 /* RAQRecorder.m in Sources */,
 				86FFDDF61BA9B45C004DFCD5 /* AppDelegate.swift in Sources */,
+				591609A41BD65ECF00F14523 /* PlayRecordVC.swift in Sources */,
 				59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */,
 				86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */,
 				86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */,

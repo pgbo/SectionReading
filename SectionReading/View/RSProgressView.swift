@@ -87,7 +87,7 @@ class RSProgressView: UIView {
         
         let radius = min((CGRectGetWidth(rect) - progressLineWidth)/2, (CGRectGetHeight(rect) - progressLineWidth)/2)
         
-        // 局中
+        // 居中
         
         let arcCenter = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect))
         

@@ -21,14 +21,15 @@ let LimitMinutesPerRecord = 3 /** 每个录音的限制时长，单位：分钟 
 let StopRecordButtonTopSpacing = CGFloat(24)
 let PlayRecordButtonTopSpacing = CGFloat(12)
 
-class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
+class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTransitioningDelegate {
     
     private var recordButtonView: RecordButtonView?
     private var recordButtonViewCenterY: NSLayoutConstraint?
     
     private var stopRecordButn: UIButton?
     private var playRecordButn: UIButton?
-    private var finishedRecordCollectionView: UICollectionView?
+    
+    private (set) var fakeCDPlaySlider: CDPlaySlider?
     
 //    private var audioRecorder: RAQRecorder?
     private var audioRecorder: AVAudioRecorder?
@@ -36,6 +37,9 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
     private var recordAudioState = RecordAudioState.Normal
 
     private var recordProcessDisplayLink: CADisplayLink? /** 进度定时器 */
+    
+    lazy private var presentRecordPlayTransition:PresentRecordPlayTransition = PresentRecordPlayTransition()
+    lazy private var dismissRecordPlayTransition:DismissRecordPlayTransition = DismissRecordPlayTransition()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -100,7 +104,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
         playRecordButn?.backgroundColor = UIColor.clearColor()
         playRecordButn?.addTarget(self, action: "playRecord", forControlEvents: UIControlEvents.TouchUpInside)
         playRecordButn?.setTitleColor(UIColor(red:0x6f/255.0, green: 0xa9/255.0, blue: 0xaf/255.0, alpha: 1), forState: UIControlState.Normal)
-        borderActionButton(playRecordButn, color: playRecordButn!.currentTitleColor)
+        roundActionButton(playRecordButn, color: playRecordButn!.currentTitleColor)
         
         playRecordButn?.translatesAutoresizingMaskIntoConstraints = false
         
@@ -111,6 +115,25 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
         playRecordButn!.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 100))
         
         playRecordButn!.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 38))
+        
+        
+        // 设置 fakeCDPlaySlider
+        
+        fakeCDPlaySlider = CDPlaySlider(frame: CGRectMake(0, 0, 220, 220))
+        self.view.addSubview(fakeCDPlaySlider!)
+        
+        fakeCDPlaySlider?.alpha = 0
+        fakeCDPlaySlider?.translatesAutoresizingMaskIntoConstraints = false
+        
+        // scopeGradientView
+        
+        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Top, multiplier: 1, constant: 0))
+        
+        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Leading, multiplier: 1, constant: 0))
+        
+        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: 0))
+        
+        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 0))
         
     }
     
@@ -194,10 +217,10 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
             stopRecordButn?.setTitleColor(tintColor!, forState: UIControlState.Normal)
         }
         
-        borderActionButton(stopRecordButn, color: tintColor!)
+        roundActionButton(stopRecordButn, color: tintColor!)
     }
     
-    private func borderActionButton(button: UIButton?, color: UIColor) {
+    private func roundActionButton(button: UIButton?, color: UIColor) {
         button?.layer.borderColor = color.CGColor
         button?.layer.borderWidth = 1.0
         button?.layer.cornerRadius = 8.0
@@ -392,6 +415,11 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
     
     @objc                                                                                                                                                                                             private func playRecord() {
         // TODO: 到播放页面
+        
+        if audioRecorder != nil {
+            let playRecordVC = PlayRecordVC(recordFilePath: audioRecorder!.url.absoluteString)
+            playRecordVC.transitioningDelegate = self
+        }
     }
     
     private func pauseRecordAudioPlay() {
@@ -400,5 +428,21 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate {
     
     private func stopRecordAudioPlay() {
         
+    }
+    
+    // MARK: UIViewControllerTransitioningDelegate
+    
+    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if presenting.isKindOfClass(PlayRecordVC) {
+            return self.presentRecordPlayTransition
+        }
+        return nil
+    }
+    
+    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if dismissed.isKindOfClass(PlayRecordVC) {
+            return self.dismissRecordPlayTransition
+        }
+        return nil
     }
 }

@@ -36,7 +36,7 @@ class ScopeGradientView: UIView {
         let l: AngleGradientLayer = self.layer as! AngleGradientLayer
         l.colors = [color.CGColor, color.colorWithAlphaComponent(alpha*(CGFloat(0.1)/CGFloat(0.6))).CGColor, UIColor.clearColor().CGColor]
         
-        if l.locations.count == 0 {
+        if l.locations == nil || l.locations!.count == 0 {
             l.locations = [0, 0.1, 1]
         }
     }

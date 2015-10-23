@@ -8,7 +8,10 @@
 
 import UIKit
 
+let PlayRecordVCBackButtonClickNotification = "PlayRecordVCBackButtonClickNotification"
+
 let PlayRecordVCPlayRecordButtonTopSpacing = CGFloat(38)
+let PlayRecordVCActionButtonSize = CGFloat(38)
 
 /// 播放录音 VC
 class PlayRecordVC: UIViewController {
@@ -64,7 +67,7 @@ class PlayRecordVC: UIViewController {
         
         self.view.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
         
-        playButn!.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 38))
+        playButn!.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
         
         playButn!.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
         
@@ -77,11 +80,13 @@ class PlayRecordVC: UIViewController {
         backButn?.translatesAutoresizingMaskIntoConstraints = false
         roundActionButton(backButn, color: actionButnColor)
         
+        backButn?.addTarget(self, action: "backButnClick", forControlEvents: UIControlEvents.TouchUpInside)
+        
         self.view.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0))
         
         self.view.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.Leading, multiplier: 1, constant: -30.0))
         
-        backButn!.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 38))
+        backButn!.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
         
         backButn!.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: backButn!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
         
@@ -95,9 +100,9 @@ class PlayRecordVC: UIViewController {
         
         self.view.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0))
         
-        self.view.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: backButn!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 30.0))
+        self.view.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 30.0))
         
-        cutButn!.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 38))
+        cutButn!.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
         
         cutButn!.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: cutButn!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
 
@@ -114,5 +119,9 @@ class PlayRecordVC: UIViewController {
             button!.layer.cornerRadius = fmax(CGRectGetWidth(button!.frame), CGRectGetHeight(button!.frame))/2
         }
         button?.layer.masksToBounds = true
+    }
+    
+    @objc private func backButnClick() {
+        NSNotificationCenter.defaultCenter().postNotificationName(PlayRecordVCBackButtonClickNotification, object: self)
     }
 }

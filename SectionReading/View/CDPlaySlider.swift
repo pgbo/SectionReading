@@ -86,7 +86,7 @@ class CDPlaySlider: UIControl {
         
         cdTrackView!.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 0, constant: CDTrackSize))
         
-        cdTrackView!.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: progressView!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
+        cdTrackView!.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: cdTrackView!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
         
         
         // progressView

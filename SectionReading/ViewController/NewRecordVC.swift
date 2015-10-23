@@ -23,7 +23,7 @@ let PlayRecordButtonTopSpacing = CGFloat(12)
 
 class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTransitioningDelegate {
     
-    private var recordButtonView: RecordButtonView?
+    private (set) var recordButtonView: RecordButtonView?
     private var recordButtonViewCenterY: NSLayoutConstraint?
     
     private var stopRecordButn: UIButton?
@@ -43,6 +43,12 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NSNotificationCenter.defaultCenter().addObserverForName(PlayRecordVCBackButtonClickNotification, object: nil, queue: NSOperationQueue.mainQueue()) { (note) -> Void in
+            if self.presentedViewController != nil && self.presentedViewController!.isKindOfClass(PlayRecordVC) {
+                self.dismissViewControllerAnimated(true, completion: nil)
+            }
+        }
         
         self.view.backgroundColor = UIColor(red: 0xf5/255.0, green: 0xee/255.0, blue: 0xee/255.0, alpha: 1)
         
@@ -135,6 +141,10 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         
         self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 0))
         
+    }
+    
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -413,12 +423,13 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         }
     }
     
-    @objc                                                                                                                                                                                             private func playRecord() {
+    @objc private func playRecord() {
         // TODO: 到播放页面
         
         if audioRecorder != nil {
             let playRecordVC = PlayRecordVC(recordFilePath: audioRecorder!.url.absoluteString)
             playRecordVC.transitioningDelegate = self
+            self.presentViewController(playRecordVC, animated: true, completion: nil)
         }
     }
     
@@ -433,7 +444,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     // MARK: UIViewControllerTransitioningDelegate
     
     func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        if presenting.isKindOfClass(PlayRecordVC) {
+        if presented.isKindOfClass(PlayRecordVC) {
             return self.presentRecordPlayTransition
         }
         return nil

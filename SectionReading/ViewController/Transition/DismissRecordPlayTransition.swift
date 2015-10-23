@@ -17,14 +17,17 @@ class DismissRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
         
         let fromVC = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as! PlayRecordVC
-        let toVC = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as! NewRecordVC
+        let toNVC = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as! UINavigationController
+        let toVC = toNVC.topViewController as! NewRecordVC
+        
         let containerView = transitionContext.containerView()
         
         // 显示
-        toVC.view.frame = transitionContext.finalFrameForViewController(toVC)
-        toVC.view.alpha = 0
+//        toVC.view.frame = transitionContext.finalFrameForViewController(toVC)
         
-        containerView?.insertSubview(toVC.view, belowSubview: fromVC.view)
+//        containerView?.insertSubview(toVC.view, belowSubview: fromVC.view)
+        
+//        containerView?.bringSubviewToFront(toVC.view)
         
         UIView.animateWithDuration(0.4, animations: { () -> Void in
             
@@ -33,16 +36,28 @@ class DismissRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
             
             }) { (finished) -> Void in
                 
-                UIView.animateWithDuration(0.6, animations: { () -> Void in
+                UIView.animateWithDuration(0.4, animations: { () -> Void in
                     
                     fromVC.playSlider?.transform = CGAffineTransformIdentity
-                    toVC.view.alpha = 1
-                    fromVC.view.alpha = 0
                     
                     }, completion: { (finished) -> Void in
                         
-                        //告诉系统动画结束
-                        transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
+                        UIView.animateWithDuration(0.4, animations: { () -> Void in
+                            
+                            fromVC.playSlider?.alpha = 0
+                            toVC.recordButtonView?.alpha = 1
+                            
+                            }, completion: { (finished) -> Void in
+                                
+                                //告诉系统动画结束
+                                transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
+                                
+                                UIView.transitionWithView(toNVC.view, duration: 3, options: UIViewAnimationOptions.TransitionFlipFromTop, animations: { () -> Void in
+                                    
+                                    }, completion: { (finshed) -> Void in
+                                        
+                                })
+                        })
                 })
         }
     }

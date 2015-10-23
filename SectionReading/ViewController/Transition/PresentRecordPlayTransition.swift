@@ -16,7 +16,8 @@ class PresentRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
     
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
     
-        let fromVC = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as! NewRecordVC
+        let fromNVC = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as! UINavigationController
+        let fromVC = fromNVC.topViewController as! NewRecordVC
         let toVC = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as! PlayRecordVC
         let containerView = transitionContext.containerView()
         
@@ -29,15 +30,17 @@ class PresentRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
         UIView.animateWithDuration(0.4, animations: { () -> Void in
             
             fromVC.fakeCDPlaySlider?.alpha = 1
+            fromVC.recordButtonView?.alpha = 0
             
             }) { (finished) -> Void in
                 
                 let fakeSliderSnapShotView = fromVC.fakeCDPlaySlider?.snapshotViewAfterScreenUpdates(false)
-                fakeSliderSnapShotView?.frame = containerView!.convertRect(fromVC.fakeCDPlaySlider!.frame, fromView: fromVC.fakeCDPlaySlider?.superview)
                 
                 fromVC.fakeCDPlaySlider?.alpha = 0
                 
                 if fakeSliderSnapShotView != nil {
+                    
+                    fakeSliderSnapShotView?.frame = containerView!.convertRect(fromVC.fakeCDPlaySlider!.frame, fromView: fromVC.fakeCDPlaySlider!.superview)
                     containerView?.addSubview(fakeSliderSnapShotView!)
                     
                     UIView.animateWithDuration(0.4, animations: { () -> Void in
@@ -48,18 +51,23 @@ class PresentRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
                             
                             UIView.animateWithDuration(0.4, animations: { () -> Void in
                                 
-                                fakeSliderSnapShotView!.transform = CGAffineTransformIdentity
+                                fakeSliderSnapShotView?.frame = containerView!.convertRect(toVC.playSlider!.frame, fromView: toVC.playSlider!.superview)
                                 
                                 }, completion: { (finished) -> Void in
                                     
-                                    fakeSliderSnapShotView?.removeFromSuperview()
-                                    
-                                    toVC.view.alpha = 1
-                                    
-                                    //告诉系统动画结束
-                                    transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
+                                    UIView.animateWithDuration(0.4, animations: { () -> Void in
+                                        
+                                        fakeSliderSnapShotView?.alpha = 0
+                                        toVC.view.alpha = 1
+                                        
+                                        }, completion: { (finished) -> Void in
+                                            
+                                            fakeSliderSnapShotView?.removeFromSuperview()
+                                            
+                                            //告诉系统动画结束
+                                            transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
+                                    })
                             })
-                            
                     })
                 }
         }

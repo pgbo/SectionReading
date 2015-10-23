@@ -11,7 +11,7 @@ import UIKit
 class DismissRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioning {
 
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
-        return Double(1)
+        return Double(0.8)
     }
     
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
@@ -22,41 +22,44 @@ class DismissRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
         
         let containerView = transitionContext.containerView()
         
-        // 显示
-//        toVC.view.frame = transitionContext.finalFrameForViewController(toVC)
+        // 创建一个截图
+        let snapShotView = fromVC.playSlider!.snapshotViewAfterScreenUpdates(false)
+        snapShotView.frame = containerView!.convertRect(fromVC.playSlider!.frame, fromView: fromVC.playSlider!.superview)
         
-//        containerView?.insertSubview(toVC.view, belowSubview: fromVC.view)
+        containerView?.addSubview(snapShotView)
         
-//        containerView?.bringSubviewToFront(toVC.view)
+        toVC.recordButtonView?.alpha = 0
         
         UIView.animateWithDuration(0.4, animations: { () -> Void in
             
             // 变大
-            fromVC.playSlider?.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3)
+            snapShotView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3)
             
             }) { (finished) -> Void in
                 
+                // 显示
+                toNVC.view.frame = transitionContext.finalFrameForViewController(toNVC)
+                containerView?.insertSubview(toNVC.view, belowSubview: fromVC.view)
+                fromVC.view.alpha = 0
+                
                 UIView.animateWithDuration(0.4, animations: { () -> Void in
                     
-                    fromVC.playSlider?.transform = CGAffineTransformIdentity
+                    snapShotView.frame = toVC.view.convertRect(toVC.fakeCDPlaySlider!.frame, toView: toVC.fakeCDPlaySlider!.superview)
                     
                     }, completion: { (finished) -> Void in
                         
-                        UIView.animateWithDuration(0.4, animations: { () -> Void in
+                        UIView.animateWithDuration(1, animations: { () -> Void in
                             
-                            fromVC.playSlider?.alpha = 0
                             toVC.recordButtonView?.alpha = 1
+                            snapShotView.alpha = 0
                             
                             }, completion: { (finished) -> Void in
                                 
+                                snapShotView.removeFromSuperview()
+                                
                                 //告诉系统动画结束
                                 transitionContext.completeTransition(!transitionContext.transitionWasCancelled())
-                                
-                                UIView.transitionWithView(toNVC.view, duration: 3, options: UIViewAnimationOptions.TransitionFlipFromTop, animations: { () -> Void in
-                                    
-                                    }, completion: { (finshed) -> Void in
-                                        
-                                })
+
                         })
                 })
         }

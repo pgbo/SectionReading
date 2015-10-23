@@ -34,6 +34,7 @@ class CDPlaySlider: UIControl {
     private func setupCDPlaySlider() {
         
         // 设置 cdTrackView
+        self.backgroundColor = UIColor.clearColor()
         
         cdTrackView = MultipleArcTracksView()
         self.addSubview(cdTrackView!)

@@ -40,6 +40,7 @@ class PlayRecordVC: UIViewController {
         playSlider = CDPlaySlider(frame: CGRectMake(0, 0, 220, 220))
         self.view.addSubview(playSlider!)
         
+        playSlider?.backgroundColor = UIColor.clearColor()
         playSlider?.translatesAutoresizingMaskIntoConstraints = false
         
         playSliderCenterYConstraint = NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0)

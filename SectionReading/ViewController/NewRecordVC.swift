@@ -128,6 +128,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         fakeCDPlaySlider = CDPlaySlider(frame: CGRectMake(0, 0, 220, 220))
         self.view.addSubview(fakeCDPlaySlider!)
         
+        fakeCDPlaySlider?.backgroundColor = UIColor.clearColor()
         fakeCDPlaySlider?.alpha = 0
         fakeCDPlaySlider?.translatesAutoresizingMaskIntoConstraints = false
         

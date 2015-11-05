@@ -24,10 +24,10 @@ let PlayRecordButtonTopSpacing = CGFloat(12)
 class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTransitioningDelegate {
     
     private (set) var recordButtonView: RecordButtonView?
-    private var recordButtonViewCenterY: NSLayoutConstraint?
+    private (set) var recordButtonViewCenterY: NSLayoutConstraint?
     
-    private var stopRecordButn: UIButton?
-    private var playRecordButn: UIButton?
+    private (set) var stopRecordButn: UIButton?
+    private (set) var playRecordButn: UIButton?
     
     private (set) var fakeCDPlaySlider: CDPlaySlider?
     

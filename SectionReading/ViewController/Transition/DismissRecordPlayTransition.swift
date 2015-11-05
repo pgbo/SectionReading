@@ -28,12 +28,20 @@ class DismissRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
         
         containerView?.addSubview(snapShotView)
         
+        fromVC.playSlider?.alpha = 0
+        
         toVC.recordButtonView?.alpha = 0
+        toVC.stopRecordButn?.alpha = 0
+        toVC.playRecordButn?.alpha = 0
         
         UIView.animateWithDuration(0.4, animations: { () -> Void in
             
             // 变大
             snapShotView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.3, 1.3)
+            
+            fromVC.playButn?.alpha = 0
+            fromVC.backButn?.alpha = 0
+            fromVC.cutButn?.alpha = 0
             
             }) { (finished) -> Void in
                 
@@ -48,9 +56,12 @@ class DismissRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
                     
                     }, completion: { (finished) -> Void in
                         
-                        UIView.animateWithDuration(1, animations: { () -> Void in
+                        UIView.animateWithDuration(0.8, animations: { () -> Void in
                             
                             toVC.recordButtonView?.alpha = 1
+                            toVC.stopRecordButn?.alpha = 1
+                            toVC.playRecordButn?.alpha = 1
+                            
                             snapShotView.alpha = 0
                             
                             }, completion: { (finished) -> Void in

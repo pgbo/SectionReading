@@ -18,10 +18,10 @@ class PlayRecordVC: UIViewController {
 
     private (set) var recordFilePath: String?
     private (set) var playSlider: CDPlaySlider?
-    private var playButn: UIButton?
-    private var backButn: UIButton?
-    private var cutButn: UIButton?
-    private var playSliderCenterYConstraint: NSLayoutConstraint?
+    private (set) var playButn: UIButton?
+    private (set) var backButn: UIButton?
+    private (set) var cutButn: UIButton?
+    private (set) var playSliderCenterYConstraint: NSLayoutConstraint?
 
     convenience init(recordFilePath filePath: String) {
         self.init()

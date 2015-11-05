@@ -27,10 +27,12 @@ class PresentRecordPlayTransition: NSObject, UIViewControllerAnimatedTransitioni
         
         containerView?.addSubview(toVC.view)
         
-        UIView.animateWithDuration(0.4, animations: { () -> Void in
+        UIView.animateWithDuration(0.8, animations: { () -> Void in
             
             fromVC.fakeCDPlaySlider?.alpha = 1
             fromVC.recordButtonView?.alpha = 0
+            fromVC.stopRecordButn?.alpha = 0
+            fromVC.playRecordButn?.alpha = 0
             
             }) { (finished) -> Void in
                 

@@ -7,16 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		591609A41BD65ECF00F14523 /* PlayRecordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A31BD65ECF00F14523 /* PlayRecordVC.swift */; settings = {ASSET_TAGS = (); }; };
-		591609A61BD72B1100F14523 /* CDPlaySlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A51BD72B1100F14523 /* CDPlaySlider.swift */; settings = {ASSET_TAGS = (); }; };
-		591609A81BD7473200F14523 /* ScopeGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A71BD7473200F14523 /* ScopeGradientView.swift */; settings = {ASSET_TAGS = (); }; };
-		591609AA1BD75C4400F14523 /* ScopeHandleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A91BD75C4400F14523 /* ScopeHandleView.swift */; settings = {ASSET_TAGS = (); }; };
-		591609AF1BD7920300F14523 /* PresentRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609AE1BD7920300F14523 /* PresentRecordPlayTransition.swift */; settings = {ASSET_TAGS = (); }; };
-		597EBCF01BD7A0440031CE2C /* DismissRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */; settings = {ASSET_TAGS = (); }; };
+		591609A41BD65ECF00F14523 /* PlayRecordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A31BD65ECF00F14523 /* PlayRecordVC.swift */; };
+		591609A61BD72B1100F14523 /* CDPlaySlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A51BD72B1100F14523 /* CDPlaySlider.swift */; };
+		591609A81BD7473200F14523 /* ScopeGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A71BD7473200F14523 /* ScopeGradientView.swift */; };
+		591609AA1BD75C4400F14523 /* ScopeHandleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A91BD75C4400F14523 /* ScopeHandleView.swift */; };
+		591609AF1BD7920300F14523 /* PresentRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609AE1BD7920300F14523 /* PresentRecordPlayTransition.swift */; };
+		592E369D1BEB563500DC8955 /* CircularButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592E369C1BEB563500DC8955 /* CircularButton.swift */; };
+		597EBCF01BD7A0440031CE2C /* DismissRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */; };
 		59BD23F61BAAB11200AB27FB /* RecordButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */; };
 		59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */; };
-		59C3C93C1BABAA7500CC6200 /* RAQRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */; settings = {ASSET_TAGS = (); }; };
-		59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */; settings = {ASSET_TAGS = (); }; };
+		59C3C93C1BABAA7500CC6200 /* RAQRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */; };
+		59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */; };
 		86FFDDD31BA9B346004DFCD5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD11BA9B346004DFCD5 /* Main.storyboard */; };
 		86FFDDD51BA9B346004DFCD5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD41BA9B346004DFCD5 /* Images.xcassets */; };
 		86FFDDD81BA9B346004DFCD5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD61BA9B346004DFCD5 /* LaunchScreen.xib */; };
@@ -46,6 +47,7 @@
 		591609A71BD7473200F14523 /* ScopeGradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScopeGradientView.swift; sourceTree = "<group>"; };
 		591609A91BD75C4400F14523 /* ScopeHandleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScopeHandleView.swift; sourceTree = "<group>"; };
 		591609AE1BD7920300F14523 /* PresentRecordPlayTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentRecordPlayTransition.swift; sourceTree = "<group>"; };
+		592E369C1BEB563500DC8955 /* CircularButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularButton.swift; sourceTree = "<group>"; };
 		597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissRecordPlayTransition.swift; sourceTree = "<group>"; };
 		59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordButtonView.swift; sourceTree = "<group>"; };
 		59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSProgressView.swift; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 				591609A51BD72B1100F14523 /* CDPlaySlider.swift */,
 				591609A71BD7473200F14523 /* ScopeGradientView.swift */,
 				591609A91BD75C4400F14523 /* ScopeHandleView.swift */,
+				592E369C1BEB563500DC8955 /* CircularButton.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -414,6 +417,7 @@
 				591609AF1BD7920300F14523 /* PresentRecordPlayTransition.swift in Sources */,
 				59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */,
 				59BD23F61BAAB11200AB27FB /* RecordButtonView.swift in Sources */,
+				592E369D1BEB563500DC8955 /* CircularButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

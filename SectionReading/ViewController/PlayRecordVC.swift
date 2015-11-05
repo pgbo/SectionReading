@@ -10,17 +10,17 @@ import UIKit
 
 let PlayRecordVCBackButtonClickNotification = "PlayRecordVCBackButtonClickNotification"
 
-let PlayRecordVCPlayRecordButtonTopSpacing = CGFloat(38)
-let PlayRecordVCActionButtonSize = CGFloat(38)
+let PlayRecordVCPlayRecordButtonTopSpacing = CGFloat(34)
+let PlayRecordVCActionButtonSize = CGFloat(50)
 
 /// 播放录音 VC
 class PlayRecordVC: UIViewController {
 
     private (set) var recordFilePath: String?
     private (set) var playSlider: CDPlaySlider?
-    private (set) var playButn: UIButton?
-    private (set) var backButn: UIButton?
-    private (set) var cutButn: UIButton?
+    private (set) var playButn: CircularButton?
+    private (set) var backButn: CircularButton?
+    private (set) var cutButn: CircularButton?
     private (set) var playSliderCenterYConstraint: NSLayoutConstraint?
 
     convenience init(recordFilePath filePath: String) {
@@ -58,11 +58,14 @@ class PlayRecordVC: UIViewController {
         
         // 设置 playButn
         
-        playButn = UIButton(type: UIButtonType.Custom)
+        playButn = CircularButton(type: UIButtonType.Custom)
         self.view.addSubview(playButn!)
         
         playButn?.translatesAutoresizingMaskIntoConstraints = false
-        roundActionButton(playButn, color: actionButnColor)
+        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Normal)
+        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
+        playButn?.backgroundColor = actionButnColor
+        
         
         self.view.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: playSlider!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: PlayRecordVCPlayRecordButtonTopSpacing))
         
@@ -75,11 +78,14 @@ class PlayRecordVC: UIViewController {
         
         // 设置 backButn
         
-        backButn = UIButton(type: UIButtonType.Custom)
+        backButn = CircularButton(type: UIButtonType.Custom)
         self.view.addSubview(backButn!)
         
         backButn?.translatesAutoresizingMaskIntoConstraints = false
-        roundActionButton(backButn, color: actionButnColor)
+        backButn?.setImage(UIImage(named: "undo"), forState: UIControlState.Normal)
+        backButn?.setImage(UIImage(named: "undo"), forState: UIControlState.Highlighted)
+        backButn?.backgroundColor = actionButnColor
+        
         
         backButn?.addTarget(self, action: "backButnClick", forControlEvents: UIControlEvents.TouchUpInside)
         
@@ -91,13 +97,18 @@ class PlayRecordVC: UIViewController {
         
         backButn!.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: backButn!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
         
+        
+        
         // 设置 cutButn
         
-        cutButn = UIButton(type: UIButtonType.Custom)
+        cutButn = CircularButton(type: UIButtonType.Custom)
         self.view.addSubview(cutButn!)
         
         cutButn?.translatesAutoresizingMaskIntoConstraints = false
-        roundActionButton(cutButn, color: actionButnColor)
+        cutButn?.setImage(UIImage(named: "cut"), forState: UIControlState.Normal)
+        cutButn?.setImage(UIImage(named: "cut"), forState: UIControlState.Highlighted)
+        cutButn?.backgroundColor = actionButnColor
+        
         
         self.view.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0))
         
@@ -109,17 +120,8 @@ class PlayRecordVC: UIViewController {
 
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
-    
-    private func roundActionButton(button: UIButton?, color: UIColor) {
-        button?.layer.borderColor = color.CGColor
-        button?.layer.borderWidth = 1.0
-        if button != nil {
-            button!.layer.cornerRadius = fmax(CGRectGetWidth(button!.frame), CGRectGetHeight(button!.frame))/2
-        }
-        button?.layer.masksToBounds = true
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     @objc private func backButnClick() {

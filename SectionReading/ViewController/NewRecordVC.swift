@@ -33,7 +33,6 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     
 //    private var audioRecorder: RAQRecorder?
     private var audioRecorder: AVAudioRecorder?
-    private var audioPlayer: AVAudioPlayer?
     private var recordAudioState = RecordAudioState.Normal
 
     private var recordProcessDisplayLink: CADisplayLink? /** 进度定时器 */

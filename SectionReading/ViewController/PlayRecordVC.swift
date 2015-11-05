@@ -7,33 +7,67 @@
 //
 
 import UIKit
+import AVFoundation
 
 let PlayRecordVCBackButtonClickNotification = "PlayRecordVCBackButtonClickNotification"
 
 let PlayRecordVCPlayRecordButtonTopSpacing = CGFloat(34)
 let PlayRecordVCActionButtonSize = CGFloat(50)
 
-/// 播放录音 VC
-class PlayRecordVC: UIViewController {
 
-    private (set) var recordFilePath: String?
+/**
+ 播放器状态
+ 
+ - Stopped: 停止
+ - Playing: 正在播放
+ - Paused:  暂停中
+ */
+enum PlayRecordVCPlayerState {
+    case Stopped
+    case Playing
+    case Paused
+}
+
+/// 播放录音 VC
+class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
+
+    private var recordFilePath: String?
+    private var audioPlayer: AVAudioPlayer?
+    private var playerState: PlayRecordVCPlayerState = .Stopped
+    
     private (set) var playSlider: CDPlaySlider?
     private (set) var playButn: CircularButton?
     private (set) var backButn: CircularButton?
     private (set) var cutButn: CircularButton?
     private (set) var playSliderCenterYConstraint: NSLayoutConstraint?
+    
 
     convenience init(recordFilePath filePath: String) {
         self.init()
+        
         self.recordFilePath = filePath
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "receiveAudioSessionInterrutionNote:", name: AVAudioSessionInterruptionNotification, object: nil)
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: filePath))
+            audioPlayer?.delegate = self
+            
+            audioPlayer?.prepareToPlay()
+            
+        } catch let error as NSError {
+            print("error: \(error)")
+        }
+    }
+    
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVAudioSessionInterruptionNotification, object: nil)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor(red: 0xf5/255.0, green: 0xee/255.0, blue: 0xee/255.0, alpha: 1)
-        
-        self.navigationItem.title = "播放声音"
         
         // 设置 recordButtonView
         
@@ -66,6 +100,7 @@ class PlayRecordVC: UIViewController {
         playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
         playButn?.backgroundColor = actionButnColor
         
+        playButn?.addTarget(self, action: "togglePlayAudio", forControlEvents: UIControlEvents.TouchUpInside)
         
         self.view.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: playSlider!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: PlayRecordVCPlayRecordButtonTopSpacing))
         
@@ -126,5 +161,56 @@ class PlayRecordVC: UIViewController {
     
     @objc private func backButnClick() {
         NSNotificationCenter.defaultCenter().postNotificationName(PlayRecordVCBackButtonClickNotification, object: self)
+    }
+    
+    @objc private func togglePlayAudio() {
+        // 播放音频
+        if playerState == .Playing {
+            audioPlayer?.pause()
+            playerState = .Paused
+            pausedPlayer()
+        } else {
+            audioPlayer?.play()
+            playerState = .Playing
+            playingPlayer()
+        }
+    }
+    
+    private func playingPlayer() {
+        playButn?.setImage(UIImage(named: "pause"), forState: UIControlState.Normal)
+        playButn?.setImage(UIImage(named: "pause"), forState: UIControlState.Highlighted)
+    }
+    
+    private func pausedPlayer() {
+        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Normal)
+        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
+    }
+    
+    private func stoppedPlayer() {
+        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Normal)
+        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
+    }
+    
+    /// MARK: AVAudioPlayerDelegate
+    
+    func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
+        playerState = .Stopped
+        stoppedPlayer()
+    }
+    
+    func audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
+        playerState = .Stopped
+        stoppedPlayer()
+    }
+    
+    /// MARK: notification
+    
+    @objc private func receiveAudioSessionInterrutionNote(note: NSNotification) {
+        let interruptionType = note.userInfo![AVAudioSessionInterruptionTypeKey]
+        let type = AVAudioSessionInterruptionType(rawValue: (interruptionType as! NSNumber).unsignedIntegerValue)!
+        if type == .Began {
+            playerState = .Paused
+            pausedPlayer()
+        }
     }
 }

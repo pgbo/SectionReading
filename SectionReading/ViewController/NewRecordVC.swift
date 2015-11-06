@@ -21,7 +21,7 @@ let LimitMinutesPerRecord = 3 /** 每个录音的限制时长，单位：分钟 
 let StopRecordButtonTopSpacing = CGFloat(24)
 let PlayRecordButtonTopSpacing = CGFloat(12)
 
-class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTransitioningDelegate {
+class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTransitioningDelegate, PlayRecordVCDelegate {
     
     private (set) var recordButtonView: RecordButtonView?
     private (set) var recordButtonViewCenterY: NSLayoutConstraint?
@@ -31,9 +31,11 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     
     private (set) var fakeCDPlaySlider: CDPlaySlider?
     
-//    private var audioRecorder: RAQRecorder?
     private var audioRecorder: AVAudioRecorder?
     private var recordAudioState = RecordAudioState.Normal
+    private var currentRecordFilePath: String?              /** 当前录音文件路径 */
+    private var lastCombineAudioFilePath: String?           /** 上次音频合并的文件路径 */
+    
 
     private var recordProcessDisplayLink: CADisplayLink? /** 进度定时器 */
     
@@ -272,17 +274,6 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         }
     }
     
-    
-    // MARK: - AVAudioRecorderDelegate
-    
-    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
-        recordStopped()
-    }
-    
-    func audioRecorderEncodeErrorDidOccur(recorder: AVAudioRecorder, error: NSError?) {
-        recordStopped()
-    }
-    
     private func startRecord() {
         if recordAudioState != .Recording {
             
@@ -298,7 +289,10 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
                 let settings = [AVFormatIDKey:NSNumber(unsignedInt: kAudioFormatALaw), AVSampleRateKey:NSNumber(int: 44100), AVNumberOfChannelsKey:NSNumber(int:1)]
                 
                 do {
-                    audioRecorder = try AVAudioRecorder(URL: NSURL(fileURLWithPath: NSTemporaryDirectory().stringByAppendingString("/\(NSUUID().UUIDString).caf")), settings: settings)
+                    let audioFilePath = randomObtainTemporaryAudioFilePath()
+                    audioRecorder = try AVAudioRecorder(URL: NSURL(fileURLWithPath: audioFilePath), settings: settings)
+                    
+                    currentRecordFilePath = audioFilePath
                     
                     weak var weakSelf = self
                     audioRecorder?.delegate = weakSelf
@@ -363,7 +357,6 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     
     private func recordPaused() {
         recordProcessDisplayLink?.invalidate()
-//        recordButtonView?.titleLabel?.text = "点击继续"
         recordButtonView?.iconView?.tintColor = recordButtonView?.iconView?.tintColor.colorWithAlphaComponent(1)
         
         // 显示出播放按钮
@@ -424,12 +417,45 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     }
     
     @objc private func playRecord() {
-        // TODO: 到播放页面
+        
+        // 到播放页面
         
         if audioRecorder != nil {
-            let playRecordVC = PlayRecordVC(recordFilePath: audioRecorder!.url.absoluteString)
-            playRecordVC.transitioningDelegate = self
-            self.presentViewController(playRecordVC, animated: true, completion: nil)
+            
+            // 停止录音, 才能将音频保存到文件
+            audioRecorder?.stop()
+            
+            var audioFiles: [String] = []
+            if lastCombineAudioFilePath != nil {
+                audioFiles.append(lastCombineAudioFilePath!)
+            }
+            if currentRecordFilePath != nil {
+                audioFiles.append(currentRecordFilePath!)
+            }
+            
+            if audioFiles.count > 0 {
+                let targetCombineFilePath = randomObtainTemporaryAudioFilePath()
+                asychCombineAudioFiles(audioFiles, targetCombineAufioFile: targetCombineFilePath, completion: { [weak self] (success) -> Void in
+                    
+                    let strongSelf = self
+                    if strongSelf == nil {
+                        return
+                    }
+                    
+                    if success == false {
+                        strongSelf!.presentViewController(UIAlertController(title: nil, message: "加载音频失败", preferredStyle: UIAlertControllerStyle.Alert), animated: true, completion: nil)
+                        return
+                    }
+                    
+                    strongSelf!.lastCombineAudioFilePath = targetCombineFilePath
+                    
+                    let playRecordVC = PlayRecordVC(recordFilePath: targetCombineFilePath)
+                    playRecordVC.delegate = strongSelf
+                    
+                    playRecordVC.transitioningDelegate = strongSelf
+                    strongSelf!.presentViewController(playRecordVC, animated: true, completion: nil)
+                })
+            }
         }
     }
     
@@ -441,7 +467,108 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         
     }
     
-    // MARK: UIViewControllerTransitioningDelegate
+    private func randomObtainTemporaryAudioFilePath() -> String {
+        return NSTemporaryDirectory().stringByAppendingString("/\(NSUUID().UUIDString).caf")
+    }
+    
+    /**
+     组合音频
+     
+     - parameter audioFiles:             组合的音频文件路径集合
+     - parameter targetCombineAufioFile: 组合后的目标存放文件路径
+     - parameter completion:             结果 Block
+     */
+    private func asychCombineAudioFiles(audioFiles: [String], targetCombineAufioFile: String, completion: ((success: Bool)->Void)?) {
+        
+        // combine
+        
+        let composition = AVMutableComposition()
+        let compositionAudioTrack = composition.addMutableTrackWithMediaType(AVMediaTypeAudio, preferredTrackID:Int32(kCMPersistentTrackID_Invalid))
+        
+        var nextClipStartTime = kCMTimeZero
+        for audioFile in audioFiles {
+            let asset = AVAsset(URL: NSURL(fileURLWithPath: audioFile))
+            let tracks = asset.tracksWithMediaType(AVMediaTypeAudio)
+            if tracks.count == 0 {
+                continue
+            }
+            let duration = asset.duration
+            
+            do {
+                try compositionAudioTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, duration), ofTrack: tracks.first!, atTime: nextClipStartTime)
+                nextClipStartTime = CMTimeAdd(nextClipStartTime, duration)
+            } catch let error as NSError {
+                print("insertTimeRange failed, err: \(error.localizedDescription)")
+            }
+        }
+        
+        if CMTimeCompare(nextClipStartTime, kCMTimeZero) == 0 {
+            print("fail to combineAudioFiles.")
+            completion?(success: false)
+            return
+        }
+        
+        // export
+        
+        let combindFileURL = NSURL(fileURLWithPath: targetCombineAufioFile)
+        let fileMan = NSFileManager.defaultManager()
+        if fileMan.fileExistsAtPath(targetCombineAufioFile) {
+            // remove it
+            do {
+                try fileMan.removeItemAtURL(combindFileURL)
+            } catch let error as NSError {
+                print("insertTimeRange failed, err: \(error.localizedDescription)")
+                completion?(success: false)
+                return
+            }
+        }
+        
+        let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A)
+        if exporter == nil {
+            completion?(success: false)
+            return
+        }
+        
+        exporter!.outputFileType = AVFileTypeAppleM4A
+        exporter!.outputURL = combindFileURL
+        
+        // do it
+        exporter!.exportAsynchronouslyWithCompletionHandler({ [weak self] () -> Void in
+            
+            let strongSelf = self
+            if strongSelf == nil {
+                return
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                switch exporter!.status {
+                case .Failed:
+                    print("export failed \(exporter!.error)")
+                    completion?(success: false)
+                    
+                case .Cancelled:
+                    print("export cancelled \(exporter!.error)")
+                    completion?(success: false)
+                    
+                default:
+                    print("export complete")
+                    completion?(success: true)
+                }
+            })
+        })
+    }
+    
+    // MARK: - AVAudioRecorderDelegate
+    
+    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
+        recordStopped()
+    }
+    
+    func audioRecorderEncodeErrorDidOccur(recorder: AVAudioRecorder, error: NSError?) {
+        recordStopped()
+    }
+    
+    // MARK: - UIViewControllerTransitioningDelegate
     
     func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         if presented.isKindOfClass(PlayRecordVC) {
@@ -455,5 +582,11 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
             return self.dismissRecordPlayTransition
         }
         return nil
+    }
+    
+    // MARK: - PlayRecordVCDelegate
+    
+    func didCutAudio(playVC: PlayRecordVC, newAudioFilePath: String) {
+        // TODO: 已经剪切完成
     }
 }

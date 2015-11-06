@@ -14,6 +14,15 @@ let PlayRecordVCBackButtonClickNotification = "PlayRecordVCBackButtonClickNotifi
 let PlayRecordVCPlayRecordButtonTopSpacing = CGFloat(34)
 let PlayRecordVCActionButtonSize = CGFloat(50)
 
+/**
+ *  播放录音 VC 的代理
+ */
+@objc protocol PlayRecordVCDelegate {
+    /**
+     已经完成剪切
+     */
+    optional func didCutAudio(playVC: PlayRecordVC, newAudioFilePath: String)
+}
 
 /**
  播放器状态
@@ -28,9 +37,11 @@ enum PlayRecordVCPlayerState {
     case Paused
 }
 
-/// 播放录音 VC
+// 播放录音 VC
 class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
 
+    weak var delegate: PlayRecordVCDelegate?
+    
     private var recordFilePath: String?
     private var audioPlayer: AVAudioPlayer?
     private var playerState: PlayRecordVCPlayerState = .Stopped
@@ -191,7 +202,7 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
         playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
     }
     
-    /// MARK: AVAudioPlayerDelegate
+    // MARK: AVAudioPlayerDelegate
     
     func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
         playerState = .Stopped
@@ -203,7 +214,7 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
         stoppedPlayer()
     }
     
-    /// MARK: notification
+    // MARK: notification
     
     @objc private func receiveAudioSessionInterrutionNote(note: NSNotification) {
         let interruptionType = note.userInfo![AVAudioSessionInterruptionTypeKey]

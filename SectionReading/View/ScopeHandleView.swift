@@ -58,7 +58,7 @@ class ScopeHandleView: UIView {
         
         let ctx = UIGraphicsGetCurrentContext()
         
-        self.tintColor.setStroke()
+        self.tintColor.set()
         
         // 画 handle bar
         

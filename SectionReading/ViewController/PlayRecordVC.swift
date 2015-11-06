@@ -52,6 +52,7 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
     private (set) var cutButn: CircularButton?
     private (set) var playSliderCenterYConstraint: NSLayoutConstraint?
     
+    private var playProcessDisplayLink: CADisplayLink? /** 播放进度定时器 */
 
     convenience init(recordFilePath filePath: String) {
         self.init()
@@ -188,16 +189,28 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
     }
     
     private func playingPlayer() {
+        
+        playProcessDisplayLink?.invalidate()
+        playProcessDisplayLink = CADisplayLink(target: self, selector: "playingAudio")
+        playProcessDisplayLink?.frameInterval = 30
+        playProcessDisplayLink?.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        
         playButn?.setImage(UIImage(named: "pause"), forState: UIControlState.Normal)
         playButn?.setImage(UIImage(named: "pause"), forState: UIControlState.Highlighted)
     }
     
     private func pausedPlayer() {
+        
+        playProcessDisplayLink?.invalidate()
+        
         playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Normal)
         playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
     }
     
     private func stoppedPlayer() {
+        
+        playProcessDisplayLink?.invalidate()
+        
         playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Normal)
         playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
     }
@@ -222,6 +235,25 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
         if type == .Began {
             playerState = .Paused
             pausedPlayer()
+        }
+    }
+    
+    // 音频播放中
+    @objc private func playingAudio() {
+        
+        if audioPlayer != nil && audioPlayer!.playing {
+            // 改变进度
+            let audioDuration = audioPlayer!.duration
+            let currentTime = audioPlayer!.currentTime
+            
+            var progress: CGFloat = 0.0
+            if audioDuration > 0 {
+                progress = CGFloat(currentTime/audioDuration)
+            }
+            
+            playSlider?.progressView?.progress = progress
+            playSlider?.progressView?.progressLabel?.text = "\(Int(currentTime))"
+//            playSlider.scopeGradientView.
         }
     }
 }

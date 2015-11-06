@@ -16,6 +16,8 @@ let PlayProgressViewLineWidth = CGFloat(2)
 /// CD 样式的播放滑动条
 class CDPlaySlider: UIControl {
 
+    var progress: CGFloat = 0                                   /** 进度 */
+    
     private (set) var cdTrackView: MultipleArcTracksView?       /* CD 轨道视图 */
     private (set) var progressView: RSProgressView?             /* 进度视图 */
     private (set) var scopeGradientView: ScopeGradientView?     /* 范围选择区域渐变视图 */
@@ -40,6 +42,7 @@ class CDPlaySlider: UIControl {
         self.addSubview(cdTrackView!)
         
         cdTrackView?.translatesAutoresizingMaskIntoConstraints = false
+        cdTrackView?.userInteractionEnabled = false
         cdTrackView?.backgroundColor = UIColor.clearColor()
         cdTrackView?.trackColors = [UIColor(red: 0x19/255.0, green: 0x6f/255.0, blue: 0x8c/255.0, alpha: 1), UIColor.clearColor(), UIColor(red: 0x23/255.0, green: 0x96/255.0, blue: 0xBB/255.0, alpha: 1)]
         cdTrackView?.trackLineWidths = [30, 2, 68]
@@ -50,6 +53,7 @@ class CDPlaySlider: UIControl {
         self.addSubview(progressView!)
         
         progressView?.translatesAutoresizingMaskIntoConstraints = false
+        progressView?.userInteractionEnabled = false
         progressView?.backgroundColor = UIColor.clearColor()
         progressView?.tintColor = UIColor(red: 0x23/255.0, green: 0x96/255.0, blue: 0xBB/255.0, alpha: 1)
         progressView?.progressLineWidth = PlayProgressViewLineWidth
@@ -62,6 +66,7 @@ class CDPlaySlider: UIControl {
         
         scopeGradientView?.alpha = 0
         scopeGradientView?.translatesAutoresizingMaskIntoConstraints = false
+        scopeGradientView?.userInteractionEnabled = false
         scopeGradientView?.backgroundColor = UIColor.clearColor()
         
         // 设置 scopeHandleView
@@ -71,6 +76,7 @@ class CDPlaySlider: UIControl {
         
         scopeHandleView?.alpha = 0
         scopeHandleView?.translatesAutoresizingMaskIntoConstraints = false
+        scopeHandleView?.userInteractionEnabled = false
         scopeHandleView?.backgroundColor = UIColor.clearColor()
         scopeHandleView?.handleSize = 10
         scopeHandleView?.handlebarWidth = 2
@@ -127,7 +133,6 @@ class CDPlaySlider: UIControl {
     private func didMovedToPoint(point: CGPoint) {
         
         // TODO: 改变 scopeGradientView 和 scopeHandleView
-        
     }
     
     // MARK: UIControl Override
@@ -136,7 +141,6 @@ class CDPlaySlider: UIControl {
         super.beginTrackingWithTouch(touch, withEvent: event)
         
         UIView.animateWithDuration(0.4, animations: { () -> Void in
-            self.progressView?.alpha = 1
             self.scopeHandleView?.alpha = 1
             }) { (finished) -> Void in
         }
@@ -163,14 +167,9 @@ class CDPlaySlider: UIControl {
         
         UIApplication.sharedApplication().beginIgnoringInteractionEvents()
         UIView.animateWithDuration(0.4, animations: { () -> Void in
-            self.progressView?.alpha = 0
             self.scopeHandleView?.alpha = 0
             }) { (finished) -> Void in
                 UIApplication.sharedApplication().endIgnoringInteractionEvents()
         }
-    }
-    
-    override func drawRect(rect: CGRect) {
-        // Drawing code
     }
 }

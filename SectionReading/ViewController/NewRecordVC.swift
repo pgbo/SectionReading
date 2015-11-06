@@ -448,6 +448,18 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
                     }
                     
                     strongSelf!.lastCombineAudioFilePath = targetCombineFilePath
+                    strongSelf!.currentRecordFilePath = nil
+                    strongSelf!.audioRecorder = nil
+                    
+                    // 删除组合前的文件
+                    let fileMan = NSFileManager.defaultManager()
+                    for audioFilePath in audioFiles {
+                        do {
+                            try fileMan.removeItemAtPath(audioFilePath)
+                        } catch let error as NSError {
+                            print("remove audio file failed, err: \(error.localizedDescription)")
+                        }
+                    }
                     
                     let playRecordVC = PlayRecordVC(recordFilePath: targetCombineFilePath)
                     playRecordVC.delegate = strongSelf
@@ -517,7 +529,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
             do {
                 try fileMan.removeItemAtURL(combindFileURL)
             } catch let error as NSError {
-                print("insertTimeRange failed, err: \(error.localizedDescription)")
+                print("remove exist combine file failed, err: \(error.localizedDescription)")
                 completion?(success: false)
                 return
             }

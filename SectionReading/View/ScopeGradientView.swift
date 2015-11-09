@@ -17,13 +17,13 @@ class ScopeGradientView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setColor(UIColor(white: 1, alpha: 0.6))
+        self.tintColor = UIColor(white: 1, alpha: 0.6)
     }
     
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        setColor(UIColor(white: 1, alpha: 0.6))
+        self.tintColor = UIColor(white: 1, alpha: 0.6)
     }
     
     override func tintColorDidChange() {

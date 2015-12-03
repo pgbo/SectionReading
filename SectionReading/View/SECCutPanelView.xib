@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="SECCutPanelView" customModule="SectionReading" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="180"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="CutPanelBg" translatesAutoresizingMaskIntoConstraints="NO" id="aDe-x9-5f3">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="180"/>
+                    <animations/>
+                    <rect key="contentStretch" x="0.0" y="0.29999999999999999" width="1" height="0.69999999999999996"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="i1C-IW-QKO">
+                    <rect key="frame" x="30" y="112" width="64" height="52"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="i1C-IW-QKO" secondAttribute="height" multiplier="16:13" id="cfQ-wA-kpr"/>
+                        <constraint firstAttribute="width" constant="64" id="gLm-aZ-l30"/>
+                    </constraints>
+                    <state key="normal" image="CutPanelBackButton"/>
+                    <state key="highlighted" image="CutPanelBackButtonHL"/>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oq5-ek-7Yz">
+                    <rect key="frame" x="156" y="112" width="64" height="52"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="64" id="RwE-uT-3aF"/>
+                        <constraint firstAttribute="width" secondItem="Oq5-ek-7Yz" secondAttribute="height" multiplier="16:13" id="i2G-CN-kVa"/>
+                    </constraints>
+                    <state key="normal" image="CutPanelPlayButton"/>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nqt-At-sIw">
+                    <rect key="frame" x="281" y="112" width="64" height="52"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="64" id="9Ln-bc-qum"/>
+                        <constraint firstAttribute="width" secondItem="Nqt-At-sIw" secondAttribute="height" multiplier="16:13" id="R71-pq-fQ0"/>
+                    </constraints>
+                    <state key="normal" image="CutPanelScissorsButton"/>
+                    <state key="highlighted" image="CutPanelScissorsButtonHL"/>
+                </button>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IXR-ha-hGj">
+                    <rect key="frame" x="30" y="32" width="315" height="56"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="CutPanelScopeAreaBg" translatesAutoresizingMaskIntoConstraints="NO" id="Ncs-3z-2EH">
+                            <rect key="frame" x="0.0" y="3" width="315" height="50"/>
+                            <animations/>
+                            <rect key="contentStretch" x="0.29999999999999999" y="0.29999999999999999" width="0.40000000000000002" height="0.40000000000000002"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="50" id="TGy-YB-chD"/>
+                            </constraints>
+                        </imageView>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pW5-4m-jd7">
+                            <rect key="frame" x="9" y="27" width="50" height="2"/>
+                            <animations/>
+                            <color key="backgroundColor" red="0.80784313725490198" green="0.80784313725490198" blue="0.80784313725490198" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="50" id="Sr6-is-2jL"/>
+                                <constraint firstAttribute="height" constant="2" id="Wym-0d-hGl"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Dhf-Pe-JUn">
+                            <rect key="frame" x="60" y="27" width="85" height="2"/>
+                            <animations/>
+                            <color key="backgroundColor" red="0.32549019610000002" green="0.61568627450000002" blue="0.62352941179999999" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="85" id="7mL-QB-9b0"/>
+                                <constraint firstAttribute="height" constant="2" id="RTm-V5-RSh"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hPH-Xg-WCa">
+                            <rect key="frame" x="147" y="27" width="159" height="2"/>
+                            <animations/>
+                            <color key="backgroundColor" red="0.80784313730000001" green="0.80784313730000001" blue="0.80784313730000001" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="2" id="pH0-Uk-QBF"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5ss-Y0-DII">
+                            <rect key="frame" x="59" y="3" width="85" height="50"/>
+                            <animations/>
+                            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.29864545863309355" colorSpace="calibratedRGB"/>
+                        </view>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="CutPanelScopeHandle" translatesAutoresizingMaskIntoConstraints="NO" id="nRU-mO-uQk">
+                            <rect key="frame" x="50" y="0.0" width="18" height="56"/>
+                            <animations/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="18" id="3ry-Xh-iLk"/>
+                                <constraint firstAttribute="width" secondItem="nRU-mO-uQk" secondAttribute="height" multiplier="9:28" id="s04-ks-EME"/>
+                            </constraints>
+                        </imageView>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="CutPanelScopeHandle" translatesAutoresizingMaskIntoConstraints="NO" id="0Bc-80-ooD">
+                            <rect key="frame" x="135" y="0.0" width="18" height="56"/>
+                            <animations/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="18" id="LAD-uk-83N"/>
+                                <constraint firstAttribute="width" secondItem="0Bc-80-ooD" secondAttribute="height" multiplier="9:28" id="mry-lj-yZT"/>
+                            </constraints>
+                        </imageView>
+                    </subviews>
+                    <animations/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="Dhf-Pe-JUn" firstAttribute="leading" secondItem="pW5-4m-jd7" secondAttribute="trailing" constant="1" id="2fh-S0-XCD"/>
+                        <constraint firstItem="pW5-4m-jd7" firstAttribute="centerY" secondItem="IXR-ha-hGj" secondAttribute="centerY" id="2zh-ip-Ktk"/>
+                        <constraint firstItem="hPH-Xg-WCa" firstAttribute="centerY" secondItem="pW5-4m-jd7" secondAttribute="centerY" id="3Om-vz-lhA"/>
+                        <constraint firstItem="5ss-Y0-DII" firstAttribute="leading" secondItem="nRU-mO-uQk" secondAttribute="leading" constant="9" id="731-v6-rqR"/>
+                        <constraint firstItem="Ncs-3z-2EH" firstAttribute="top" secondItem="IXR-ha-hGj" secondAttribute="top" constant="3" id="8HE-cn-Ny7"/>
+                        <constraint firstItem="Dhf-Pe-JUn" firstAttribute="centerY" secondItem="pW5-4m-jd7" secondAttribute="centerY" id="Ays-yi-s8x"/>
+                        <constraint firstItem="0Bc-80-ooD" firstAttribute="centerY" secondItem="nRU-mO-uQk" secondAttribute="centerY" id="BTw-jS-Ful"/>
+                        <constraint firstItem="nRU-mO-uQk" firstAttribute="leading" secondItem="IXR-ha-hGj" secondAttribute="leading" constant="50" id="Fui-3s-Mhj"/>
+                        <constraint firstItem="5ss-Y0-DII" firstAttribute="top" secondItem="Ncs-3z-2EH" secondAttribute="top" id="VXv-Cy-nyj"/>
+                        <constraint firstAttribute="bottom" secondItem="Ncs-3z-2EH" secondAttribute="bottom" constant="3" id="Z9M-zs-vgA"/>
+                        <constraint firstItem="5ss-Y0-DII" firstAttribute="trailing" secondItem="0Bc-80-ooD" secondAttribute="trailing" constant="-9" id="ZBr-T6-35Y"/>
+                        <constraint firstAttribute="trailing" secondItem="Ncs-3z-2EH" secondAttribute="trailing" id="c2L-5w-qGX"/>
+                        <constraint firstItem="5ss-Y0-DII" firstAttribute="bottom" secondItem="Ncs-3z-2EH" secondAttribute="bottom" id="ctf-D0-mHV"/>
+                        <constraint firstAttribute="trailing" secondItem="hPH-Xg-WCa" secondAttribute="trailing" constant="9" id="fMn-YG-b6a"/>
+                        <constraint firstItem="pW5-4m-jd7" firstAttribute="leading" secondItem="IXR-ha-hGj" secondAttribute="leading" constant="9" id="gz1-5b-IbO"/>
+                        <constraint firstItem="nRU-mO-uQk" firstAttribute="centerY" secondItem="IXR-ha-hGj" secondAttribute="centerY" id="o4f-fZ-0Oi"/>
+                        <constraint firstItem="0Bc-80-ooD" firstAttribute="leading" secondItem="IXR-ha-hGj" secondAttribute="leading" constant="135" id="vcw-0V-7JI"/>
+                        <constraint firstItem="hPH-Xg-WCa" firstAttribute="leading" secondItem="Dhf-Pe-JUn" secondAttribute="trailing" constant="2" id="zg4-Uh-GeN"/>
+                        <constraint firstItem="Ncs-3z-2EH" firstAttribute="leading" secondItem="IXR-ha-hGj" secondAttribute="leading" id="zoK-pK-XBZ"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <animations/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="aDe-x9-5f3" secondAttribute="bottom" id="7NN-h4-O5a"/>
+                <constraint firstAttribute="trailing" secondItem="IXR-ha-hGj" secondAttribute="trailing" constant="30" id="F37-cP-6RH"/>
+                <constraint firstItem="i1C-IW-QKO" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="30" id="IGM-k3-B5T"/>
+                <constraint firstItem="Nqt-At-sIw" firstAttribute="top" secondItem="IXR-ha-hGj" secondAttribute="bottom" constant="24" id="W6k-Pa-VX8"/>
+                <constraint firstItem="i1C-IW-QKO" firstAttribute="centerY" secondItem="Oq5-ek-7Yz" secondAttribute="centerY" id="YPJ-Nj-14O"/>
+                <constraint firstItem="Oq5-ek-7Yz" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="bvX-iG-JAl"/>
+                <constraint firstAttribute="bottom" secondItem="Oq5-ek-7Yz" secondAttribute="bottom" constant="16" id="g48-5Z-cAw"/>
+                <constraint firstAttribute="trailing" secondItem="Nqt-At-sIw" secondAttribute="trailing" constant="30" id="jP4-d4-2OR"/>
+                <constraint firstItem="aDe-x9-5f3" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="jTf-6P-BV4"/>
+                <constraint firstItem="aDe-x9-5f3" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="pQF-En-Adj"/>
+                <constraint firstAttribute="trailing" secondItem="aDe-x9-5f3" secondAttribute="trailing" id="pWr-Qj-Jgr"/>
+                <constraint firstItem="IXR-ha-hGj" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="30" id="u4c-yf-1If"/>
+                <constraint firstItem="Oq5-ek-7Yz" firstAttribute="centerY" secondItem="Nqt-At-sIw" secondAttribute="centerY" id="ys1-ZG-8w6"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="mBackButton" destination="i1C-IW-QKO" id="7ea-fa-Ucs"/>
+                <outlet property="mLeftSlideHandle" destination="nRU-mO-uQk" id="5zR-V0-RtQ"/>
+                <outlet property="mLeftUnactiveTrackLine" destination="pW5-4m-jd7" id="3ZF-Xs-X3e"/>
+                <outlet property="mMiddleActiveTrackLine" destination="Dhf-Pe-JUn" id="jid-yx-LWx"/>
+                <outlet property="mPlayButton" destination="Oq5-ek-7Yz" id="ZfP-tC-RKr"/>
+                <outlet property="mRightSlideHandle" destination="0Bc-80-ooD" id="nUg-XH-69K"/>
+                <outlet property="mRightUnactiveTrackLine" destination="hPH-Xg-WCa" id="30H-94-8pi"/>
+                <outlet property="mScissorsButton" destination="Nqt-At-sIw" id="23p-OC-pxw"/>
+                <outlet property="mSelectScopeBackgroundImageView" destination="Ncs-3z-2EH" id="koW-es-KHB"/>
+                <outlet property="mSelectedRangeOverlay" destination="5ss-Y0-DII" id="TFW-IS-4gk"/>
+            </connections>
+            <point key="canvasLocation" x="386.5" y="420"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="CutPanelBackButton" width="64" height="52"/>
+        <image name="CutPanelBackButtonHL" width="64" height="52"/>
+        <image name="CutPanelBg" width="20" height="59"/>
+        <image name="CutPanelPlayButton" width="64" height="52"/>
+        <image name="CutPanelScissorsButton" width="64" height="52"/>
+        <image name="CutPanelScissorsButtonHL" width="64" height="52"/>
+        <image name="CutPanelScopeAreaBg" width="68" height="50"/>
+        <image name="CutPanelScopeHandle" width="18" height="56"/>
+    </resources>
+</document>

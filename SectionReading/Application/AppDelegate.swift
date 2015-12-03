@@ -9,7 +9,7 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegate {
 
     var window: UIWindow?
 
@@ -18,10 +18,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame:UIScreen.mainScreen().bounds)
         
-        let nav = UINavigationController(rootViewController: ReadingRecordsVC(collectionViewLayout: nil))
+        let nav = UINavigationController(rootViewController: SECReadingHistoryViewController(style: UITableViewStyle.Grouped))
+        
         window!.rootViewController = nav
         
         window!.makeKeyAndVisible()
+        
+        
+        // Global settings
+        
+        SECHelper.globalCustomSetNavigationBar()
+        SECHelper.globalCustomSetBarButtonItem()
         
         return true
     }

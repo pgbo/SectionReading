@@ -28,4 +28,37 @@ class SECHelper: NSObject {
         barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFontOfSize(14),NSForegroundColorAttributeName: UIColor(red: 0x4D/255.0, green: 0x83/255.0, blue: 0x84/255.0, alpha: 1)], forState: UIControlState.Highlighted)
         barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFontOfSize(14),NSForegroundColorAttributeName: UIColor(red: 0xA0/255.0, green: 0xB0/255.0, blue: 0xB1/255.0, alpha: 1)], forState: UIControlState.Disabled)
     }
+    
+    static func createFormatTextForRecordDuration(duration: NSTimeInterval) -> String {
+        let totalSeconds = Int(duration)
+        
+        let remaindPart = Int((duration - NSTimeInterval(totalSeconds))*10)
+        let minutePart = totalSeconds/60
+        let secondPart = totalSeconds - minutePart*60
+        
+        var formatTxt: String = ""
+        
+        // 拼接分钟
+        if minutePart < 10 {
+            formatTxt += "0\(minutePart)"
+        } else {
+            formatTxt += "\(minutePart)"
+        }
+        
+        formatTxt += ":"
+        
+        // 拼接秒
+        if secondPart < 10 {
+            formatTxt += "0\(secondPart)"
+        } else {
+            formatTxt += "\(secondPart)"
+        }
+        
+        formatTxt += "."
+        
+        // 拼接0.秒
+        formatTxt += "\(remaindPart)"
+        
+        return formatTxt
+    }
 }

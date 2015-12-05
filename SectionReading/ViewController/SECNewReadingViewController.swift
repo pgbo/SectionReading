@@ -7,6 +7,14 @@
 //
 
 import UIKit
+import AVFoundation
+
+/// 录音音频状态
+enum SECRecordAudioState {
+    case Stopped
+    case Recording
+    case Paused
+}
 
 /**
  *  建立新读书记录页面
@@ -35,6 +43,11 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate {
     private var cutPanelTrailing: NSLayoutConstraint?
     private var cutPanelWidth: NSLayoutConstraint?
     private var cutPanelHidden = false
+    
+    private var recordState: SECRecordAudioState = .Stopped
+    private var recordDuration: NSTimeInterval = 0.0
+    private var wheelsLastTimeAngle: CGFloat = 0
+    private var recordTimming: NSTimer?
     
     convenience init() {
         self.init(nibName:"SECNewReadingViewController", bundle:nil)
@@ -80,10 +93,44 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate {
         self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:[cutPanel(180)]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
         
         cutPanelHidden(true, animated: false)
+        
+        updateResumeRecordButtonImageForRecordState(recordState)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    private func updateResumeRecordButtonImageForRecordState(state: SECRecordAudioState) {
+        switch state {
+        case .Stopped, .Paused:
+            let buttonImage = UIImage(named: "ResumeRecordButton")
+            let buttonImageHL = UIImage(named: "ResumeRecordButtonHL")
+            
+            mResumeRecordButton.setImage(buttonImage, forState: UIControlState.Normal)
+            mResumeRecordButton.setImage(buttonImageHL, forState: UIControlState.Highlighted)
+        case .Recording:
+            let buttonImage = UIImage(named: "PauseRecordButton")
+            let buttonImageHL = UIImage(named: "PauseRecordButtonHL")
+            
+            mResumeRecordButton.setImage(buttonImage, forState: UIControlState.Normal)
+            mResumeRecordButton.setImage(buttonImageHL, forState: UIControlState.Highlighted)
+        }
+    }
+    
+    private func resumedRecord() {
+        updateResumeRecordButtonImageForRecordState(recordState)
+        
+        // 恢复计时并转动轮子
+        recordTimming = NSTimer(timeInterval: 0.1, target: self, selector: "firedRecordTimming", userInfo: nil, repeats: true)
+        NSRunLoop.mainRunLoop().addTimer(recordTimming!, forMode: NSRunLoopCommonModes)
+    }
+    
+    private func pausedRecord() {
+        updateResumeRecordButtonImageForRecordState(recordState)
+        
+        // 停止计时和转动轮子
+        recordTimming?.invalidate()
     }
     
     private func cutPanelHidden(hidden: Bool, animated: Bool) {
@@ -134,6 +181,25 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate {
         }
     }
     
+    @objc private func firedRecordTimming() {
+        
+        if recordState == .Recording {
+            
+            // 计时
+            recordDuration += 0.1
+            
+            // 更新计时 lebal
+            mRecordDurationLabel.text = SECHelper.createFormatTextForRecordDuration(recordDuration)
+            
+            // 转动轮子
+            let newWheelAngle = wheelsLastTimeAngle + CGFloat((2.0*M_PI)/4.0)
+            let newTransform = CGAffineTransformMakeRotation(newWheelAngle)
+            self.mFirstWheel.transform = newTransform
+            self.mSecondWheel.transform = newTransform
+            
+            wheelsLastTimeAngle = newWheelAngle
+        }
+    }
     
     @objc private func toClosePage() {
         self.dismissViewControllerAnimated(true, completion: nil)
@@ -151,7 +217,21 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate {
     }
     
     @IBAction func clickedResumeRecordButton(sender: UIButton) {
-        
+        switch recordState {
+        case .Stopped, .Paused:
+            
+            // TODO: resume or start record
+            
+            recordState = .Recording
+            resumedRecord()
+            
+        case .Recording:
+            
+            // TODO: pause record
+            
+            recordState = .Paused
+            pausedRecord()
+        }
     }
     
     @IBAction func clickedStopRecordButton(sender: UIButton) {

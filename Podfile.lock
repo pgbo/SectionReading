@@ -10,4 +10,4 @@ SPEC CHECKSUMS:
   AngleGradientLayer: 085302f7f9764735762f83642e86cababfec1d37
   evernote-cloud-sdk-ios: 048cf5dcdc0c64069192d1336b7e121bc1a77e12
 
-COCOAPODS: 0.38.2
+COCOAPODS: 0.39.0

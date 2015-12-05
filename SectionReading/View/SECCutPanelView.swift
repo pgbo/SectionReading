@@ -75,12 +75,16 @@ class SECCutPanelView: UIView {
     // 是否在播放
     var isPlaying: Bool = false
     
-    class func instanceFromNib() -> UIView {
-        return UINib(nibName: "SECCutPanelView", bundle: nil).instantiateWithOwner(nil, options: nil).first as! UIView
+    class func instanceFromNib() -> SECCutPanelView {
+        return UINib(nibName: "SECCutPanelView", bundle: nil).instantiateWithOwner(nil, options: nil).first as! SECCutPanelView
     }
     
     override func awakeFromNib() {
-        
+     
+        mBackButton.addTarget(self, action: "clickedBackButton:", forControlEvents: UIControlEvents.TouchUpInside)
     }
-
+    
+    @objc private func clickedBackButton(sender: UIButton) {
+        delegate?.clickedBackButtonOnCutPanel?(self)
+    }
 }

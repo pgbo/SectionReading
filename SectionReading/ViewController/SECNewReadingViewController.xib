@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9060" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
@@ -63,18 +63,27 @@
                         <constraint firstAttribute="width" secondItem="xpc-QH-xCT" secondAttribute="height" multiplier="35:29" id="WYg-IP-gdI"/>
                     </constraints>
                     <state key="normal" image="ResumeRecordButton"/>
+                    <connections>
+                        <action selector="clickedResumeRecordButton:" destination="-1" eventType="touchUpInside" id="hqT-iW-eAH"/>
+                    </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SeC-s7-LdE">
                     <rect key="frame" x="276" y="589" width="70" height="58"/>
                     <animations/>
                     <state key="normal" image="ScissorsRecordButton"/>
                     <state key="highlighted" image="ScissorsRecordButtonHL"/>
+                    <connections>
+                        <action selector="clickedScissorsRecordButton:" destination="-1" eventType="touchUpInside" id="iPw-3f-LLA"/>
+                    </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xwA-zE-HEM">
                     <rect key="frame" x="30" y="589" width="70" height="58"/>
                     <animations/>
                     <state key="normal" image="StopRecordButton"/>
                     <state key="highlighted" image="StopRecordButtonHL"/>
+                    <connections>
+                        <action selector="clickedStopRecordButton:" destination="-1" eventType="touchUpInside" id="HK1-6c-Kwd"/>
+                    </connections>
                 </button>
             </subviews>
             <animations/>

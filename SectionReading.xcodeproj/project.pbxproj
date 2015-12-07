@@ -13,6 +13,7 @@
 		591609AA1BD75C4400F14523 /* ScopeHandleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609A91BD75C4400F14523 /* ScopeHandleView.swift */; };
 		591609AF1BD7920300F14523 /* PresentRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609AE1BD7920300F14523 /* PresentRecordPlayTransition.swift */; };
 		592E369D1BEB563500DC8955 /* CircularButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592E369C1BEB563500DC8955 /* CircularButton.swift */; };
+		596EB85F1C153FEE00F2C670 /* SECEditReadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */; };
 		597EBCF01BD7A0440031CE2C /* DismissRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */; };
 		598FD59C1C0FF9ED00FC056B /* ImageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 598FD59B1C0FF9ED00FC056B /* ImageAssets.xcassets */; };
 		598FD59E1C1014F800FC056B /* SECReadingHistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 598FD59D1C1014F800FC056B /* SECReadingHistoryViewController.swift */; };
@@ -34,7 +35,7 @@
 		86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDF81BA9B4B4004DFCD5 /* ReadingRecordsVC.swift */; };
 		86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDFA1BA9B576004DFCD5 /* ReadingRecordCell.swift */; };
 		86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDFC1BAB052B004DFCD5 /* NewRecordVC.swift */; };
-		A1BCBC8D8A3E764A7AD58FC5 /* Pods_SectionReading.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F694485C302FA27B255B35 /* Pods_SectionReading.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		A1BCBC8D8A3E764A7AD58FC5 /* Pods_SectionReading.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F694485C302FA27B255B35 /* Pods_SectionReading.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 		591609A91BD75C4400F14523 /* ScopeHandleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScopeHandleView.swift; sourceTree = "<group>"; };
 		591609AE1BD7920300F14523 /* PresentRecordPlayTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentRecordPlayTransition.swift; sourceTree = "<group>"; };
 		592E369C1BEB563500DC8955 /* CircularButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularButton.swift; sourceTree = "<group>"; };
+		596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECEditReadingViewController.swift; sourceTree = "<group>"; };
 		597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissRecordPlayTransition.swift; sourceTree = "<group>"; };
 		598FD59B1C0FF9ED00FC056B /* ImageAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ImageAssets.xcassets; sourceTree = "<group>"; };
 		598FD59D1C1014F800FC056B /* SECReadingHistoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECReadingHistoryViewController.swift; sourceTree = "<group>"; };
@@ -271,6 +273,7 @@
 				598FD59F1C10205A00FC056B /* SECNewReadingViewController.swift */,
 				598FD5A51C102F6000FC056B /* SECNewReadingViewController.xib */,
 				598FD5A11C10221000FC056B /* SECSettingViewController.swift */,
+				596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -442,6 +445,7 @@
 				598FD59E1C1014F800FC056B /* SECReadingHistoryViewController.swift in Sources */,
 				59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */,
 				86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */,
+				596EB85F1C153FEE00F2C670 /* SECEditReadingViewController.swift in Sources */,
 				86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */,
 				86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */,
 				598FD5A41C10268600FC056B /* SECHelper.swift in Sources */,

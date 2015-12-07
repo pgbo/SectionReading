@@ -61,4 +61,37 @@ class SECHelper: NSObject {
         
         return formatTxt
     }
+    
+    /**
+     读书录音存放目录
+     
+     - returns: 
+     */
+    static func readingRecordStoreDirectory() -> String? {
+        
+        let recordStorageDirPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true).first
+
+        let fileMan = NSFileManager.defaultManager()
+
+        var isDirectory: ObjCBool = ObjCBool(true)
+        let existPath = fileMan.fileExistsAtPath(recordStorageDirPath!, isDirectory: &isDirectory)
+        if existPath && isDirectory.boolValue == false {
+            do {
+                try fileMan.removeItemAtPath(recordStorageDirPath!)
+            } catch let error as NSError {
+                print("Fail to removeItemAtPath(\(recordStorageDirPath)), error: \(error.localizedDescription)")
+                return nil
+            }
+        }
+        
+        // 创建目录
+        do {
+            try fileMan.createDirectoryAtPath(recordStorageDirPath!, withIntermediateDirectories: true, attributes: nil)
+        } catch let error as NSError {
+            print("Fail to removeItemAtPath(\(recordStorageDirPath)), error: \(error.localizedDescription)")
+            return nil
+        }
+        
+        return recordStorageDirPath
+    }
 }

@@ -14,6 +14,7 @@
 		591609AF1BD7920300F14523 /* PresentRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591609AE1BD7920300F14523 /* PresentRecordPlayTransition.swift */; };
 		592E369D1BEB563500DC8955 /* CircularButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592E369C1BEB563500DC8955 /* CircularButton.swift */; };
 		596EB85F1C153FEE00F2C670 /* SECEditReadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */; };
+		596EB8631C16C79900F2C670 /* SECReadingRecordCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596EB8621C16C79900F2C670 /* SECReadingRecordCropper.swift */; };
 		597EBCF01BD7A0440031CE2C /* DismissRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */; };
 		598FD59C1C0FF9ED00FC056B /* ImageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 598FD59B1C0FF9ED00FC056B /* ImageAssets.xcassets */; };
 		598FD59E1C1014F800FC056B /* SECReadingHistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 598FD59D1C1014F800FC056B /* SECReadingHistoryViewController.swift */; };
@@ -58,6 +59,7 @@
 		591609AE1BD7920300F14523 /* PresentRecordPlayTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentRecordPlayTransition.swift; sourceTree = "<group>"; };
 		592E369C1BEB563500DC8955 /* CircularButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularButton.swift; sourceTree = "<group>"; };
 		596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECEditReadingViewController.swift; sourceTree = "<group>"; };
+		596EB8621C16C79900F2C670 /* SECReadingRecordCropper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SECReadingRecordCropper.swift; path = SectionReading/ViewController/SECReadingRecordCropper.swift; sourceTree = SOURCE_ROOT; };
 		597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissRecordPlayTransition.swift; sourceTree = "<group>"; };
 		598FD59B1C0FF9ED00FC056B /* ImageAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ImageAssets.xcassets; sourceTree = "<group>"; };
 		598FD59D1C1014F800FC056B /* SECReadingHistoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECReadingHistoryViewController.swift; sourceTree = "<group>"; };
@@ -220,6 +222,7 @@
 			isa = PBXGroup;
 			children = (
 				598FD5A31C10268600FC056B /* SECHelper.swift */,
+				596EB8621C16C79900F2C670 /* SECReadingRecordCropper.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -441,6 +444,7 @@
 				86FFDDF61BA9B45C004DFCD5 /* AppDelegate.swift in Sources */,
 				598FD5A01C10205A00FC056B /* SECNewReadingViewController.swift in Sources */,
 				591609A81BD7473200F14523 /* ScopeGradientView.swift in Sources */,
+				596EB8631C16C79900F2C670 /* SECReadingRecordCropper.swift in Sources */,
 				591609A41BD65ECF00F14523 /* PlayRecordVC.swift in Sources */,
 				598FD59E1C1014F800FC056B /* SECReadingHistoryViewController.swift in Sources */,
 				59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */,

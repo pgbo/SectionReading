@@ -8,11 +8,19 @@
 
 import UIKit
 import AVFoundation
+import SVProgressHUD
 
 /// 录音音频状态
 enum SECRecordAudioState {
     case Stopped
     case Recording
+    case Paused
+}
+
+/// 播放音频状态
+enum SECPlayAudioState {
+    case Stopped
+    case Playing
     case Paused
 }
 
@@ -54,7 +62,12 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     private var currentRecordFilePath: String?              /** 当前录音文件路径 */
     private var lastCombineAudioFilePath: String?           /** 上次音频合并的文件路径 */
     
-    private var selectedWillScissorsScopeRange: NSRange?    /** 选中的将要剪切的区域 */
+    private var prepareTrimRecordFilePath: String?          /** 准备剪切的录音文件路径 */
+    /** 选中的将要剪切的区域 */
+    private var selectedWillScissorsScopeRange: SECRecordRange?
+    
+    private var audioPlayer: AVAudioPlayer?                 /** 播放器 */
+    private var playState: SECPlayAudioState = .Stopped
     
     convenience init() {
         self.init(nibName:"SECNewReadingViewController", bundle:nil)
@@ -92,7 +105,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         let cutPanel = SECCutPanelView.instanceFromNib()
         self.view.addSubview(cutPanel)
         
-//        cutPanel.defaultSelectedRange = SECCutPanelView.SECRecordRange(location: 0, length: 1)
+        cutPanel.defaultSelectedRange = SECRecordRange(location: 0, length: 1)
         cutPanel.delegate = self
         cutPanel.translatesAutoresizingMaskIntoConstraints = false
         let views = ["cutPanel": cutPanel]
@@ -206,12 +219,14 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         }
     }
     
-    private func stopRecord() {
+    private func stopRecordWithCompletion(completion: (Void -> ())?) {
         if recordState != .Stopped {
             audioRecorder?.stop()
-            
+
             recordState = .Stopped
-            stoppedRecord()
+            if completion != nil {
+                completion!()
+            }
         }
     }
     
@@ -341,18 +356,71 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     }
     
     @IBAction func clickedScissorsRecordButton(sender: UIButton) {
+        
         if cutPanelHidden {
-            
-            pauseRercord()
-            
-            // 创建一个新的
-            cutPanel = createCutPanel()
-            cutPanelHidden(true, animated: false)
-            cutPanelHidden(false, animated: true)
+            stopRecordWithCompletion { [weak self] () -> Void in
+                let strongSelf = self
+                if strongSelf == nil {
+                    return
+                }
+                
+                // TODO: 拷贝一份音频用以剪切和播放
+                let fileMan = NSFileManager.defaultManager()
+                strongSelf!.prepareTrimRecordFilePath = strongSelf!.randomObtainTemporaryAudioFilePath()
+
+                do {
+                    try fileMan.copyItemAtPath(strongSelf!.currentRecordFilePath!, toPath: strongSelf!.prepareTrimRecordFilePath!)
+                    
+                } catch let error as NSError {
+                    
+                    print("Fail to copyItemAtPath:\(strongSelf!.currentRecordFilePath!) toPath:\(strongSelf!.prepareTrimRecordFilePath!), error:\(error.localizedDescription)")
+                    let alert = UIAlertController(title: "发生错误", message: "出现了错误，请稍后再试", preferredStyle: UIAlertControllerStyle.Alert)
+                    alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+                        strongSelf?.dismissViewControllerAnimated(true, completion: nil)
+                    }))
+                    
+                    strongSelf?.presentViewController(alert, animated: true, completion: nil)
+                    
+                    return
+                }
+                
+                // 初始化播放器
+                do {
+                    try strongSelf?.audioPlayer = AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: strongSelf!.prepareTrimRecordFilePath!))
+                    
+                    strongSelf?.audioPlayer?.prepareToPlay()
+                    
+                } catch let error as NSError {
+                    
+                    print("Fail to init AVAudioPlayer, error:\(error.localizedDescription)")
+                    let alert = UIAlertController(title: "发生错误", message: "出现了错误，请稍后再试", preferredStyle: UIAlertControllerStyle.Alert)
+                    alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+                        strongSelf?.dismissViewControllerAnimated(true, completion: nil)
+                    }))
+                    
+                    strongSelf?.presentViewController(alert, animated: true, completion: nil)
+                    
+                    return
+                }
+                
+                // 重置状态
+                strongSelf?.playState = .Stopped
+                
+                dispatch_async(dispatch_get_main_queue(), { [weak self] () -> Void in
+                    
+                    if let strongSelf = self {
+                        // 创建一个新的剪切视图
+                        strongSelf.cutPanel = strongSelf.createCutPanel()
+                        strongSelf.cutPanelHidden(true, animated: false)
+                        strongSelf.cutPanelHidden(false, animated: true)
+                    }
+                })
+            }
         }
     }
     
     @IBAction func clickedResumeRecordButton(sender: UIButton) {
+        
         switch recordState {
         case .Stopped, .Paused:
             
@@ -366,12 +434,17 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     @IBAction func clickedStopRecordButton(sender: UIButton) {
         
-        stopRecord()
+        stopRecordWithCompletion { [weak self] () -> () in
+            if let strongSelf = self {
+                strongSelf.stoppedRecord()
+            }
+        }
     }
     
     // MARK: - SECCutPanelViewDelegate
     
     func clickedBackButtonOnCutPanel(panel: SECCutPanelView) {
+        
         if cutPanelHidden == false {
             cutPanelHidden(true, animated: true)
         }
@@ -379,27 +452,99 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     func clickedPlayRecordButtonOnCutPanel(panel: SECCutPanelView) {
         
+        if playState == .Playing {
+            // 暂停播放
+            audioPlayer?.pause()
+            playState = .Paused
+        } else {
+            // 开始播放
+            audioPlayer?.play()
+            playState = .Playing
+        }
     }
     
     func clickedScissorsButtonOnCutPanel(panel: SECCutPanelView) {
-    
+        
+        // 弹出剪切提示
+        let alert = UIAlertController(title: "剪辑", message: "确定剪掉选中的录音吗？", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        alert.addAction(UIAlertAction(title: "确认", style: UIAlertActionStyle.Default, handler: { [weak self] (action) -> Void in
+            
+            let strongSelf = self
+            if strongSelf == nil {
+                return
+            }
+            
+            let selectedRange = strongSelf!.selectedWillScissorsScopeRange
+            if selectedRange == nil || selectedRange!.length < 1 {
+                return
+            }
+            
+            
+            // 裁切
+            let prepareTrimRecordFilePath = strongSelf!.prepareTrimRecordFilePath
+            if prepareTrimRecordFilePath == nil {
+                
+                strongSelf?.audioPlayer?.stop()
+                strongSelf?.playState = .Stopped
+                
+                strongSelf?.cutPanelHidden(true, animated: true)
+                
+                return
+            }
+            
+            SVProgressHUD.showWithStatus("")
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), { () -> Void in
+                let cropper = SECReadingRecordCropper(sourceRecordFilePath: prepareTrimRecordFilePath!, cropRange: selectedRange!)
+                cropper.cropWithCompletion({ (croppedFilePath) -> Void in
+                    
+                    // TODO: 处理裁切结果
+                    
+                })
+            })
+            
+            // 隐藏裁剪框
+            
+            // 弹出提示：可以继续录制或停止录制
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: { [weak self] (action) -> Void in
+            if let strongSelf = self {
+                strongSelf.dismissViewControllerAnimated(true, completion: nil)
+            }
+        }))
+        
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     func willSlideScopeHandleOnCutPanel(panel: SECCutPanelView) {
         
+        panel.isPlaying = false
+        panel.playProgress = 0
+        
+        audioPlayer?.pause()
+        audioPlayer?.currentTime = 0
+        
+        playState = .Paused
     }
     
-    func selectedScopeOnCutPanel(panel: SECCutPanelView, selectedScopeRange: SECCutPanelView.SECRecordRange) {
+    func selectedScopeOnCutPanel(panel: SECCutPanelView, selectedScopeRange: SECRecordRange) {
         
+        self.selectedWillScissorsScopeRange = selectedScopeRange
     }
     
     // MARK: - AVAudioRecorderDelegate
     
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
+        
+        recordState = .Stopped
         stoppedRecord()
     }
     
     func audioRecorderEncodeErrorDidOccur(recorder: AVAudioRecorder, error: NSError?) {
+        
+        recordState = .Stopped
         stoppedRecord()
     }
 }

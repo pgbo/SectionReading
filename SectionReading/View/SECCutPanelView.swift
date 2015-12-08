@@ -44,7 +44,7 @@ import UIKit
      - parameter panel:
      - parameter selectedScopeRange: 已选范围
      */
-    optional func selectedScopeOnCutPanel(panel: SECCutPanelView, selectedScopeRange: SECCutPanelView.SECRecordRange)
+    optional func selectedScopeOnCutPanel(panel: SECCutPanelView, selectedScopeRange: SECRecordRange)
 }
 
 
@@ -86,17 +86,6 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
         case Left
         case Right
     }
-    
-    class SECRecordRange: NSObject {
-        private (set) var location: CGFloat = 0
-        private (set) var length: CGFloat = 0
-        
-        init(location: CGFloat, length: CGFloat) {
-            self.location = location
-            self.length = length
-        }
-    }
-    
     
     // 代理
     weak var delegate: SECCutPanelViewDelegate?

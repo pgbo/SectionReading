@@ -1,13 +1,16 @@
 PODS:
   - AngleGradientLayer (1.2.3)
   - evernote-cloud-sdk-ios (2.0.5)
+  - SVProgressHUD (1.1.3)
 
 DEPENDENCIES:
   - AngleGradientLayer (~> 1.0)
-  - evernote-cloud-sdk-ios (= 2.0.5)
+  - evernote-cloud-sdk-ios
+  - SVProgressHUD (~> 1.1.3)
 
 SPEC CHECKSUMS:
   AngleGradientLayer: 085302f7f9764735762f83642e86cababfec1d37
   evernote-cloud-sdk-ios: 048cf5dcdc0c64069192d1336b7e121bc1a77e12
+  SVProgressHUD: 748080e4f36e603f6c02aec292664239df5279c1
 
 COCOAPODS: 0.39.0

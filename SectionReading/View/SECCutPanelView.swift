@@ -73,8 +73,6 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
     @IBOutlet weak var mLeftUnactiveTrackLineLeading: NSLayoutConstraint!
     @IBOutlet weak var mRightUnactiveTrackLineTrailing: NSLayoutConstraint!
     
-//    private var leftSlideHandlePanLastLocation: CGPoint = CGPointZero
-//    private var rightSlideHandlePanLastLocation: CGPoint = CGPointZero
     
     /**
      水平拽动方向
@@ -336,8 +334,8 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
     }
     
     private func setupCutPanelView() {
-        
-        self.defaultSelectedRange = SECRecordRange(location: 0.0, length: 1.0)
+        self.playProgress = 0
+        self.defaultSelectedRange = SECRecordRange(location: 0.0, length: 0)
         self.isPlaying = false
     }
     

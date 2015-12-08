@@ -99,22 +99,22 @@
                             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.29864545863309355" colorSpace="calibratedRGB"/>
                         </view>
                         <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="CutPanelScopeHandle" translatesAutoresizingMaskIntoConstraints="NO" id="nRU-mO-uQk">
-                            <rect key="frame" x="47" y="0.0" width="18" height="56"/>
+                            <rect key="frame" x="49" y="0.0" width="16" height="56"/>
                             <animations/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="18" id="3ry-Xh-iLk"/>
-                                <constraint firstAttribute="width" secondItem="nRU-mO-uQk" secondAttribute="height" multiplier="9:28" id="s04-ks-EME"/>
+                                <constraint firstAttribute="width" constant="16" id="3ry-Xh-iLk"/>
+                                <constraint firstAttribute="height" constant="56" id="fMD-nb-YcW"/>
                             </constraints>
                             <connections>
                                 <outletCollection property="gestureRecognizers" destination="1Oh-8c-a8z" appends="YES" id="Z8J-XQ-0of"/>
                             </connections>
                         </imageView>
                         <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="CutPanelScopeHandle" translatesAutoresizingMaskIntoConstraints="NO" id="0Bc-80-ooD">
-                            <rect key="frame" x="150" y="0.0" width="18" height="56"/>
+                            <rect key="frame" x="150" y="0.0" width="16" height="56"/>
                             <animations/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="18" id="LAD-uk-83N"/>
-                                <constraint firstAttribute="width" secondItem="0Bc-80-ooD" secondAttribute="height" multiplier="9:28" id="mry-lj-yZT"/>
+                                <constraint firstAttribute="width" constant="16" id="LAD-uk-83N"/>
+                                <constraint firstAttribute="height" constant="56" id="WHG-2s-MmD"/>
                             </constraints>
                             <connections>
                                 <outletCollection property="gestureRecognizers" destination="syR-yM-dqG" appends="YES" id="SmD-8S-loQ"/>

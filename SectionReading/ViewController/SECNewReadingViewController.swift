@@ -92,7 +92,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         let cutPanel = SECCutPanelView.instanceFromNib()
         self.view.addSubview(cutPanel)
         
-        
+//        cutPanel.defaultSelectedRange = SECCutPanelView.SECRecordRange(location: 0, length: 1)
         cutPanel.delegate = self
         cutPanel.translatesAutoresizingMaskIntoConstraints = false
         let views = ["cutPanel": cutPanel]

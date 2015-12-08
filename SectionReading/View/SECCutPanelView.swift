@@ -73,8 +73,21 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
     @IBOutlet weak var mLeftUnactiveTrackLineLeading: NSLayoutConstraint!
     @IBOutlet weak var mRightUnactiveTrackLineTrailing: NSLayoutConstraint!
     
-    private var leftSlideHandlePanStartLocation: CGPoint = CGPointZero
-    private var rightSlideHandlePanStartLocation: CGPoint = CGPointZero
+//    private var leftSlideHandlePanLastLocation: CGPoint = CGPointZero
+//    private var rightSlideHandlePanLastLocation: CGPoint = CGPointZero
+    
+    /**
+     水平拽动方向
+     
+     - None:  无
+     - Left:  向左
+     - Right: 向右
+     */
+    private enum HorizonPanDirection {
+        case None
+        case Left
+        case Right
+    }
     
     class SECRecordRange: NSObject {
         private (set) var location: CGFloat = 0
@@ -162,13 +175,10 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
         
         print("leftSlideHandlePanRecognized")
         
+        let translation = recognizer.translationInView(recognizer.view)
         let state = recognizer.state
-        let location = recognizer.locationInView(self.mSelectScopeContainnerView)
         
         switch state {
-        case .Began:
-            leftSlideHandlePanStartLocation = location
-        
         case .Changed:
             
             let leftSlideHandleFrame = mLeftSlideHandle.frame
@@ -176,14 +186,57 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
             
             print("leftSlideHandleFrame:\(leftSlideHandleFrame), rightSlideHandleFrame:\(rightSlideHandleFrame)")
             
-            let notSlideLimitLeft = CGRectGetMinX(leftSlideHandleFrame) >= 0
-            let notSlideLimitRight = CGRectGetMaxX(leftSlideHandleFrame) <= CGRectGetMinX(rightSlideHandleFrame)
             
-            if notSlideLimitLeft && notSlideLimitRight {
-                // 计算移动距离
-                self.mLeftSlideHandleTrailing.constant = (location.x - leftSlideHandlePanStartLocation.x)
+            let slideHorizonSpacing = CGRectGetMinX(rightSlideHandleFrame) - CGRectGetMaxX(leftSlideHandleFrame)
+            let leftSlideLeadingSpacing = CGRectGetMinX(leftSlideHandleFrame)
+            
+            var translationX = translation.x
+            var panDir = HorizonPanDirection.None
+            
+            // 判断滑动方向
+            if slideHorizonSpacing > 0 {
+                if leftSlideLeadingSpacing > 0 {
+                    // 可左可右滑动
+                    if translationX > 0 {
+                        // 右滑
+                        panDir = .Right
+                    } else {
+                        // 左滑
+                        panDir = .Left
+                    }
+                } else {
+                    // 只能向右滑动
+                    if translationX > 0 {
+                        panDir = .Right
+                    }
+                }
+            } else {
+                // 只能向左滑动
+                if leftSlideLeadingSpacing > 0 && translationX < 0 {
+                    panDir = .Left
+                }
             }
             
+            switch panDir {
+            case .Right:
+                let caculateNextTimeSlideSpacing = slideHorizonSpacing - translationX
+                if caculateNextTimeSlideSpacing < 0 {
+                    translationX = slideHorizonSpacing
+                }
+            case .Left:
+                let caculateNextTimeLeftSlideLeadingSpacing = leftSlideLeadingSpacing + translationX
+                if caculateNextTimeLeftSlideLeadingSpacing < 0 {
+                    translationX = -leftSlideLeadingSpacing
+                }
+            case .None:
+                translationX = 0
+            }
+            
+            if translationX != 0 {
+                self.mLeftSlideHandleTrailing.constant += translationX
+                recognizer.setTranslation(CGPointMake(0, translation.y), inView: recognizer.view)
+            }
+    
         case .Ended:
             
             delegate?.selectedScopeOnCutPanel?(self, selectedScopeRange: caculateSelectScopeRange())
@@ -202,13 +255,10 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
         
         print("rightSlideHandlePanRecognized")
         
+        let translation = recognizer.translationInView(recognizer.view)
         let state = recognizer.state
-        let location = recognizer.locationInView(self.mSelectScopeContainnerView)
         
         switch state {
-        case .Began:
-            rightSlideHandlePanStartLocation = location
-            
         case .Changed:
             
             let leftSlideHandleFrame = mLeftSlideHandle.frame
@@ -216,16 +266,60 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
             
             print("leftSlideHandleFrame:\(leftSlideHandleFrame), rightSlideHandleFrame:\(rightSlideHandleFrame)")
             
-            let notSlideLimitLeft = CGRectGetMinX(rightSlideHandleFrame) >= CGRectGetMaxX(leftSlideHandleFrame)
-            let notSlideLimitRight = CGRectGetMaxX(rightSlideHandleFrame) <= CGRectGetMaxX(self.mSelectScopeContainnerView.bounds)
+            let slideHorizonSpacing = CGRectGetMinX(rightSlideHandleFrame) - CGRectGetMaxX(leftSlideHandleFrame)
+            let rightSlideTrailingSpacing = CGRectGetMaxX(self.mSelectScopeContainnerView.bounds) - CGRectGetMaxX(rightSlideHandleFrame)
             
-            if notSlideLimitLeft && notSlideLimitRight {
-                // 计算移动距离
-                self.mRightSlideHandleLeading.constant = (location.x - rightSlideHandlePanStartLocation.x)
+            var translationX = translation.x
+            
+            var panDir = HorizonPanDirection.None
+            
+            // 判断滑动方向
+            if slideHorizonSpacing > 0 {
+                if rightSlideTrailingSpacing > 0 {
+                    // 可左可右滑动
+                    if translationX > 0 {
+                        // 右滑
+                        panDir = .Right
+                    } else {
+                        // 左滑
+                        panDir = .Left
+                    }
+                } else {
+                    // 只能向左滑动
+                    if translationX < 0 {
+                        panDir = .Left
+                    }
+                }
+                
+            } else {
+                // 只能向右滑动
+                if rightSlideTrailingSpacing > 0 && translationX > 0 {
+                    panDir = .Right
+                }
+            }
+            
+            switch panDir {
+            case .Right:
+                let caculateNextTimeRightSlideTrailingSpacing = rightSlideTrailingSpacing - translationX
+                if caculateNextTimeRightSlideTrailingSpacing < 0 {
+                    translationX = rightSlideTrailingSpacing
+                }
+            case .Left:
+                let caculateNextTimeSlideSpacing = slideHorizonSpacing + translationX
+                if caculateNextTimeSlideSpacing < 0 {
+                    translationX = -slideHorizonSpacing
+                }
+            case .None:
+                translationX = 0
+            }
+            
+            if translationX != 0 {
+                self.mRightSlideHandleLeading.constant += translationX
+                recognizer.setTranslation(CGPointMake(0, translation.y), inView: recognizer.view)
             }
             
         case .Ended:
-            
+        
             delegate?.selectedScopeOnCutPanel?(self, selectedScopeRange: caculateSelectScopeRange())
             
         default:
@@ -302,33 +396,5 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
         delegate?.willSlideScopeHandleOnCutPanel?(self)
         
         return true
-        
-//        let panLocationAtContainnerView = gestureRecognizer.locationInView(self.mSelectScopeContainnerView)
-//        let panLocationAtAttachView = gestureRecognizer.locationInView(gestureRecognizer.view!)
-//        
-//        print("panLocationAtContainnerView:\(panLocationAtContainnerView), panLocationAtAttachView:\(panLocationAtAttachView)")
-//        
-//        var result = false
-//        
-//        if gestureRecognizer.view!.isEqual(self.mLeftSlideHandle) {
-//            // 左滑块
-//            
-//            let notSlideLimitLeft = ((panLocationAtContainnerView.x - panLocationAtAttachView.x) >= 0)
-//            
-//            let notSlideLimitRight = panLocationAtContainnerView.x + (CGRectGetWidth(self.mLeftSlideHandle.frame) - panLocationAtAttachView.x) <= CGRectGetMinX(self.mRightSlideHandle.frame)
-//            
-//            result = notSlideLimitLeft && notSlideLimitRight
-//            
-//        } else {
-//            // 右滑块
-//            
-//            let notSlideLimitLeft = ((panLocationAtContainnerView.x - panLocationAtAttachView.x) >= CGRectGetMaxX(self.mLeftSlideHandle.frame))
-//            
-//            let notSlideLimitRight = ((panLocationAtContainnerView.x + panLocationAtAttachView.x) <= CGRectGetMinX(self.mSelectScopeContainnerView.frame))
-//            
-//            result = notSlideLimitLeft && notSlideLimitRight
-//        }
-//        
-//        return result
     }
 }

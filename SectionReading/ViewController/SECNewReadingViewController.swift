@@ -326,7 +326,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             wheelsLastTimeAngle = newWheelAngle
             
             // 恢复剪切按钮状态
-            if recordDuration >= 5 {
+            if recordDuration >= 3 {
                 self.mScissorsRecordButton.enabled = true
             }
         }
@@ -342,11 +342,13 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     @IBAction func clickedScissorsRecordButton(sender: UIButton) {
         if cutPanelHidden {
+            
+            pauseRercord()
+            
             // 创建一个新的
             cutPanel = createCutPanel()
             cutPanelHidden(true, animated: false)
-            // TODO: 加入其他判定条件
-            cutPanelHidden(!cutPanelHidden, animated: true)
+            cutPanelHidden(false, animated: true)
         }
     }
     

@@ -60,11 +60,12 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     private var audioRecorder: AVAudioRecorder?             /** 录音器 */
     private var currentRecordFilePath: String?              /** 当前录音文件路径 */
-    private var lastCombineAudioFilePath: String?           /** 上次音频合并的文件路径 */
     
     private var prepareTrimRecordFilePath: String?          /** 准备剪切的录音文件路径 */
     /** 选中的将要剪切的区域 */
     private var selectedWillScissorsScopeRange: SECRecordRange?
+    /** 裁切后录音保存的文件路径 */
+    private var croppedRecordFilePath: String?
     
     private var audioPlayer: AVAudioPlayer?                 /** 播放器 */
     private var playState: SECPlayAudioState = .Stopped
@@ -476,10 +477,16 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             }
             
             let selectedRange = strongSelf!.selectedWillScissorsScopeRange
-            if selectedRange == nil || selectedRange!.length < 1 {
+            if selectedRange == nil {
+                strongSelf?.dismissViewControllerAnimated(true, completion: nil)
                 return
             }
             
+            // 没有做任何裁切
+            if selectedRange!.length == 0 {
+                strongSelf?.dismissViewControllerAnimated(true, completion: nil)
+                return
+            }
             
             // 裁切
             let prepareTrimRecordFilePath = strongSelf!.prepareTrimRecordFilePath
@@ -495,11 +502,26 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             
             SVProgressHUD.showWithStatus("")
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), { () -> Void in
-                let cropper = SECReadingRecordCropper(sourceRecordFilePath: prepareTrimRecordFilePath!, cropRange: selectedRange!)
-                cropper.cropWithCompletion({ (croppedFilePath) -> Void in
+                
+                let destinationCroppedFilePath = strongSelf!.randomObtainTemporaryAudioFilePath()
+                let cropper = SECReadingRecordCropper(sourceRecordFilePath: prepareTrimRecordFilePath!, cropRange: selectedRange!, destinationCroppedFilePath: destinationCroppedFilePath)
+                cropper.cropWithCompletion({ [weak self] (success) -> Void in
                     
                     // TODO: 处理裁切结果
                     
+                    let strongSelf = self
+                    if strongSelf == nil {
+                        return
+                    }
+                    
+                    if success {
+                        strongSelf!.croppedRecordFilePath = cropper.destinationCroppedFilePath
+                    }
+                    
+                    // TODO: 更新录音时间
+                    // TODO: 使用一个有序列表保存裁切或新录音片段记录，最后拼接为最终的录音
+                    
+                    SVProgressHUD.dismiss()
                 })
             })
             

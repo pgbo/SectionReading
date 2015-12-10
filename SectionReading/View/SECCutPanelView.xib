@@ -68,11 +68,10 @@
                             </constraints>
                         </imageView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pW5-4m-jd7">
-                            <rect key="frame" x="16" y="27" width="49" height="2"/>
+                            <rect key="frame" x="16" y="27" width="283" height="2"/>
                             <animations/>
                             <color key="backgroundColor" red="0.80784313725490198" green="0.80784313725490198" blue="0.80784313725490198" alpha="1" colorSpace="calibratedRGB"/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="49" id="Sr6-is-2jL"/>
                                 <constraint firstAttribute="height" constant="2" id="Wym-0d-hGl"/>
                             </constraints>
                         </view>
@@ -83,14 +82,6 @@
                             <constraints>
                                 <constraint firstAttribute="width" constant="85" identifier="$_MiddleActiveTrackLineWidth" id="7mL-QB-9b0"/>
                                 <constraint firstAttribute="height" constant="2" id="RTm-V5-RSh"/>
-                            </constraints>
-                        </view>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hPH-Xg-WCa">
-                            <rect key="frame" x="150" y="27" width="149" height="2"/>
-                            <animations/>
-                            <color key="backgroundColor" red="0.80784313730000001" green="0.80784313730000001" blue="0.80784313730000001" alpha="1" colorSpace="calibratedRGB"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="2" id="pH0-Uk-QBF"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5ss-Y0-DII">
@@ -124,9 +115,7 @@
                     <animations/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstItem="Dhf-Pe-JUn" firstAttribute="leading" secondItem="pW5-4m-jd7" secondAttribute="trailing" id="2fh-S0-XCD"/>
                         <constraint firstItem="pW5-4m-jd7" firstAttribute="centerY" secondItem="IXR-ha-hGj" secondAttribute="centerY" id="2zh-ip-Ktk"/>
-                        <constraint firstItem="hPH-Xg-WCa" firstAttribute="centerY" secondItem="pW5-4m-jd7" secondAttribute="centerY" id="3Om-vz-lhA"/>
                         <constraint firstItem="Ncs-3z-2EH" firstAttribute="top" secondItem="IXR-ha-hGj" secondAttribute="top" constant="3" id="8HE-cn-Ny7"/>
                         <constraint firstItem="Dhf-Pe-JUn" firstAttribute="centerY" secondItem="pW5-4m-jd7" secondAttribute="centerY" id="Ays-yi-s8x"/>
                         <constraint firstItem="0Bc-80-ooD" firstAttribute="centerY" secondItem="nRU-mO-uQk" secondAttribute="centerY" id="BTw-jS-Ful"/>
@@ -138,10 +127,10 @@
                         <constraint firstItem="0Bc-80-ooD" firstAttribute="leading" secondItem="pW5-4m-jd7" secondAttribute="leading" constant="134" id="bTh-gI-xtu"/>
                         <constraint firstAttribute="trailing" secondItem="Ncs-3z-2EH" secondAttribute="trailing" id="c2L-5w-qGX"/>
                         <constraint firstItem="5ss-Y0-DII" firstAttribute="bottom" secondItem="Ncs-3z-2EH" secondAttribute="bottom" id="ctf-D0-mHV"/>
-                        <constraint firstAttribute="trailing" secondItem="hPH-Xg-WCa" secondAttribute="trailing" constant="16" id="fMn-YG-b6a"/>
                         <constraint firstItem="pW5-4m-jd7" firstAttribute="leading" secondItem="IXR-ha-hGj" secondAttribute="leading" constant="16" id="gz1-5b-IbO"/>
+                        <constraint firstAttribute="trailing" secondItem="pW5-4m-jd7" secondAttribute="trailing" constant="16" id="hDN-uz-GCF"/>
                         <constraint firstItem="nRU-mO-uQk" firstAttribute="centerY" secondItem="IXR-ha-hGj" secondAttribute="centerY" id="o4f-fZ-0Oi"/>
-                        <constraint firstItem="hPH-Xg-WCa" firstAttribute="leading" secondItem="Dhf-Pe-JUn" secondAttribute="trailing" id="zg4-Uh-GeN"/>
+                        <constraint firstItem="Dhf-Pe-JUn" firstAttribute="leading" secondItem="nRU-mO-uQk" secondAttribute="trailing" id="vhH-rT-ldZ"/>
                         <constraint firstItem="Ncs-3z-2EH" firstAttribute="leading" secondItem="IXR-ha-hGj" secondAttribute="leading" id="zoK-pK-XBZ"/>
                     </constraints>
                 </view>
@@ -166,19 +155,17 @@
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
+                <outlet property="mActiveTrackLine" destination="Dhf-Pe-JUn" id="Rg2-58-sa6"/>
+                <outlet property="mActiveTrackLineWidth" destination="7mL-QB-9b0" id="Mfe-3l-wj4"/>
                 <outlet property="mBackButton" destination="i1C-IW-QKO" id="7ea-fa-Ucs"/>
+                <outlet property="mBackgroundTrackLine" destination="pW5-4m-jd7" id="YjK-KD-IhR"/>
+                <outlet property="mBackgroundTrackLineLeading" destination="gz1-5b-IbO" id="tNt-AI-MMH"/>
+                <outlet property="mBackgroundTrackLineTrailing" destination="hDN-uz-GCF" id="718-5Q-rWz"/>
                 <outlet property="mLeftSlideHandle" destination="nRU-mO-uQk" id="5zR-V0-RtQ"/>
                 <outlet property="mLeftSlideHandleTrailing" destination="Guk-tx-8VH" id="9xS-AP-KDx"/>
-                <outlet property="mLeftUnactiveTrackLine" destination="pW5-4m-jd7" id="3ZF-Xs-X3e"/>
-                <outlet property="mLeftUnactiveTrackLineLeading" destination="gz1-5b-IbO" id="9nx-ek-aKS"/>
-                <outlet property="mLeftUnactiveTrackLineWidth" destination="Sr6-is-2jL" id="QGf-qt-ebx"/>
-                <outlet property="mMiddleActiveTrackLine" destination="Dhf-Pe-JUn" id="jid-yx-LWx"/>
-                <outlet property="mMiddleActiveTrackLineWidth" destination="7mL-QB-9b0" id="qie-9l-9hN"/>
                 <outlet property="mPlayButton" destination="Oq5-ek-7Yz" id="ZfP-tC-RKr"/>
                 <outlet property="mRightSlideHandle" destination="0Bc-80-ooD" id="nUg-XH-69K"/>
                 <outlet property="mRightSlideHandleLeading" destination="bTh-gI-xtu" id="fJs-vh-zA4"/>
-                <outlet property="mRightUnactiveTrackLine" destination="hPH-Xg-WCa" id="30H-94-8pi"/>
-                <outlet property="mRightUnactiveTrackLineTrailing" destination="fMn-YG-b6a" id="i3t-fS-xjf"/>
                 <outlet property="mScissorsButton" destination="Nqt-At-sIw" id="23p-OC-pxw"/>
                 <outlet property="mSelectScopeBackgroundImageView" destination="Ncs-3z-2EH" id="koW-es-KHB"/>
                 <outlet property="mSelectScopeContainnerView" destination="IXR-ha-hGj" id="dqX-km-pcA"/>

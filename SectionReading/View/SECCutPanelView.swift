@@ -61,17 +61,14 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
     @IBOutlet private weak var mLeftSlideHandle: UIImageView!
     @IBOutlet private weak var mRightSlideHandle: UIImageView!
     @IBOutlet private weak var mSelectedRangeOverlay: UIView!
-    @IBOutlet private weak var mLeftUnactiveTrackLine: UIView!
-    @IBOutlet private weak var mMiddleActiveTrackLine: UIView!
-    @IBOutlet private weak var mRightUnactiveTrackLine: UIView!
+    @IBOutlet private weak var mBackgroundTrackLine: UIView!
+    @IBOutlet private weak var mActiveTrackLine: UIView!
     
-    
-    @IBOutlet private weak var mLeftUnactiveTrackLineWidth: NSLayoutConstraint!
-    @IBOutlet private weak var mMiddleActiveTrackLineWidth: NSLayoutConstraint!
+    @IBOutlet private weak var mActiveTrackLineWidth: NSLayoutConstraint!
     @IBOutlet private weak var mLeftSlideHandleTrailing: NSLayoutConstraint!
     @IBOutlet private weak var mRightSlideHandleLeading: NSLayoutConstraint!
-    @IBOutlet weak var mLeftUnactiveTrackLineLeading: NSLayoutConstraint!
-    @IBOutlet weak var mRightUnactiveTrackLineTrailing: NSLayoutConstraint!
+    @IBOutlet weak var mBackgroundTrackLineLeading: NSLayoutConstraint!
+    @IBOutlet weak var mBackgroundTrackLineTrailing: NSLayoutConstraint!
     
     
     /**
@@ -101,9 +98,8 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
             self.mLeftSlideHandleTrailing.constant = defaultSelectedRange.location * trackTotalWidth
             self.mRightSlideHandleLeading.constant = self.mLeftSlideHandleTrailing.constant + defaultSelectedRange.length * trackTotalWidth
             
-            self.mLeftUnactiveTrackLineWidth.constant = self.mLeftSlideHandleTrailing.constant
             // 更新进度
-            self.mMiddleActiveTrackLineWidth.constant = CGRectGetWidth(self.mSelectedRangeOverlay.bounds) * playProgress
+            self.mActiveTrackLineWidth.constant = CGRectGetWidth(self.mSelectedRangeOverlay.bounds) * playProgress
         }
     }
     
@@ -114,7 +110,7 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
         didSet {
             
             // 更新进度
-            self.mMiddleActiveTrackLineWidth.constant = CGRectGetWidth(self.mSelectedRangeOverlay.bounds) * playProgress
+            self.mActiveTrackLineWidth.constant = CGRectGetWidth(self.mSelectedRangeOverlay.bounds) * playProgress
         }
     }
     
@@ -333,7 +329,7 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
      */
     private func trackTotalWidth() -> CGFloat {
         
-        return CGRectGetWidth(self.mSelectScopeContainnerView.bounds) - self.mLeftUnactiveTrackLineLeading.constant - self.mRightUnactiveTrackLineTrailing.constant;
+        return CGRectGetWidth(self.mSelectScopeContainnerView.bounds) - self.mBackgroundTrackLineLeading.constant - self.mBackgroundTrackLineTrailing.constant;
     }
     
     /**

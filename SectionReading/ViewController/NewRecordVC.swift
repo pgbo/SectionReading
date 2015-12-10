@@ -480,7 +480,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     }
     
     private func randomObtainTemporaryAudioFilePath() -> String {
-        return NSTemporaryDirectory().stringByAppendingString("/\(NSUUID().UUIDString).caf")
+        return NSTemporaryDirectory().stringByAppendingString("\(NSUUID().UUIDString).caf")
     }
     
     /**

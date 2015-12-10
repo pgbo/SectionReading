@@ -63,7 +63,9 @@ class SECReadingRecordCropper: NSObject {
             
             if sourceRecordFilePath == nil || cropRange == nil || destinationCroppedFilePath == nil {
                 print("Fail to crop audio, cause sourceRecordFilePath, cropRange or destinationCroppedFilePath is nil.")
-                completion?(success: false)
+                dispatch_async(dispatch_get_main_queue(), {
+                    completion?(success: false)
+                })
                 return
             }
             
@@ -73,39 +75,45 @@ class SECReadingRecordCropper: NSObject {
             let tracks = asset.tracksWithMediaType(AVMediaTypeAudio)
             if tracks.count == 0 {
                 print("Fail to crop audio, cause tracks is empty.")
-                completion?(success: false)
+                dispatch_async(dispatch_get_main_queue(), {
+                    completion?(success: false)
+                })
                 return
             }
             
             let duration = asset.duration
             if duration.seconds == 0  {
                 print("Fail to crop audio, cause duration is 0.")
-                completion?(success: false)
+                dispatch_async(dispatch_get_main_queue(), {
+                    completion?(success: false)
+                })
                 return
             }
             
-            let timeScale = Int32(10)
+            let timeScale = Int32(1)
             var insertTimeRanges: [CMTimeRange] = []
             
             if cropRange!.location > 0 {
                 // 插入第一段
                 let startTime = kCMTimeZero
-                let endTime = CMTimeMake(Int64(cropRange!.location * CGFloat(timeScale)), timeScale)
+                let endTime = CMTimeMakeWithSeconds(Float64(cropRange!.location * CGFloat(timeScale) * CGFloat(duration.seconds)), timeScale)
                 let firstTimeRange = CMTimeRangeMake(startTime, endTime)
                 insertTimeRanges.append(firstTimeRange)
             }
             
             if (cropRange!.location + cropRange!.length) < 1 {
                 // 插入第二段
-                let startTime = CMTimeMake(Int64((cropRange!.location + cropRange!.length) * CGFloat(timeScale)), timeScale)
-                let endTime = CMTimeMake(Int64(1.0 * CGFloat(timeScale)), timeScale)
+                let startTime = CMTimeMakeWithSeconds(Float64((cropRange!.location + cropRange!.length) * CGFloat(timeScale) * CGFloat(duration.seconds)), timeScale)
+                let endTime = CMTimeMake(Int64(CGFloat(timeScale) * CGFloat(duration.seconds)), timeScale)
                 let secondTimeRange = CMTimeRangeMake(startTime, endTime)
                 insertTimeRanges.append(secondTimeRange)
             }
             
             if insertTimeRanges.count == 0 {
                 // 没有选取裁切区域
-                completion?(success: true)
+                dispatch_async(dispatch_get_main_queue(), {
+                    completion?(success: true)
+                })
                 return
             }
             
@@ -118,11 +126,15 @@ class SECReadingRecordCropper: NSObject {
                 
                     try compositionAudioTrack.insertTimeRange(timeRange, ofTrack: tracks.first!, atTime: nextClipStartTime)
                     nextClipStartTime = CMTimeAdd(nextClipStartTime, timeRange.duration)
+                    
+//                    print("timeRange:\(timeRange), timeRange.start:\(CMTimeGetSeconds(timeRange.start)), timeRange.duration:\(CMTimeGetSeconds(timeRange.duration))")
                 }
                 
             } catch let error as NSError {
                 print("Fail to crop audio, err: \(error.localizedDescription)")
-                completion?(success: false)
+                dispatch_async(dispatch_get_main_queue(), {
+                    completion?(success: false)
+                })
                 return
             }
             
@@ -130,7 +142,9 @@ class SECReadingRecordCropper: NSObject {
             let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A)
             if exporter == nil {
                 print("Fail to crop audio, initialize AVAssetExportSession failed.")
-                completion?(success: false)
+                dispatch_async(dispatch_get_main_queue(), {
+                    completion?(success: false)
+                })
                 return
             }
             
@@ -165,7 +179,7 @@ class SECReadingRecordCropper: NSObject {
     }
     
     private func randomObtainTemporaryAudioFilePath() -> String {
-        return NSTemporaryDirectory().stringByAppendingString("/\(NSUUID().UUIDString).caf")
+        return NSTemporaryDirectory().stringByAppendingString("\(NSUUID().UUIDString).caf")
     }
     
     /**
@@ -177,13 +191,6 @@ class SECReadingRecordCropper: NSObject {
      - parameter completion:  结束 block
      */
     private static func exportPartForAudioAsset(sourceAsset: AVAsset, exportRange: SECRecordRange, exportDestinationFilePath: String, completion: ((success:Bool) -> Void)?) {
-        
-//        var exportSuccess = false
-//        var exporter: AVAssetExportSession?
-//        var startTime: CMTime?
-//        var endTime: CMTime?
-//        var exportAudioMix: AVMutableAudioMix?
-        
         
         // 导出第一段
         let exporter = AVAssetExportSession(asset: sourceAsset, presetName: AVAssetExportPresetAppleM4A)
@@ -199,7 +206,9 @@ class SECReadingRecordCropper: NSObject {
         let tracks = sourceAsset.tracksWithMediaType(AVMediaTypeAudio)
         if tracks.count == 0 {
             print("Fail to exportPartForAudioAsset, cause tracks is empty.")
-            completion?(success: false)
+            dispatch_async(dispatch_get_main_queue(), {
+                completion?(success: false)
+            })
             return
         }
         

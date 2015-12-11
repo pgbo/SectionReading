@@ -24,6 +24,8 @@ enum SECPlayAudioState {
     case Paused
 }
 
+let MininumRecordAudioSecondsToScissors = NSTimeInterval(3)
+
 /**
  *  建立新读书记录页面
  */
@@ -343,7 +345,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             wheelsLastTimeAngle = newWheelAngle
             
             // 恢复剪切按钮状态
-            if recordDuration >= 3 {
+            if recordDuration > MininumRecordAudioSecondsToScissors {
                 self.mScissorsRecordButton.enabled = true
             }
         }
@@ -583,7 +585,11 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
                 
                 // 更新录音时间
                 let croppedAudioDuration = self.recordDuration * NSTimeInterval(1.0 - selectedRange!.length)
+                self.recordDuration = croppedAudioDuration
                 self.mRecordDurationLabel.text = SECHelper.createFormatTextForRecordDuration(croppedAudioDuration)
+                if croppedAudioDuration <= MininumRecordAudioSecondsToScissors {
+                    self.mScissorsRecordButton.enabled = false
+                }
             })
         }))
         

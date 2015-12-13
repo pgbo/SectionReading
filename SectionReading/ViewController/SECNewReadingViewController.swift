@@ -179,41 +179,49 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         return NSTemporaryDirectory().stringByAppendingString("\(NSUUID().UUIDString).caf")
     }
     
+    private func randomReadingRecordCompletedFilePath() -> String? {
+        let readingRecordDir = SECHelper.readingRecordStoreDirectory()
+        return readingRecordDir?.stringByAppendingString("\(NSUUID().UUIDString).caf")
+    }
+    
     private func resumeRecord() {
-        if recordState != .Recording {
+        
+        if recordState == .Recording {
+            return
+        }
+        
+        if activeRecordAudioSession() == false {
+            print("Fail to activeRecordAudioSession.")
+            return
+        }
+        
+        if recordState == .Paused {
+            audioRecorder?.record()
             
-            if activeRecordAudioSession() == false {
-                print("Fail to activeRecordAudioSession.")
+        } else if recordState == .Stopped {
+        
+            let settings = [AVFormatIDKey:NSNumber(unsignedInt: kAudioFormatALaw), AVSampleRateKey:NSNumber(int: 44100), AVNumberOfChannelsKey:NSNumber(int:1)]
+            
+            do {
+                let audioFilePath = randomObtainTemporaryAudioFilePath()
+                audioRecorder = try AVAudioRecorder(URL: NSURL(fileURLWithPath: audioFilePath), settings: settings)
+                
+                currentRecordFilePath = audioFilePath
+                
+                weak var weakSelf = self
+                audioRecorder?.delegate = weakSelf
+                
+                audioRecorder?.prepareToRecord()
+                audioRecorder?.record()
+                
+            } catch let error as NSError {
+                print("error: \(error)")
                 return
             }
-            
-            if audioRecorder == nil {
-                
-                let settings = [AVFormatIDKey:NSNumber(unsignedInt: kAudioFormatALaw), AVSampleRateKey:NSNumber(int: 44100), AVNumberOfChannelsKey:NSNumber(int:1)]
-                
-                do {
-                    let audioFilePath = randomObtainTemporaryAudioFilePath()
-                    audioRecorder = try AVAudioRecorder(URL: NSURL(fileURLWithPath: audioFilePath), settings: settings)
-                    
-                    currentRecordFilePath = audioFilePath
-                    
-                    weak var weakSelf = self
-                    audioRecorder?.delegate = weakSelf
-                    audioRecorder?.prepareToRecord()
-                    
-                    audioRecorder?.recordForDuration(NSTimeInterval(LimitMinutesPerRecord * 60))
-                    
-                } catch let error as NSError {
-                    print("error: \(error)")
-                }
-                
-            } else {
-                audioRecorder?.record()
-            }
-            
-            recordState = .Recording
-            resumedRecord()
         }
+        
+        recordState = .Recording
+        resumedRecord()
     }
     
     private func pauseRercord() {
@@ -222,17 +230,6 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             
             recordState = .Paused
             pausedRecord()
-        }
-    }
-    
-    private func stopRecordWithCompletion(completion: (Void -> ())?) {
-        if recordState != .Stopped {
-            audioRecorder?.stop()
-            
-            recordState = .Stopped
-            if completion != nil {
-                completion!()
-            }
         }
     }
     
@@ -259,12 +256,65 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     private func stoppedRecord() {
         
+        recordTimming?.invalidate()
         updateResumeRecordButtonImageForRecordState(.Stopped)
         
-        // 停止计时和转动轮子
-        recordTimming?.invalidate()
+        let recordSnippetCount = audioRecordFilePathSnippets.count
         
-        // TODO: 保存录音到本地
+        if recordSnippetCount == 0 {
+            return
+        } else if recordSnippetCount == 1 {
+            
+            let onlyRecordAudioSnippetFilePath = audioRecordFilePathSnippets.first!
+            
+            // 保存文件
+            let recordCompletedFilePath = self.moveIntoRecordAudioIntoCompletedRecordFileFromTempFilePath(onlyRecordAudioSnippetFilePath)
+            if recordCompletedFilePath != nil {
+                // 弹出提示
+                self.showPublishRightNowAlert()
+            } else {
+                // 提示失败
+                SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
+            }
+            
+            return
+        }
+        
+        // 合成音频
+        let combineAudioFilePath = randomObtainTemporaryAudioFilePath()
+        audioCombiner = SECReadingRecordCombiner(sourceAudioFilePaths: audioRecordFilePathSnippets, destinationFilePath: combineAudioFilePath)
+        
+        // 开始模态等待合成
+        SVProgressHUD.showWithStatus("")
+        audioCombiner!.combineWithCompletion({ (success) -> Void in
+            
+            if success == false {
+                SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
+                return
+            }
+            
+            // 取消模态等待
+            SVProgressHUD.dismiss()
+            
+            // 合成文件设置成为唯一录音片段
+            self.audioRecordFilePathSnippets = [combineAudioFilePath]
+            
+            // 保存文件
+            let recordCompletedFilePath = self.moveIntoRecordAudioIntoCompletedRecordFileFromTempFilePath(combineAudioFilePath)
+            if recordCompletedFilePath != nil {
+                // 弹出提示
+                self.showPublishRightNowAlert()
+            } else {
+                // 提示失败
+                SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
+            }
+        })
+    }
+    
+    /**
+     * 弹出马上发布的提示
+     */
+    private func showPublishRightNowAlert() {
         
         // 弹出发布提示框
         let alertVC = UIAlertController(title: nil, message: "您录制了一段读书录音，是否现在发布？", preferredStyle: UIAlertControllerStyle.Alert)
@@ -276,6 +326,27 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         }))
         
         self.presentViewController(alertVC, animated: true, completion: nil)
+    }
+    
+    /**
+     *  将临时录音文件转移到最终的录音文件
+     *
+     *  @return   是否成功
+     */
+    private func moveIntoRecordAudioIntoCompletedRecordFileFromTempFilePath(tmpFilePath: String) -> String? {
+        
+        let recordCompletedFilePath = self.randomReadingRecordCompletedFilePath()
+        if recordCompletedFilePath != nil {
+
+            do {
+                try NSFileManager.defaultManager().moveItemAtPath(tmpFilePath, toPath: recordCompletedFilePath!)
+            } catch (let error as NSError) {
+                print("Fail move file, error: \(error.localizedDescription)")
+                return nil
+            }
+        }
+        
+        return recordCompletedFilePath
     }
     
     private func cutPanelHidden(hidden: Bool, animated: Bool) {
@@ -479,11 +550,23 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     @IBAction func clickedStopRecordButton(sender: UIButton) {
         
-        stopRecordWithCompletion { [weak self] () -> () in
-            if let strongSelf = self {
-                strongSelf.stoppedRecord()
+        if recordState != .Stopped {
+            
+            // 停止录音
+            audioRecorder?.stop()
+            
+            recordState = .Stopped
+            
+            // 添加到录音片段
+            if currentRecordFilePath != nil {
+                audioRecordFilePathSnippets.append(currentRecordFilePath!)
             }
+            
+            // 设置为空
+            currentRecordFilePath = nil
         }
+        
+        stoppedRecord()
     }
     
     // MARK: - SECCutPanelViewDelegate
@@ -492,6 +575,17 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         
         if cutPanelHidden == false {
             cutPanelHidden(true, animated: true)
+        }
+        
+        if playState == .Playing {
+            // 暂停播放
+            audioPlayer?.pause()
+            playState = .Paused
+            
+            // 关闭播放定时器
+            playTimming?.invalidate()
+            
+            cutPanel?.isPlaying = false
         }
     }
     
@@ -623,6 +717,15 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     func audioRecorderEncodeErrorDidOccur(recorder: AVAudioRecorder, error: NSError?) {
         
         recordState = .Stopped
+        
+        // 添加到录音片段
+        if currentRecordFilePath != nil {
+            audioRecordFilePathSnippets.append(currentRecordFilePath!)
+        }
+        
+        // 设置为空
+        currentRecordFilePath = nil
+        
         stoppedRecord()
     }
     

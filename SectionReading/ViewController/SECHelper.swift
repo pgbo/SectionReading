@@ -69,7 +69,7 @@ class SECHelper: NSObject {
      */
     static func readingRecordStoreDirectory() -> String? {
         
-        let recordStorageDirPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true).first
+        let recordStorageDirPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true).first?.stringByAppendingString("/ReadingRecordAudio/")
 
         let fileMan = NSFileManager.defaultManager()
 

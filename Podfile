@@ -5,4 +5,5 @@ target 'SectionReading' do
     pod 'evernote-cloud-sdk-ios'
     pod 'AngleGradientLayer', '~> 1.0'
     pod 'SVProgressHUD', '~> 1.1.3'
+    pod 'KMPlaceholderTextView', '~> 1.1.1'
 end

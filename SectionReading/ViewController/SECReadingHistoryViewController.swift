@@ -50,7 +50,7 @@ class SECReadingHistoryViewController: UITableViewController {
     
     @objc private func toAddNewRecord() {
         
-        let nav = UINavigationController(rootViewController: SECNewReadingViewController())
+        let nav = UINavigationController(rootViewController: SECNewReadingViewController.instanceFromSB())
         self.presentViewController(nav, animated: true, completion: nil)
 //        self.showViewController(SECNewReadingViewController(), sender: nil)
     }

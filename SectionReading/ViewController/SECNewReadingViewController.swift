@@ -74,24 +74,27 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     private var audioRecordFilePathSnippets: [String] = []
     private var audioCombiner: SECReadingRecordCombiner?
     private var audioCropper: SECReadingRecordCropper?
-    
-    convenience init() {
-        self.init(nibName:"SECNewReadingViewController", bundle:nil)
+
+    class func instanceFromSB() -> SECNewReadingViewController {
+        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewControllerWithIdentifier("SECNewReadingViewController") as! SECNewReadingViewController
     }
     
+//    convenience init() {
+//        self.init(nibName:"SECNewReadingViewController", bundle:nil)
+//    }
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+//        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        fatalError("init(nibName:, bundle:) has not been implemented")
     }
 
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: aDecoder)
     }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.view.backgroundColor = UIColor(red: 0xf2/255.0, green: 0xf2/255.0, blue: 0xf2/255.0, alpha: 1)
         
         self.navigationItem.title = "新建读书"
         self.navigationItem.leftBarButtonItem = self.mCancelBarItem
@@ -270,8 +273,10 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             // 保存文件
             let recordCompletedFilePath = self.moveIntoRecordAudioIntoCompletedRecordFileFromTempFilePath(onlyRecordAudioSnippetFilePath)
             if recordCompletedFilePath != nil {
+                
+                self.audioRecordFilePathSnippets = [recordCompletedFilePath!]
                 // 弹出提示
-                self.showPublishRightNowAlert()
+                self.showPublishAlertViewForReadingRecordFilePath(recordCompletedFilePath!)
             } else {
                 // 提示失败
                 SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
@@ -293,6 +298,18 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
                 return
             }
             
+            // 删除原来的录音片段
+            let fileMan = NSFileManager.defaultManager()
+            for snippetFilePath in self.audioRecordFilePathSnippets {
+                if snippetFilePath != combineAudioFilePath {
+                    do {
+                        try fileMan.removeItemAtPath(snippetFilePath)
+                    } catch let error as NSError {
+                        print("Fail to remove file item:\(snippetFilePath), error:\(error.localizedDescription)")
+                    }
+                }
+            }
+            
             // 取消模态等待
             SVProgressHUD.dismiss()
             
@@ -302,8 +319,10 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             // 保存文件
             let recordCompletedFilePath = self.moveIntoRecordAudioIntoCompletedRecordFileFromTempFilePath(combineAudioFilePath)
             if recordCompletedFilePath != nil {
+                
+                self.audioRecordFilePathSnippets = [recordCompletedFilePath!]
                 // 弹出提示
-                self.showPublishRightNowAlert()
+                self.showPublishAlertViewForReadingRecordFilePath(recordCompletedFilePath!)
             } else {
                 // 提示失败
                 SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
@@ -314,7 +333,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     /**
      * 弹出马上发布的提示
      */
-    private func showPublishRightNowAlert() {
+    private func showPublishAlertViewForReadingRecordFilePath(filePath: String) {
         
         // 弹出发布提示框
         let alertVC = UIAlertController(title: nil, message: "您录制了一段读书录音，是否现在发布？", preferredStyle: UIAlertControllerStyle.Alert)
@@ -322,7 +341,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         alertVC.addAction(UIAlertAction(title: "否", style: UIAlertActionStyle.Cancel, handler: nil))
         
         alertVC.addAction(UIAlertAction(title: "去发布", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
-            self.presentViewController(SECEditReadingViewController(), animated: true, completion: nil)
+            self.navigationController?.showViewController(SECEditNewReadingViewController.instanceFromSB(filePath), sender: nil)
         }))
         
         self.presentViewController(alertVC, animated: true, completion: nil)
@@ -424,8 +443,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     @objc private func firedPlayTimming() {
         
-        if audioPlayer != nil && playState == .Playing {
-            
+        if audioPlayer != nil {
             var selectedRecordRange = selectedWillScissorsScopeRange
             if selectedRecordRange == nil {
                 selectedRecordRange = cutPanel!.defaultSelectedRange
@@ -445,7 +463,13 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     }
     
     @objc private func toClosePage() {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        // 弹出退出确认提示
+        let alert = UIAlertController(title: nil, message: "确定要退出本次读书录音吗?", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "退出", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+            self.dismissViewControllerAnimated(true, completion: nil)
+        }))
+        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+        presentViewController(alert, animated: true, completion: nil)
     }
     
     @objc private func toRecordHistory() {
@@ -522,6 +546,18 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
                 if success == false {
                     SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
                     return
+                }
+                
+                // 删除原来的录音片段
+                let fileMan = NSFileManager.defaultManager()
+                for snippetFilePath in self.audioRecordFilePathSnippets {
+                    if snippetFilePath != combineAudioFilePath {
+                        do {
+                            try fileMan.removeItemAtPath(snippetFilePath)
+                        } catch let error as NSError {
+                            print("Fail to remove file item:\(snippetFilePath), error:\(error.localizedDescription)")
+                        }
+                    }
                 }
                 
                 // 取消模态等待

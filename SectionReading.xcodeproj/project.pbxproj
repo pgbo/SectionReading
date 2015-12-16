@@ -30,6 +30,14 @@
 		599CC6FF1C1E817300147E97 /* SECStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 599CC6FE1C1E817300147E97 /* SECStoryboard.storyboard */; };
 		599CC7011C1E9FFB00147E97 /* SECAudioPlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC7001C1E9FFB00147E97 /* SECAudioPlayView.swift */; };
 		599CC7031C1EA03500147E97 /* SECAudioPlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 599CC7021C1EA03500147E97 /* SECAudioPlayView.xib */; };
+		599CC7071C1FDEA800147E97 /* LvMultiThreadCoreDataDao.m in Sources */ = {isa = PBXBuildFile; fileRef = 599CC7061C1FDEA800147E97 /* LvMultiThreadCoreDataDao.m */; };
+		599CC7091C1FDECF00147E97 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 599CC7081C1FDECF00147E97 /* AVFoundation.framework */; };
+		599CC70B1C1FDED700147E97 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 599CC70A1C1FDED700147E97 /* CoreData.framework */; };
+		599CC70E1C1FDFBF00147E97 /* MainModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 599CC70C1C1FDFBF00147E97 /* MainModel.xcdatamodeld */; };
+		599CC71E1C20083500147E97 /* EvernoteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC71D1C20083500147E97 /* EvernoteManager.swift */; };
+		599CC7211C200A0300147E97 /* TReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC71F1C200A0300147E97 /* TReading+CoreDataProperties.swift */; };
+		599CC7221C200A0300147E97 /* TReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC7201C200A0300147E97 /* TReading.swift */; };
+		599CC7241C202A3D00147E97 /* TReading+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC7231C202A3D00147E97 /* TReading+Mapping.swift */; };
 		59BD23F61BAAB11200AB27FB /* RecordButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */; };
 		59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */; };
 		59C3C93C1BABAA7500CC6200 /* RAQRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */; };
@@ -38,7 +46,7 @@
 		86FFDDD51BA9B346004DFCD5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD41BA9B346004DFCD5 /* Images.xcassets */; };
 		86FFDDD81BA9B346004DFCD5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD61BA9B346004DFCD5 /* LaunchScreen.xib */; };
 		86FFDDE41BA9B346004DFCD5 /* SectionReadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDE31BA9B346004DFCD5 /* SectionReadingTests.swift */; };
-		86FFDDF61BA9B45C004DFCD5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDEE1BA9B45C004DFCD5 /* AppDelegate.swift */; };
+		86FFDDF61BA9B45C004DFCD5 /* SECAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDEE1BA9B45C004DFCD5 /* SECAppDelegate.swift */; };
 		86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDF81BA9B4B4004DFCD5 /* ReadingRecordsVC.swift */; };
 		86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDFA1BA9B576004DFCD5 /* ReadingRecordCell.swift */; };
 		86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FFDDFC1BAB052B004DFCD5 /* NewRecordVC.swift */; };
@@ -81,6 +89,15 @@
 		599CC6FE1C1E817300147E97 /* SECStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = SECStoryboard.storyboard; sourceTree = "<group>"; };
 		599CC7001C1E9FFB00147E97 /* SECAudioPlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECAudioPlayView.swift; sourceTree = "<group>"; };
 		599CC7021C1EA03500147E97 /* SECAudioPlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SECAudioPlayView.xib; sourceTree = "<group>"; };
+		599CC7051C1FDEA800147E97 /* LvMultiThreadCoreDataDao.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LvMultiThreadCoreDataDao.h; sourceTree = "<group>"; };
+		599CC7061C1FDEA800147E97 /* LvMultiThreadCoreDataDao.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LvMultiThreadCoreDataDao.m; sourceTree = "<group>"; };
+		599CC7081C1FDECF00147E97 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		599CC70A1C1FDED700147E97 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		599CC70D1C1FDFBF00147E97 /* MainModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MainModel.xcdatamodel; sourceTree = "<group>"; };
+		599CC71D1C20083500147E97 /* EvernoteManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EvernoteManager.swift; sourceTree = "<group>"; };
+		599CC71F1C200A0300147E97 /* TReading+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		599CC7201C200A0300147E97 /* TReading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TReading.swift; sourceTree = "<group>"; };
+		599CC7231C202A3D00147E97 /* TReading+Mapping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TReading+Mapping.swift"; sourceTree = "<group>"; };
 		59BD23F51BAAB11200AB27FB /* RecordButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordButtonView.swift; sourceTree = "<group>"; };
 		59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSProgressView.swift; sourceTree = "<group>"; };
 		59C3C93A1BABAA7500CC6200 /* RAQRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAQRecorder.h; sourceTree = "<group>"; };
@@ -94,7 +111,7 @@
 		86FFDDDD1BA9B346004DFCD5 /* SectionReadingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SectionReadingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		86FFDDE21BA9B346004DFCD5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86FFDDE31BA9B346004DFCD5 /* SectionReadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionReadingTests.swift; sourceTree = "<group>"; };
-		86FFDDEE1BA9B45C004DFCD5 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		86FFDDEE1BA9B45C004DFCD5 /* SECAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECAppDelegate.swift; sourceTree = "<group>"; };
 		86FFDDEF1BA9B45C004DFCD5 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86FFDDF81BA9B4B4004DFCD5 /* ReadingRecordsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingRecordsVC.swift; sourceTree = "<group>"; };
 		86FFDDFA1BA9B576004DFCD5 /* ReadingRecordCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingRecordCell.swift; sourceTree = "<group>"; };
@@ -107,6 +124,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				599CC70B1C1FDED700147E97 /* CoreData.framework in Frameworks */,
+				599CC7091C1FDECF00147E97 /* AVFoundation.framework in Frameworks */,
 				A1BCBC8D8A3E764A7AD58FC5 /* Pods_SectionReading.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -133,6 +152,8 @@
 		390508CF39368B77473CA623 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				599CC70A1C1FDED700147E97 /* CoreData.framework */,
+				599CC7081C1FDECF00147E97 /* AVFoundation.framework */,
 				29F694485C302FA27B255B35 /* Pods_SectionReading.framework */,
 			);
 			name = Frameworks;
@@ -147,9 +168,37 @@
 			path = Transition;
 			sourceTree = "<group>";
 		};
+		599CC7041C1FDEA800147E97 /* LvMultiThreadCoreDataDao */ = {
+			isa = PBXGroup;
+			children = (
+				599CC7051C1FDEA800147E97 /* LvMultiThreadCoreDataDao.h */,
+				599CC7061C1FDEA800147E97 /* LvMultiThreadCoreDataDao.m */,
+			);
+			path = LvMultiThreadCoreDataDao;
+			sourceTree = "<group>";
+		};
+		599CC70F1C1FE0A500147E97 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				599CC7201C200A0300147E97 /* TReading.swift */,
+				599CC71F1C200A0300147E97 /* TReading+CoreDataProperties.swift */,
+				599CC7231C202A3D00147E97 /* TReading+Mapping.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		599CC71C1C20083500147E97 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				599CC71D1C20083500147E97 /* EvernoteManager.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
 		59C3C9381BABAA7500CC6200 /* Vender */ = {
 			isa = PBXGroup;
 			children = (
+				599CC7041C1FDEA800147E97 /* LvMultiThreadCoreDataDao */,
 				59C3C9391BABAA7500CC6200 /* RAQRecorder */,
 			);
 			path = Vender;
@@ -188,12 +237,12 @@
 		86FFDDCA1BA9B346004DFCD5 /* SectionReading */ = {
 			isa = PBXGroup;
 			children = (
+				599CC71C1C20083500147E97 /* Manager */,
+				599CC70F1C1FE0A500147E97 /* Data */,
 				59C3C9381BABAA7500CC6200 /* Vender */,
 				86FFDDED1BA9B45C004DFCD5 /* Application */,
 				86FFDDF01BA9B45C004DFCD5 /* Helper */,
 				86FFDDF11BA9B45C004DFCD5 /* Model */,
-				86FFDDF21BA9B45C004DFCD5 /* Network */,
-				86FFDDF31BA9B45C004DFCD5 /* Storage */,
 				86FFDDF41BA9B45C004DFCD5 /* View */,
 				86FFDDF51BA9B45C004DFCD5 /* ViewController */,
 				86FFDDD11BA9B346004DFCD5 /* Main.storyboard */,
@@ -224,8 +273,9 @@
 		86FFDDED1BA9B45C004DFCD5 /* Application */ = {
 			isa = PBXGroup;
 			children = (
-				86FFDDEE1BA9B45C004DFCD5 /* AppDelegate.swift */,
+				86FFDDEE1BA9B45C004DFCD5 /* SECAppDelegate.swift */,
 				86FFDDEF1BA9B45C004DFCD5 /* Info.plist */,
+				599CC70C1C1FDFBF00147E97 /* MainModel.xcdatamodeld */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -247,20 +297,6 @@
 				599CC6F81C1E7A9700147E97 /* SECUploadReadingModel.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		86FFDDF21BA9B45C004DFCD5 /* Network */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Network;
-			sourceTree = "<group>";
-		};
-		86FFDDF31BA9B45C004DFCD5 /* Storage */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Storage;
 			sourceTree = "<group>";
 		};
 		86FFDDF41BA9B45C004DFCD5 /* View */ = {
@@ -461,7 +497,7 @@
 				598FD5AA1C103CAC00FC056B /* SECCutPanelView.swift in Sources */,
 				591609A61BD72B1100F14523 /* CDPlaySlider.swift in Sources */,
 				598FD5A21C10221000FC056B /* SECSettingViewController.swift in Sources */,
-				86FFDDF61BA9B45C004DFCD5 /* AppDelegate.swift in Sources */,
+				86FFDDF61BA9B45C004DFCD5 /* SECAppDelegate.swift in Sources */,
 				598FD5A01C10205A00FC056B /* SECNewReadingViewController.swift in Sources */,
 				591609A81BD7473200F14523 /* ScopeGradientView.swift in Sources */,
 				596EB8631C16C79900F2C670 /* SECReadingRecordCropper.swift in Sources */,
@@ -469,19 +505,25 @@
 				598FD59E1C1014F800FC056B /* SECReadingHistoryViewController.swift in Sources */,
 				5995004A1C192B3800EBE225 /* SECReadingRecordCombiner.swift in Sources */,
 				599CC6FB1C1E7CCB00147E97 /* SECEditNewReadingViewController.swift in Sources */,
+				599CC7241C202A3D00147E97 /* TReading+Mapping.swift in Sources */,
 				59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */,
 				599CC6F91C1E7A9700147E97 /* SECUploadReadingModel.swift in Sources */,
 				86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */,
+				599CC71E1C20083500147E97 /* EvernoteManager.swift in Sources */,
 				599CC6F71C1E79DB00147E97 /* SECReadingInfoModel.swift in Sources */,
 				596EB85F1C153FEE00F2C670 /* SECEditReadingViewController.swift in Sources */,
 				86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */,
 				86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */,
 				598FD5A41C10268600FC056B /* SECHelper.swift in Sources */,
+				599CC7221C200A0300147E97 /* TReading.swift in Sources */,
 				597EBCF01BD7A0440031CE2C /* DismissRecordPlayTransition.swift in Sources */,
 				591609AF1BD7920300F14523 /* PresentRecordPlayTransition.swift in Sources */,
 				59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */,
+				599CC7071C1FDEA800147E97 /* LvMultiThreadCoreDataDao.m in Sources */,
 				59BD23F61BAAB11200AB27FB /* RecordButtonView.swift in Sources */,
 				592E369D1BEB563500DC8955 /* CircularButton.swift in Sources */,
+				599CC70E1C1FDFBF00147E97 /* MainModel.xcdatamodeld in Sources */,
+				599CC7211C200A0300147E97 /* TReading+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -702,6 +744,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		599CC70C1C1FDFBF00147E97 /* MainModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				599CC70D1C1FDFBF00147E97 /* MainModel.xcdatamodel */,
+			);
+			currentVersion = 599CC70D1C1FDFBF00147E97 /* MainModel.xcdatamodel */;
+			path = MainModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 86FFDDC01BA9B346004DFCD5 /* Project object */;
 }

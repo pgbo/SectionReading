@@ -79,12 +79,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewControllerWithIdentifier("SECNewReadingViewController") as! SECNewReadingViewController
     }
     
-//    convenience init() {
-//        self.init(nibName:"SECNewReadingViewController", bundle:nil)
-//    }
-    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
-//        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         fatalError("init(nibName:, bundle:) has not been implemented")
     }
 

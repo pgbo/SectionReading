@@ -10,6 +10,9 @@ import UIKit
 
 class SECHelper: NSObject {
 
+    /**
+     全局设置导航栏
+     */
     static func globalCustomSetNavigationBar() {
         
         let navBarAppearance = UINavigationBar.appearance()
@@ -20,6 +23,9 @@ class SECHelper: NSObject {
         navBarAppearance.tintColor = UIColor(red: 0x53/255.0, green: 0x9d/255.0, blue: 0x9f/255.0, alpha: 1)
     }
     
+    /**
+     全局设置 Bar button item
+     */
     static func globalCustomSetBarButtonItem() {
         
         let barButtonItemAppearance = UIBarButtonItem.appearance()
@@ -29,6 +35,20 @@ class SECHelper: NSObject {
         barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFontOfSize(14),NSForegroundColorAttributeName: UIColor(red: 0xA0/255.0, green: 0xB0/255.0, blue: 0xB1/255.0, alpha: 1)], forState: UIControlState.Disabled)
     }
     
+    /**
+     全局设置 TextView
+     */
+    static func globalCustomSetTextView() {
+        UITextView.appearance().tintColor = UIColor(red: 0x53/255.0, green: 0x9d/255.0, blue: 0x9f/255.0, alpha: 1)
+    }
+    
+    /**
+     创建格式化的时长
+     
+     - parameter duration: 时长
+     
+     - returns: 
+     */
     static func createFormatTextForRecordDuration(duration: NSTimeInterval) -> String {
         let totalSeconds = Int(duration)
         

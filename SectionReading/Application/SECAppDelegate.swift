@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  SECAppDelegate.swift
 //  SectionReading
 //
 //  Created by 彭光波 on 15/9/16.
@@ -9,10 +9,15 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegate {
+class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegate {
 
     var window: UIWindow?
+    private (set) var mainDao: LvMultiThreadCoreDataDao!
 
+    static func SELF() -> SECAppDelegate? {
+        return (UIApplication.sharedApplication().delegate as? SECAppDelegate)
+    }
+    
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
@@ -29,6 +34,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegate {
         
         SECHelper.globalCustomSetNavigationBar()
         SECHelper.globalCustomSetBarButtonItem()
+        SECHelper.globalCustomSetTextView()
+        
+        // set up mainDao
+        
+        mainDao = LvMultiThreadCoreDataDao()
+        mainDao!.setupEnvModel("MainModel", dbFile: "MainDB.sqlite")
         
         return true
     }
@@ -54,7 +65,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
 

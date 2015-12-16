@@ -9,6 +9,7 @@
 import UIKit
 import KMPlaceholderTextView
 import AVFoundation
+import evernote_cloud_sdk_ios
 
 class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegate, AVAudioPlayerDelegate {
 
@@ -26,6 +27,8 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
     private (set) var attachAudioFilePath: String?
     private var audioPlayer: AVAudioPlayer?
     private var playTimming: NSTimer?
+    
+    private var hasAttachAudio = false
     
     private lazy var mSaveBarItem: UIBarButtonItem = {
         let item = UIBarButtonItem(title: "保存", style: UIBarButtonItemStyle.Plain, target: self, action: "toSaveReading")
@@ -59,8 +62,9 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
                 // 创建新的播放器
                 try audioPlayer = AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: attachAudioFilePath!))
                 audioPlayer!.delegate = self
-                
                 audioPlayer!.prepareToPlay()
+                
+                hasAttachAudio = true
                 
             } catch let error as NSError {
                 
@@ -131,14 +135,44 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
     }
     
     @objc private func toSaveReading() {
-        // TODO:
+        
+        audioPlayer?.pause()
+        mAudioPlayView?.isPlaying = false
+        playTimming?.invalidate()
+        
+        let textContent = mTextView.text
+        let hasContent = textContent != nil && textContent.isEmpty == false
+        let hasAudio = hasAttachAudio && audioPlayer != nil && audioPlayer!.duration != 0
+        
+        if hasContent ||  hasAudio{
+            let note = ENNote()
+            if textContent != nil {
+                note.setContent(ENNoteContent(string: textContent))
+            }
+            if hasAudio {
+                let audioData = NSData(contentsOfURL: NSURL(fileURLWithPath: attachAudioFilePath!))
+                note.addResource(ENResource(data: audioData, mimeType: "audio/basic", filename: "读书录音"))
+                ENSession.sharedSession().uploadNote(note, notebook: nil, completion: { (noteRef, error) -> Void in
+                    
+                })
+            }
+        }
     }
     
     @objc private func clickedClearAudioButton(sender: UIButton) {
 
-        mAudioContainnerViewTop.constant = 0
-        mAudioContainnerViewHeight.constant = 0
-        mAudioContainnerView.hidden = true
+        self.view.layoutIfNeeded()
+        
+        UIView.animateWithDuration(0.4, animations: {
+            
+            self.mAudioContainnerViewTop.constant = 0
+            self.mAudioContainnerViewHeight.constant = 0
+            self.mAudioContainnerView.hidden = true
+            
+            self.view.layoutIfNeeded()
+        })
+        
+        hasAttachAudio = false
     }
     
     @objc private func firedPlayTimming() {
@@ -175,5 +209,19 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
         NSRunLoop.mainRunLoop().addTimer(playTimming!, forMode: NSRunLoopCommonModes)
         
         mAudioPlayView?.isPlaying = true
+    }
+    
+    // MARK: - AVAudioPlayerDelegate
+    
+    func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
+        
+        playTimming?.invalidate()
+        mAudioPlayView?.isPlaying = false
+    }
+    
+    func audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
+    
+        playTimming?.invalidate()
+        mAudioPlayView?.isPlaying = false
     }
 }

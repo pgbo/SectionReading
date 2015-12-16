@@ -132,7 +132,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eYm-fV-72r">
-                                <rect key="frame" x="0.0" y="36" width="375" height="55"/>
+                                <rect key="frame" x="0.0" y="36" width="375" height="60"/>
                                 <subviews>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AttachIcon" translatesAutoresizingMaskIntoConstraints="NO" id="jor-Ef-KSi">
                                         <rect key="frame" x="16" y="0.0" width="20" height="20"/>
@@ -153,15 +153,15 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hzx-w0-2Zf">
-                                        <rect key="frame" x="16" y="28" width="317" height="27"/>
+                                        <rect key="frame" x="16" y="28" width="317" height="32"/>
                                         <animations/>
                                         <color key="backgroundColor" red="0.32549019610000002" green="0.61568627450000002" blue="0.62352941179999999" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="27" id="rCg-It-Q4N"/>
+                                            <constraint firstAttribute="height" constant="32" id="rCg-It-Q4N"/>
                                         </constraints>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6E7-9N-boq">
-                                        <rect key="frame" x="337" y="26" width="32" height="32"/>
+                                        <rect key="frame" x="337" y="28" width="32" height="32"/>
                                         <animations/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="6E7-9N-boq" secondAttribute="height" multiplier="1:1" id="MjA-1k-eBu"/>
@@ -179,7 +179,7 @@
                                     <constraint firstItem="6E7-9N-boq" firstAttribute="centerY" secondItem="Hzx-w0-2Zf" secondAttribute="centerY" id="TO1-gA-4hy"/>
                                     <constraint firstItem="6E7-9N-boq" firstAttribute="leading" secondItem="Hzx-w0-2Zf" secondAttribute="trailing" constant="4" id="Tf1-WE-afC"/>
                                     <constraint firstItem="Hzx-w0-2Zf" firstAttribute="top" secondItem="jor-Ef-KSi" secondAttribute="bottom" constant="8" id="Uep-AI-TP1"/>
-                                    <constraint firstAttribute="height" constant="55" id="a1v-ML-iy1"/>
+                                    <constraint firstAttribute="height" constant="60" id="a1v-ML-iy1"/>
                                     <constraint firstItem="jor-Ef-KSi" firstAttribute="top" secondItem="eYm-fV-72r" secondAttribute="top" id="cTT-n7-SCy"/>
                                     <constraint firstItem="3Wm-KC-Oa2" firstAttribute="leading" secondItem="jor-Ef-KSi" secondAttribute="trailing" constant="6" id="eIi-Ko-tdl"/>
                                     <constraint firstAttribute="trailing" secondItem="6E7-9N-boq" secondAttribute="trailing" constant="6" id="k0Y-h0-kBp"/>
@@ -187,7 +187,7 @@
                                 </constraints>
                             </view>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TextIcon" translatesAutoresizingMaskIntoConstraints="NO" id="Bi9-h8-RzJ">
-                                <rect key="frame" x="16" y="111" width="20" height="20"/>
+                                <rect key="frame" x="16" y="116" width="20" height="20"/>
                                 <animations/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Bi9-h8-RzJ" secondAttribute="height" multiplier="1:1" id="XjO-zF-X2x"/>
@@ -195,7 +195,7 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="文字" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ik4-1W-GF3">
-                                <rect key="frame" x="42" y="112" width="28" height="18"/>
+                                <rect key="frame" x="42" y="117" width="28" height="18"/>
                                 <animations/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="BZg-5V-DWz"/>
@@ -205,12 +205,12 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="RecordTextInputAreaBg" translatesAutoresizingMaskIntoConstraints="NO" id="Drs-LS-kMQ">
-                                <rect key="frame" x="0.0" y="139" width="375" height="528"/>
+                                <rect key="frame" x="0.0" y="144" width="375" height="523"/>
                                 <animations/>
                                 <rect key="contentStretch" x="0.0" y="0.20000000000000001" width="1" height="0.80000000000000004"/>
                             </imageView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" translatesAutoresizingMaskIntoConstraints="NO" id="JVl-7o-EYy" customClass="KMPlaceholderTextView" customModule="KMPlaceholderTextView">
-                                <rect key="frame" x="0.0" y="141" width="375" height="526"/>
+                                <rect key="frame" x="0.0" y="146" width="375" height="521"/>
                                 <animations/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <color key="textColor" red="0.1803921568627451" green="0.1803921568627451" blue="0.1803921568627451" alpha="1" colorSpace="calibratedRGB"/>

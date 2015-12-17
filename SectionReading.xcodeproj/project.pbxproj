@@ -34,7 +34,7 @@
 		599CC7091C1FDECF00147E97 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 599CC7081C1FDECF00147E97 /* AVFoundation.framework */; };
 		599CC70B1C1FDED700147E97 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 599CC70A1C1FDED700147E97 /* CoreData.framework */; };
 		599CC70E1C1FDFBF00147E97 /* MainModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 599CC70C1C1FDFBF00147E97 /* MainModel.xcdatamodeld */; };
-		599CC71E1C20083500147E97 /* EvernoteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC71D1C20083500147E97 /* EvernoteManager.swift */; };
+		599CC71E1C20083500147E97 /* SECEvernoteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC71D1C20083500147E97 /* SECEvernoteManager.swift */; };
 		599CC7211C200A0300147E97 /* TReading+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC71F1C200A0300147E97 /* TReading+CoreDataProperties.swift */; };
 		599CC7221C200A0300147E97 /* TReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC7201C200A0300147E97 /* TReading.swift */; };
 		599CC7241C202A3D00147E97 /* TReading+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC7231C202A3D00147E97 /* TReading+Mapping.swift */; };
@@ -94,7 +94,7 @@
 		599CC7081C1FDECF00147E97 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		599CC70A1C1FDED700147E97 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		599CC70D1C1FDFBF00147E97 /* MainModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MainModel.xcdatamodel; sourceTree = "<group>"; };
-		599CC71D1C20083500147E97 /* EvernoteManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EvernoteManager.swift; sourceTree = "<group>"; };
+		599CC71D1C20083500147E97 /* SECEvernoteManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECEvernoteManager.swift; sourceTree = "<group>"; };
 		599CC71F1C200A0300147E97 /* TReading+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TReading+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		599CC7201C200A0300147E97 /* TReading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TReading.swift; sourceTree = "<group>"; };
 		599CC7231C202A3D00147E97 /* TReading+Mapping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TReading+Mapping.swift"; sourceTree = "<group>"; };
@@ -190,7 +190,7 @@
 		599CC71C1C20083500147E97 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
-				599CC71D1C20083500147E97 /* EvernoteManager.swift */,
+				599CC71D1C20083500147E97 /* SECEvernoteManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -509,7 +509,7 @@
 				59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */,
 				599CC6F91C1E7A9700147E97 /* SECUploadReadingModel.swift in Sources */,
 				86FFDDFB1BA9B576004DFCD5 /* ReadingRecordCell.swift in Sources */,
-				599CC71E1C20083500147E97 /* EvernoteManager.swift in Sources */,
+				599CC71E1C20083500147E97 /* SECEvernoteManager.swift in Sources */,
 				599CC6F71C1E79DB00147E97 /* SECReadingInfoModel.swift in Sources */,
 				596EB85F1C153FEE00F2C670 /* SECEditReadingViewController.swift in Sources */,
 				86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */,

@@ -13,6 +13,7 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
 
     var window: UIWindow?
     private (set) var mainDao: LvMultiThreadCoreDataDao!
+    private (set) var evernoteManager: SECEvernoteManager!
 
     static func SELF() -> SECAppDelegate? {
         return (UIApplication.sharedApplication().delegate as? SECAppDelegate)
@@ -36,10 +37,15 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
         SECHelper.globalCustomSetBarButtonItem()
         SECHelper.globalCustomSetTextView()
         
-        // set up mainDao
+        // setup mainDao
         
         mainDao = LvMultiThreadCoreDataDao()
         mainDao!.setupEnvModel("MainModel", dbFile: "MainDB.sqlite")
+        
+        // setup evernoteManager
+        
+        evernoteManager = SECEvernoteManager()
+        
         
         return true
     }
@@ -52,6 +58,8 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
     func applicationDidEnterBackground(application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        mainDao.saveToStorageFile()
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
@@ -63,7 +71,8 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
     }
 
     func applicationWillTerminate(application: UIApplication) {
-        // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        
+        mainDao.saveToStorageFile()
     }
 }
 

@@ -16,7 +16,8 @@ extension TReading {
 
     @NSManaged var fUploadingAudioFilePath: String?
     @NSManaged var fUploadedAudioUrl: String?
-    @NSManaged var fGuid: String?
+    @NSManaged var fEvernoteGuid: String?
+    @NSManaged var fLocalId: String?
     @NSManaged var fCreateTimestamp: NSNumber?
     @NSManaged var fModifyTimestamp: NSNumber?
     @NSManaged var fContent: String?

@@ -18,9 +18,9 @@ extension TReading {
      */
     func fillFields(fromEverNote note: EDAMNote) {
         
-        fGuid = note.guid
-        fCreateTimestamp = note.created.integerValue
-        fModifyTimestamp = note.updated.integerValue
+        fEvernoteGuid = note.guid
+        fCreateTimestamp = note.created
+        fModifyTimestamp = note.updated
         fContent = note.content
     }
     
@@ -32,7 +32,7 @@ extension TReading {
      */
     static func fillFieldsFor(note: EDAMNote, withReading reading: TReading) {
     
-        note.guid = reading.fGuid
+        note.guid = reading.fEvernoteGuid
         note.created = reading.fCreateTimestamp
         note.updated = reading.fModifyTimestamp
         note.content = reading.fContent

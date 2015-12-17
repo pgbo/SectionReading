@@ -23,13 +23,6 @@ let TReadingEntityName = "TReading"
 
 @objc(TReading)
 class TReading: NSManagedObject {
-
-    class ReadingQueryOption: NSObject {
-        var guid: String?
-        var syncStatus: ReadingSyncStatus?
-        var status: String?
-    }
-    
     
     /**
     新建读书记录
@@ -58,12 +51,12 @@ class TReading: NSManagedObject {
     }
     
     /**
-     修改某条读书记录
+     修改读书记录
      
-     - parameter guid:        想要修改读书记录的 guid
-     - parameter updateBlock: 修改记录的 Block
+     - parameter filterOption: 过滤条件
+     - parameter updateBlock:  修改 Block
      */
-    static func update(ReadingWithGuid guid: String, withUpdateBlock updateBlock: ((readingtoUpdate: TReading) -> Void)) {
+    static func update(withFilterOption filterOption: ReadingQueryOption, updateBlock: ((readingtoUpdate: TReading) -> Void)) {
         
         let mainDao = SECAppDelegate.SELF()?.mainDao
         if mainDao == nil {
@@ -71,8 +64,7 @@ class TReading: NSManagedObject {
         }
         
         let fetchReq = NSFetchRequest(entityName: TReadingEntityName)
-        fetchReq.predicate = NSPredicate(format: "(%K == %@)", "fGuid", guid)
-        fetchReq.fetchLimit = 1
+        fetchReq.predicate = createFetchRequestPredicate(fromReadingQueryOption: filterOption)
         
         mainDao!.filterObjectWithFetchRequest(fetchReq) { (results, error) -> Void in
             for reading in results {
@@ -121,6 +113,24 @@ class TReading: NSManagedObject {
             completion?(results: (results as? [TReading]))
         })
     }
+    
+    /**
+     查询数量
+     
+     - parameter option: 查询条件
+     */
+    static func count(withOption option: ReadingQueryOption?) -> Int? {
+        
+        let mainDao = SECAppDelegate.SELF()?.mainDao
+        if mainDao == nil {
+            return nil
+        }
+        
+        let fetchReq = NSFetchRequest(entityName: TReadingEntityName)
+        fetchReq.predicate = createFetchRequestPredicate(fromReadingQueryOption: option)
+        
+        return mainDao!.countWithFetchRequest(fetchReq)
+    }
 
     
     private static func createFetchRequestPredicate(fromReadingQueryOption queryOption: ReadingQueryOption?) -> NSPredicate? {
@@ -131,18 +141,35 @@ class TReading: NSManagedObject {
         
         var predicates: [NSPredicate] = []
         
-        if queryOption!.guid != nil {
-            predicates.append(NSPredicate(format: "(%K == %@)", "fGuid", queryOption!.guid!))
+        if queryOption!.localId != nil {
+            predicates.append(NSPredicate(format: "(%K == %@)", "fLocalId", queryOption!.localId!))
+        }
+        
+        if queryOption!.evernoteGuid != nil {
+            predicates.append(NSPredicate(format: "(%K == %@)", "fEvernoteGuid", queryOption!.evernoteGuid!))
         }
         
         if queryOption!.syncStatus != nil {
-            predicates.append(NSPredicate(format: "(%K == %@)", "fSyncStatus", NSNumber(integer: queryOption!.syncStatus!.rawValue)))
+            var syncStatusPredicates: [NSPredicate] = []
+            for syncStatus in queryOption!.syncStatus! {
+                syncStatusPredicates.append(NSPredicate(format: "(%K == %@)", "fSyncStatus", NSNumber(integer: syncStatus.rawValue)))
+            }
+            if syncStatusPredicates.count > 0 {
+                predicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: syncStatusPredicates))
+            }
         }
         
         if queryOption!.status != nil {
             predicates.append(NSPredicate(format: "(%K == %@)", "fStatus", queryOption!.status!))
         }
         
-        return NSCompoundPredicate(type: NSCompoundPredicateType.AndPredicateType, subpredicates: predicates)
+        return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
+}
+
+class ReadingQueryOption: NSObject {
+    var localId: String?
+    var evernoteGuid: String?
+    var syncStatus: [ReadingSyncStatus]?
+    var status: String?
 }

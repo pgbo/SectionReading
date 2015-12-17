@@ -38,9 +38,20 @@ class SECSettingViewController: UITableViewController {
         
         if cellSection == 0 {
             if cellRow == 0 {
-            
+                if SECAppDelegate.SELF()!.evernoteManager.isAuthenticated() {
+                    cell.textLabel?.text = "退出 Evernote"
+                } else {
+                    cell.textLabel?.text = "登录并同步到 Evernote"
+                }
             } else if cellRow == 1 {
-            
+                
+                let stillSync = NSUserDefaults.standardUserDefaults().boolForKey(kUserDefault_StillSyncNoteUnder2Or3G)
+                if stillSync {
+                    cell.detailTextLabel?.text = "开启"
+                } else {
+                    cell.detailTextLabel?.text = "关闭"
+                }
+                
             } else if cellRow == 2 {
             
             }

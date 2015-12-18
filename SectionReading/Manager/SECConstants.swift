@@ -8,4 +8,5 @@
 
 import Foundation
 
-let kUserDefault_StillSyncNoteUnder2Or3G = "kUserDefault_StillSyncNoteUnder2Or3G"
+// 只在 WIFI 下同步的开关 key
+let kUserDefault_OnlySyncNoteUnderWIFI = "kUserDefault_OnlySyncNoteUnderWIFI"

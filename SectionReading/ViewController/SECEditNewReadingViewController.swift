@@ -10,6 +10,7 @@ import UIKit
 import KMPlaceholderTextView
 import AVFoundation
 import evernote_cloud_sdk_ios
+import SVProgressHUD
 
 class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegate, AVAudioPlayerDelegate {
 
@@ -34,6 +35,8 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
         let item = UIBarButtonItem(title: "保存", style: UIBarButtonItemStyle.Plain, target: self, action: "toSaveReading")
         return item
     }()
+    
+    private var evernoteManager = SECAppDelegate.SELF()!.evernoteManager
     
     class func instanceFromSB(attachAudioFilePath: String?) -> SECEditNewReadingViewController {
         
@@ -154,6 +157,27 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
                 note.addResource(ENResource(data: audioData, mimeType: "audio/basic", filename: "读书录音"))
                 ENSession.sharedSession().uploadNote(note, notebook: nil, completion: { (noteRef, error) -> Void in
                     
+                })
+                
+                SVProgressHUD.showWithStatus("")
+                TReading.create(withConstructBlock: { (newReading) -> Void in
+                    newReading.fLocalId = "\(NSUUID().UUIDString)"
+                    newReading.fContent = textContent
+                    newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.NeedSyncUpload.rawValue)
+                    
+                    let time = NSNumber(int: Int32(NSDate().timeIntervalSince1970))
+                    newReading.fCreateTimestamp = time
+                    newReading.fModifyTimestamp = time
+                
+                    // 同步
+                    self.evernoteManager.createNote(withContent: newReading, completion: { (note) -> Void in
+                        SVProgressHUD.dismiss()
+                        if note != nil {
+                            newReading.fillFields(fromEverNote: note!)
+                            // 到分享页面
+                            print("上传成功")
+                        }
+                    })
                 })
             }
         }

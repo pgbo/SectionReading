@@ -7,13 +7,20 @@
 //
 
 import UIKit
+import evernote_cloud_sdk_ios
+
+let ENDPOINT_HOST = ENSessionHostSandbox
+let CONSUMER_KEY = "guangbool"
+let CONSUMER_SECRET = "035fdd283de30a69"
 
 @UIApplicationMain
 class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegate {
 
     var window: UIWindow?
-    private (set) var mainDao: LvMultiThreadCoreDataDao!
+    
     private (set) var evernoteManager: SECEvernoteManager!
+    
+    private (set) var mainDao: LvMultiThreadCoreDataDao!
 
     static func SELF() -> SECAppDelegate? {
         return (UIApplication.sharedApplication().delegate as? SECAppDelegate)
@@ -37,15 +44,19 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
         SECHelper.globalCustomSetBarButtonItem()
         SECHelper.globalCustomSetTextView()
         
-        // setup mainDao
+        // Initial evernote sdk
         
-        mainDao = LvMultiThreadCoreDataDao()
-        mainDao!.setupEnvModel("MainModel", dbFile: "MainDB.sqlite")
+        ENSession.setSharedSessionConsumerKey(CONSUMER_KEY, consumerSecret: CONSUMER_SECRET, optionalHost: ENDPOINT_HOST)
         
         // setup evernoteManager
         
         evernoteManager = SECEvernoteManager()
         
+        
+        // setup mainDao
+        
+        mainDao = LvMultiThreadCoreDataDao()
+        mainDao!.setupEnvModel("MainModel", dbFile: "MainDB.sqlite")
         
         return true
     }
@@ -73,6 +84,18 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
     func applicationWillTerminate(application: UIApplication) {
         
         mainDao.saveToStorageFile()
+    }
+    
+    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+        
+        let didHandle = ENSession.sharedSession().handleOpenURL(url)
+        return didHandle
+    }
+    
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+        
+        let didHandle = ENSession.sharedSession().handleOpenURL(url)
+        return didHandle
     }
 }
 

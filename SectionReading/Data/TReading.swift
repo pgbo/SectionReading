@@ -44,7 +44,7 @@ class TReading: NSManagedObject {
                 constructBlock(newReading: newReading!)
                 
                 if newReading!.fModifyTimestamp == nil {
-                    newReading!.fModifyTimestamp = Int(NSDate().timeIntervalSince1970)
+                    newReading!.fModifyTimestamp = NSNumber(int: Int32(NSDate().timeIntervalSince1970))
                 }
             }
         })

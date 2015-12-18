@@ -24,6 +24,10 @@ class SECReadingHistoryViewController: UITableViewController {
         return item
     }()
     
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
     override init(style: UITableViewStyle) {
         super.init(style: UITableViewStyle.Grouped)
     }
@@ -45,18 +49,16 @@ class SECReadingHistoryViewController: UITableViewController {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     @objc private func toAddNewRecord() {
         
         let nav = UINavigationController(rootViewController: SECNewReadingViewController.instanceFromSB())
         self.presentViewController(nav, animated: true, completion: nil)
-//        self.showViewController(SECNewReadingViewController(), sender: nil)
     }
     
     @objc private func toSetting() {
-        self.navigationController?.showViewController(SECSettingViewController(style: UITableViewStyle.Grouped), sender: nil)
+        self.navigationController?.showViewController(SECSettingViewController.instanceFromSB(), sender: nil)
     }
     
 

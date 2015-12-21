@@ -102,7 +102,7 @@ class SECEvernoteManager: NSObject {
         TReading.fillFieldsFor(note, withReading: content)
         
         note.notebookGuid = appNotebookGuid!
-        note.title = ""
+        note.title = "读书记录"
         
         noteSession.primaryNoteStore().createNote(note, success: { (createdNote) -> Void in
             

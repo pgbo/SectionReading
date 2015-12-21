@@ -28,7 +28,6 @@
 		599CC6F71C1E79DB00147E97 /* SECReadingInfoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC6F61C1E79DB00147E97 /* SECReadingInfoModel.swift */; };
 		599CC6F91C1E7A9700147E97 /* SECUploadReadingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC6F81C1E7A9700147E97 /* SECUploadReadingModel.swift */; };
 		599CC6FB1C1E7CCB00147E97 /* SECEditNewReadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC6FA1C1E7CCB00147E97 /* SECEditNewReadingViewController.swift */; };
-		599CC6FF1C1E817300147E97 /* SECStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 599CC6FE1C1E817300147E97 /* SECStoryboard.storyboard */; };
 		599CC7011C1E9FFB00147E97 /* SECAudioPlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599CC7001C1E9FFB00147E97 /* SECAudioPlayView.swift */; };
 		599CC7031C1EA03500147E97 /* SECAudioPlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 599CC7021C1EA03500147E97 /* SECAudioPlayView.xib */; };
 		599CC7071C1FDEA800147E97 /* LvMultiThreadCoreDataDao.m in Sources */ = {isa = PBXBuildFile; fileRef = 599CC7061C1FDEA800147E97 /* LvMultiThreadCoreDataDao.m */; };
@@ -43,6 +42,8 @@
 		59C3C9371BAABA6F00CC6200 /* RSProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C9361BAABA6F00CC6200 /* RSProgressView.swift */; };
 		59C3C93C1BABAA7500CC6200 /* RAQRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */; };
 		59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */; };
+		59D9529E1C27F69500FE9B36 /* SECStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 59D9529D1C27F69500FE9B36 /* SECStoryboard.storyboard */; };
+		59D952A31C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D952A21C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift */; };
 		86FFDDD31BA9B346004DFCD5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD11BA9B346004DFCD5 /* Main.storyboard */; };
 		86FFDDD51BA9B346004DFCD5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD41BA9B346004DFCD5 /* Images.xcassets */; };
 		86FFDDD81BA9B346004DFCD5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD61BA9B346004DFCD5 /* LaunchScreen.xib */; };
@@ -88,7 +89,6 @@
 		599CC6F61C1E79DB00147E97 /* SECReadingInfoModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECReadingInfoModel.swift; sourceTree = "<group>"; };
 		599CC6F81C1E7A9700147E97 /* SECUploadReadingModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECUploadReadingModel.swift; sourceTree = "<group>"; };
 		599CC6FA1C1E7CCB00147E97 /* SECEditNewReadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECEditNewReadingViewController.swift; sourceTree = "<group>"; };
-		599CC6FE1C1E817300147E97 /* SECStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = SECStoryboard.storyboard; sourceTree = "<group>"; };
 		599CC7001C1E9FFB00147E97 /* SECAudioPlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECAudioPlayView.swift; sourceTree = "<group>"; };
 		599CC7021C1EA03500147E97 /* SECAudioPlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SECAudioPlayView.xib; sourceTree = "<group>"; };
 		599CC7051C1FDEA800147E97 /* LvMultiThreadCoreDataDao.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LvMultiThreadCoreDataDao.h; sourceTree = "<group>"; };
@@ -106,6 +106,8 @@
 		59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RAQRecorder.m; sourceTree = "<group>"; };
 		59C3C93E1BABAB4100CC6200 /* SectionReading-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SectionReading-Bridging-Header.h"; sourceTree = "<group>"; };
 		59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipleArcTracksView.swift; sourceTree = "<group>"; };
+		59D9529D1C27F69500FE9B36 /* SECStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = SECStoryboard.storyboard; sourceTree = "<group>"; };
+		59D952A21C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECReadingHistoryTableViewCell.swift; sourceTree = "<group>"; };
 		86FFDDC81BA9B346004DFCD5 /* SectionReading.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SectionReading.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		86FFDDD21BA9B346004DFCD5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		86FFDDD41BA9B346004DFCD5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 				86FFDDF41BA9B45C004DFCD5 /* View */,
 				86FFDDF51BA9B45C004DFCD5 /* ViewController */,
 				86FFDDD11BA9B346004DFCD5 /* Main.storyboard */,
+				59D9529D1C27F69500FE9B36 /* SECStoryboard.storyboard */,
 				86FFDDD41BA9B346004DFCD5 /* Images.xcassets */,
 				86FFDDD61BA9B346004DFCD5 /* LaunchScreen.xib */,
 				598FD59B1C0FF9ED00FC056B /* ImageAssets.xcassets */,
@@ -317,6 +320,7 @@
 				598FD5A71C103C9300FC056B /* SECCutPanelView.xib */,
 				599CC7001C1E9FFB00147E97 /* SECAudioPlayView.swift */,
 				599CC7021C1EA03500147E97 /* SECAudioPlayView.xib */,
+				59D952A21C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -333,7 +337,6 @@
 				598FD5A11C10221000FC056B /* SECSettingViewController.swift */,
 				596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */,
 				599CC6FA1C1E7CCB00147E97 /* SECEditNewReadingViewController.swift */,
-				599CC6FE1C1E817300147E97 /* SECStoryboard.storyboard */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -422,10 +425,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				59D9529E1C27F69500FE9B36 /* SECStoryboard.storyboard in Resources */,
 				598FD5A81C103C9300FC056B /* SECCutPanelView.xib in Resources */,
 				599CC7031C1EA03500147E97 /* SECAudioPlayView.xib in Resources */,
 				86FFDDD31BA9B346004DFCD5 /* Main.storyboard in Resources */,
-				599CC6FF1C1E817300147E97 /* SECStoryboard.storyboard in Resources */,
 				86FFDDD81BA9B346004DFCD5 /* LaunchScreen.xib in Resources */,
 				598FD59C1C0FF9ED00FC056B /* ImageAssets.xcassets in Resources */,
 				86FFDDD51BA9B346004DFCD5 /* Images.xcassets in Resources */,
@@ -528,6 +531,7 @@
 				592E369D1BEB563500DC8955 /* CircularButton.swift in Sources */,
 				599CC70E1C1FDFBF00147E97 /* MainModel.xcdatamodeld in Sources */,
 				599CC7211C200A0300147E97 /* TReading+CoreDataProperties.swift in Sources */,
+				59D952A31C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

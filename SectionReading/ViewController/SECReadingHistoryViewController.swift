@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UITableView_FDTemplateLayoutCell
 
 /**
  *  读书纪录列表页面
@@ -14,6 +15,8 @@ import UIKit
  */
 class SECReadingHistoryViewController: UITableViewController {
 
+    private var readings: [TReading]?
+    
     private lazy var mNewRecordBarItem: UIBarButtonItem = {
         let item = UIBarButtonItem(title: "新建", style: UIBarButtonItemStyle.Plain, target: self, action: "toAddNewRecord")
         return item
@@ -23,6 +26,10 @@ class SECReadingHistoryViewController: UITableViewController {
         let item = UIBarButtonItem(title: "设置", style: UIBarButtonItemStyle.Plain, target: self, action: "toSetting")
         return item
     }()
+    
+    class func instanceFromSB() -> SECReadingHistoryViewController {
+        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewControllerWithIdentifier("SECReadingHistoryViewController") as! SECReadingHistoryViewController
+    }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -37,6 +44,7 @@ class SECReadingHistoryViewController: UITableViewController {
     }
   
     override func viewDidLoad() {
+       
         super.viewDidLoad()
         
         self.clearsSelectionOnViewWillAppear = false
@@ -45,6 +53,14 @@ class SECReadingHistoryViewController: UITableViewController {
         self.navigationItem.title = "读书记录"
         self.navigationItem.leftBarButtonItem = self.mNewRecordBarItem
         self.navigationItem.rightBarButtonItem = self.mSettingBarItem
+        
+        TReading.filterByOption(nil, completion: { [weak self] (results) -> Void in
+            if let strongSelf = self {
+                print("Reading count: \(results != nil ?results!.count :0)")
+                strongSelf.readings = results
+                strongSelf.tableView.reloadData()
+            }
+        })
     }
 
     override func didReceiveMemoryWarning() {
@@ -58,79 +74,42 @@ class SECReadingHistoryViewController: UITableViewController {
     }
     
     @objc private func toSetting() {
+       
         self.navigationController?.showViewController(SECSettingViewController.instanceFromSB(), sender: nil)
     }
     
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        
+        return readings != nil ?readings!.count :0
     }
-
+    
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    
+        let cell = tableView.dequeueReusableCellWithIdentifier("SECReadingHistoryTableViewCell", forIndexPath: indexPath) as! SECReadingHistoryTableViewCell
+        configureCell(cell, atIndexPath: indexPath)
+        return cell
+    }
+    
+    private func configureCell(cell: SECReadingHistoryTableViewCell, atIndexPath indexPath: NSIndexPath) {
+    
+        let reading = readings![indexPath.row]
+        cell.configure(withReading: reading)
+    }
+    
+    // MARK: -  UITableViewDelegate
+    
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        
         return 0.1
     }
     
-    /*
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath)
-
-        // Configure the cell...
-
-        return cell
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        
+        return tableView.fd_heightForCellWithIdentifier("SECReadingHistoryTableViewCell", cacheByIndexPath: indexPath, configuration: { (cell) -> Void in
+            self.configureCell(cell as! SECReadingHistoryTableViewCell, atIndexPath: indexPath)
+        })
     }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

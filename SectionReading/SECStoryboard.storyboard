@@ -119,6 +119,131 @@
             </objects>
             <point key="canvasLocation" x="417.5" y="323.5"/>
         </scene>
+        <!--Reading History View Controller-->
+        <scene sceneID="dls-sI-yc3">
+            <objects>
+                <tableViewController storyboardIdentifier="SECReadingHistoryViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="RRd-4q-yyX" customClass="SECReadingHistoryViewController" customModule="SectionReading" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="hgu-h5-hzk">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <animations/>
+                        <color key="backgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SECReadingHistoryTableViewCell" rowHeight="150" id="vVY-4l-Nb7" customClass="SECReadingHistoryTableViewCell" customModule="SectionReading" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="92" width="375" height="150"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="vVY-4l-Nb7" id="8da-W5-oZS">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="149"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YVf-Jr-30J">
+                                            <rect key="frame" x="12" y="10" width="351" height="55"/>
+                                            <animations/>
+                                            <string key="text">在一起的时间有限，怎么忍心分隔争吵与生气呢？我只想安安稳稳的和你在一起，我很认真，也很走心。
+在一起的时间有限，怎么忍心分隔争吵与生气呢？我只想安安稳稳的和你在一起，我很认真，也很走心。</string>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.29019607843137252" green="0.29019607843137252" blue="0.29019607843137252" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VSu-Jd-Nur">
+                                            <rect key="frame" x="12" y="75" width="351" height="32"/>
+                                            <animations/>
+                                            <color key="backgroundColor" red="0.32549019610000002" green="0.61568627450000002" blue="0.62352941179999999" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="32" id="1QF-n4-BvF"/>
+                                            </constraints>
+                                        </view>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2015/11/28 22:01" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IID-py-OtM">
+                                            <rect key="frame" x="12" y="122" width="97" height="15"/>
+                                            <animations/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="textColor" red="0.48627450980392156" green="0.48627450980392156" blue="0.48627450980392156" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dAw-9h-f5x">
+                                            <rect key="frame" x="339" y="117" width="24" height="24"/>
+                                            <animations/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="dAw-9h-f5x" secondAttribute="height" multiplier="1:1" id="JY4-Mo-Fiy"/>
+                                                <constraint firstAttribute="width" constant="24" id="mIM-vB-UGy"/>
+                                            </constraints>
+                                            <state key="normal" image="ShareButn"/>
+                                            <state key="highlighted" image="ShareButnHL"/>
+                                            <connections>
+                                                <action selector="clickedActionButton:" destination="vVY-4l-Nb7" eventType="touchUpInside" id="vwV-Xj-m00"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NSK-pZ-PET">
+                                            <rect key="frame" x="305" y="117" width="24" height="24"/>
+                                            <animations/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="NSK-pZ-PET" secondAttribute="height" multiplier="1:1" id="1RL-iy-xsV"/>
+                                                <constraint firstAttribute="width" constant="24" id="olw-Nw-UK6"/>
+                                            </constraints>
+                                            <state key="normal" image="TrashButn"/>
+                                            <state key="highlighted" image="TrashButnHL"/>
+                                            <connections>
+                                                <action selector="clickedActionButton:" destination="vVY-4l-Nb7" eventType="touchUpInside" id="YiZ-53-puM"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rln-oP-r1g">
+                                            <rect key="frame" x="271" y="117" width="24" height="24"/>
+                                            <animations/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="Rln-oP-r1g" secondAttribute="height" multiplier="1:1" id="OAX-Av-xDs"/>
+                                                <constraint firstAttribute="width" constant="24" id="awW-uF-Jkg"/>
+                                            </constraints>
+                                            <state key="normal" image="EditButn"/>
+                                            <state key="highlighted" image="EditButnHL"/>
+                                            <connections>
+                                                <action selector="clickedActionButton:" destination="vVY-4l-Nb7" eventType="touchUpInside" id="y2O-kg-ugT"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <animations/>
+                                    <constraints>
+                                        <constraint firstItem="IID-py-OtM" firstAttribute="leading" secondItem="8da-W5-oZS" secondAttribute="leading" constant="12" id="Blw-Yn-nvj"/>
+                                        <constraint firstItem="YVf-Jr-30J" firstAttribute="top" secondItem="8da-W5-oZS" secondAttribute="top" constant="10" id="DhA-Dq-GDT"/>
+                                        <constraint firstAttribute="bottom" secondItem="dAw-9h-f5x" secondAttribute="bottom" constant="8" id="FBF-GH-n3H"/>
+                                        <constraint firstItem="NSK-pZ-PET" firstAttribute="leading" secondItem="Rln-oP-r1g" secondAttribute="trailing" constant="10" id="HcL-gS-eN3"/>
+                                        <constraint firstItem="dAw-9h-f5x" firstAttribute="leading" secondItem="NSK-pZ-PET" secondAttribute="trailing" constant="10" id="Lib-EV-dtA"/>
+                                        <constraint firstAttribute="trailing" secondItem="VSu-Jd-Nur" secondAttribute="trailing" constant="12" id="QH3-7q-hgT"/>
+                                        <constraint firstItem="IID-py-OtM" firstAttribute="centerY" secondItem="dAw-9h-f5x" secondAttribute="centerY" id="SjV-gT-5or"/>
+                                        <constraint firstItem="NSK-pZ-PET" firstAttribute="centerY" secondItem="dAw-9h-f5x" secondAttribute="centerY" id="UIe-nB-6ES"/>
+                                        <constraint firstItem="YVf-Jr-30J" firstAttribute="leading" secondItem="8da-W5-oZS" secondAttribute="leading" constant="12" id="Wgf-eI-eGn"/>
+                                        <constraint firstItem="dAw-9h-f5x" firstAttribute="top" secondItem="VSu-Jd-Nur" secondAttribute="bottom" constant="10" id="ZnE-DS-VUN"/>
+                                        <constraint firstAttribute="trailing" secondItem="YVf-Jr-30J" secondAttribute="trailing" constant="12" id="mGI-CV-daw"/>
+                                        <constraint firstAttribute="trailing" secondItem="dAw-9h-f5x" secondAttribute="trailing" constant="12" id="mvf-8l-Jfc"/>
+                                        <constraint firstItem="Rln-oP-r1g" firstAttribute="centerY" secondItem="dAw-9h-f5x" secondAttribute="centerY" id="o57-PS-GVV"/>
+                                        <constraint firstItem="VSu-Jd-Nur" firstAttribute="leading" secondItem="8da-W5-oZS" secondAttribute="leading" constant="12" id="oPL-1j-xM0"/>
+                                        <constraint firstItem="VSu-Jd-Nur" firstAttribute="top" secondItem="YVf-Jr-30J" secondAttribute="bottom" constant="10" id="pGY-kJ-o70"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <animations/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="mAudioPanel" destination="VSu-Jd-Nur" id="VFy-hz-MIL"/>
+                                    <outlet property="mAudioPanelHeight" destination="1QF-n4-BvF" id="nky-Xh-PJm"/>
+                                    <outlet property="mDateLabel" destination="IID-py-OtM" id="hZH-Tl-i5k"/>
+                                    <outlet property="mEditButton" destination="Rln-oP-r1g" id="u67-gu-AaK"/>
+                                    <outlet property="mShareButton" destination="dAw-9h-f5x" id="mZI-ke-bSD"/>
+                                    <outlet property="mTextLabel" destination="YVf-Jr-30J" id="gmc-Iw-kLe"/>
+                                    <outlet property="mTrashButton" destination="NSK-pZ-PET" id="n8x-KU-Cot"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="RRd-4q-yyX" id="ajM-d4-58E"/>
+                            <outlet property="delegate" destination="RRd-4q-yyX" id="DEV-Fa-tpU"/>
+                        </connections>
+                    </tableView>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="DtC-Qt-iV2" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-40.5" y="323.5"/>
+        </scene>
         <!--Edit New Reading View Controller-->
         <scene sceneID="H7r-gS-NGD">
             <objects>
@@ -437,6 +562,8 @@
         <image name="AttachRecordClearButton" width="24" height="24"/>
         <image name="AttachRecordClearButtonHL" width="24" height="24"/>
         <image name="BlackInnerWheel" width="35" height="35"/>
+        <image name="EditButn" width="20" height="20"/>
+        <image name="EditButnHL" width="20" height="20"/>
         <image name="EvernoteIcon" width="30" height="30"/>
         <image name="FavorIcon" width="30" height="30"/>
         <image name="MailIcon" width="30" height="30"/>
@@ -446,11 +573,15 @@
         <image name="ScissorsRecordButton" width="70" height="58"/>
         <image name="ScissorsRecordButtonDisabled" width="70" height="58"/>
         <image name="ScissorsRecordButtonHL" width="70" height="58"/>
+        <image name="ShareButn" width="20" height="20"/>
+        <image name="ShareButnHL" width="20" height="20"/>
         <image name="StopRecordButton" width="70" height="58"/>
         <image name="StopRecordButtonDisabled" width="70" height="58"/>
         <image name="StopRecordButtonHL" width="70" height="58"/>
         <image name="SynchronizeIcon1" width="30" height="30"/>
         <image name="SynchronizeIcon2" width="30" height="30"/>
         <image name="TextIcon" width="20" height="20"/>
+        <image name="TrashButn" width="20" height="20"/>
+        <image name="TrashButnHL" width="20" height="20"/>
     </resources>
 </document>

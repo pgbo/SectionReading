@@ -57,7 +57,7 @@ class SECAudioPlayView: UIView {
         }
     }
     
-    /// 是否隐藏进度 lebal
+    /// 是否隐藏进度 label
     var hiddenProgressLabel: Bool = false {
         didSet {
             if hiddenProgressLabel {

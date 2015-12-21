@@ -33,8 +33,51 @@ extension TReading {
     static func fillFieldsFor(note: EDAMNote, withReading reading: TReading) {
     
         note.guid = reading.fEvernoteGuid
-        note.created = reading.fCreateTimestamp
-        note.updated = reading.fModifyTimestamp
-        note.content = reading.fContent
+        
+        var audioRes: EDAMResource?
+        
+        if reading.fUploadingAudioFilePath != nil {
+            if let audioData = NSData(contentsOfFile: reading.fUploadingAudioFilePath!) {
+                audioRes = EDAMResource()
+                audioRes!.data = EDAMData()
+                audioRes!.data.body = audioData
+                audioRes!.data.bodyHash = audioData.enmd5()
+                audioRes!.data.size = NSNumber(integer: audioData.length)
+                
+                var audioMime = ENMIMEUtils.determineMIMETypeForFile(reading.fUploadingAudioFilePath!)
+                print("audioMime: \(audioMime)")
+                if audioMime == nil {
+                    audioMime = "audio/basic"
+                }
+                
+                audioRes!.mime = audioMime
+                
+                note.resources = [audioRes!]
+            }
+        }
+        
+        note.content = TReading.generateEvernoteContent(withAudioResource: audioRes, plainText: reading.fContent)
+    }
+    
+    private static func generateEvernoteContent(withAudioResource audioResource: EDAMResource?, plainText: String?) -> String? {
+        
+        if audioResource == nil && plainText == nil {
+            return nil
+        }
+        
+        var noteContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
+        noteContent += "<en-note>"
+        
+        if audioResource != nil {
+            noteContent += "<en-media type=\"\(audioResource!.mime)\" hash=\"\(audioResource!.data.bodyHash.enlowercaseHexDigits())\" /><br />"
+        }
+        
+        if plainText != nil {
+            noteContent += "\(plainText!)"
+        }
+        
+        noteContent += "</en-note>"
+        
+        return noteContent
     }
 }

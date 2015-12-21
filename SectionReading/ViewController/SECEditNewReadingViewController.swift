@@ -148,38 +148,37 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
         let hasAudio = hasAttachAudio && audioPlayer != nil && audioPlayer!.duration != 0
         
         if hasContent ||  hasAudio{
-            let note = ENNote()
-            if textContent != nil {
-                note.setContent(ENNoteContent(string: textContent))
-            }
-            if hasAudio {
-                let audioData = NSData(contentsOfURL: NSURL(fileURLWithPath: attachAudioFilePath!))
-                note.addResource(ENResource(data: audioData, mimeType: "audio/basic", filename: "读书录音"))
-                ENSession.sharedSession().uploadNote(note, notebook: nil, completion: { (noteRef, error) -> Void in
+            
+            SVProgressHUD.showWithStatus("", maskType: SVProgressHUDMaskType.Gradient)
+            TReading.create(withConstructBlock: { (newReading) -> Void in
+                newReading.fLocalId = "\(NSUUID().UUIDString)"
+                newReading.fContent = textContent
+                
+                if hasAudio && self.attachAudioFilePath != nil {
+                    newReading.fUploadingAudioFilePath = self.attachAudioFilePath
+                }
+                
+                let time = NSNumber(int: Int32(NSDate().timeIntervalSince1970))
+                newReading.fCreateTimestamp = time
+                newReading.fModifyTimestamp = time
+                
+                newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.NeedSyncUpload.rawValue)
+                
+                // 同步
+                self.evernoteManager.createNote(withContent: newReading, completion: { (note) -> Void in
+                    SVProgressHUD.dismiss()
+                    if note != nil {
+                        newReading.fillFields(fromEverNote: note!)
+                        newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
+                        print("上传成功")
+                    } else {
+                        print("上传失败")
+                    }
+                    
+                    // TODO: 到分享页面
                     
                 })
-                
-                SVProgressHUD.showWithStatus("")
-                TReading.create(withConstructBlock: { (newReading) -> Void in
-                    newReading.fLocalId = "\(NSUUID().UUIDString)"
-                    newReading.fContent = textContent
-                    newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.NeedSyncUpload.rawValue)
-                    
-                    let time = NSNumber(int: Int32(NSDate().timeIntervalSince1970))
-                    newReading.fCreateTimestamp = time
-                    newReading.fModifyTimestamp = time
-                
-                    // 同步
-                    self.evernoteManager.createNote(withContent: newReading, completion: { (note) -> Void in
-                        SVProgressHUD.dismiss()
-                        if note != nil {
-                            newReading.fillFields(fromEverNote: note!)
-                            // 到分享页面
-                            print("上传成功")
-                        }
-                    })
-                })
-            }
+            })
         }
     }
     

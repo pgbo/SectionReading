@@ -31,7 +31,7 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
         
         window = UIWindow(frame:UIScreen.mainScreen().bounds)
         
-        let nav = UINavigationController(rootViewController: SECReadingHistoryViewController(style: UITableViewStyle.Grouped))
+        let nav = UINavigationController(rootViewController: SECReadingHistoryViewController.instanceFromSB())
         
         window!.rootViewController = nav
         

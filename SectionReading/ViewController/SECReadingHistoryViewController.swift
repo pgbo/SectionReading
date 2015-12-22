@@ -13,7 +13,7 @@ import UITableView_FDTemplateLayoutCell
  *  读书纪录列表页面
  *  先展示本地数据、然后接收印象笔记同步下载通知并更新数据
  */
-class SECReadingHistoryViewController: UITableViewController {
+class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryTableViewCellDelegate {
 
     private var readings: [TReading]?
     
@@ -40,7 +40,7 @@ class SECReadingHistoryViewController: UITableViewController {
     }
   
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: aDecoder)
     }
   
     override func viewDidLoad() {
@@ -48,7 +48,10 @@ class SECReadingHistoryViewController: UITableViewController {
         super.viewDidLoad()
         
         self.clearsSelectionOnViewWillAppear = false
-        self.view.backgroundColor = UIColor(red: 0xf2/255.0, green: 0xf2/255.0, blue: 0xf2/255.0, alpha: 1)
+        
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.SingleLine
+        self.tableView.separatorColor = UIColor(white: 0, alpha: 0.2)
+        self.tableView.separatorInset = UIEdgeInsetsZero
         
         self.navigationItem.title = "读书记录"
         self.navigationItem.leftBarButtonItem = self.mNewRecordBarItem
@@ -89,7 +92,10 @@ class SECReadingHistoryViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
     
         let cell = tableView.dequeueReusableCellWithIdentifier("SECReadingHistoryTableViewCell", forIndexPath: indexPath) as! SECReadingHistoryTableViewCell
+        cell.delegate = self
+        
         configureCell(cell, atIndexPath: indexPath)
+        
         return cell
     }
     
@@ -111,5 +117,27 @@ class SECReadingHistoryViewController: UITableViewController {
         return tableView.fd_heightForCellWithIdentifier("SECReadingHistoryTableViewCell", cacheByIndexPath: indexPath, configuration: { (cell) -> Void in
             self.configureCell(cell as! SECReadingHistoryTableViewCell, atIndexPath: indexPath)
         })
+    }
+    
+    // MARK: - SECReadingHistoryTableViewCellDelegate
+    
+    func clickEditButtonIn(cell: SECReadingHistoryTableViewCell) {
+        
+        print("clickEditButtonIn.")
+    }
+    
+    func clickTrashButtonIn(cell: SECReadingHistoryTableViewCell) {
+        
+        print("clickTrashButtonIn.")
+    }
+    
+    func clickShareButtonIn(cell: SECReadingHistoryTableViewCell) {
+        
+        print("clickShareButtonIn.")
+    }
+    
+    func clickPlayAudioButtonIn(cell: SECReadingHistoryTableViewCell) {
+    
+        print("clickPlayAudioButtonIn.")
     }
 }

@@ -46,12 +46,11 @@
             <constraints>
                 <constraint firstItem="akx-xk-o3f" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="EiG-Yc-SnA"/>
                 <constraint firstAttribute="trailing" secondItem="djI-7R-a8u" secondAttribute="trailing" constant="8" id="FDh-dn-50d"/>
-                <constraint firstItem="ijB-jg-a1e" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="KdU-7R-wEu"/>
                 <constraint firstItem="ijB-jg-a1e" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Lcj-Ro-qeh"/>
                 <constraint firstAttribute="trailing" secondItem="ijB-jg-a1e" secondAttribute="trailing" id="Q2G-dx-SBz"/>
                 <constraint firstItem="djI-7R-a8u" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="Qau-ad-sHV"/>
                 <constraint firstItem="69N-tW-CZJ" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="Ywu-vT-uom"/>
-                <constraint firstAttribute="bottom" secondItem="ijB-jg-a1e" secondAttribute="bottom" id="can-oD-5mG"/>
+                <constraint firstItem="ijB-jg-a1e" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="bZR-8X-Fgh"/>
                 <constraint firstItem="akx-xk-o3f" firstAttribute="leading" secondItem="69N-tW-CZJ" secondAttribute="trailing" constant="6" id="jev-Fw-4er"/>
                 <constraint firstItem="djI-7R-a8u" firstAttribute="leading" secondItem="akx-xk-o3f" secondAttribute="trailing" constant="8" id="uFV-5B-qWL"/>
                 <constraint firstItem="69N-tW-CZJ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="yR0-cK-QdB"/>

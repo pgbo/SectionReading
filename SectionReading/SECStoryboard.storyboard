@@ -123,14 +123,14 @@
         <scene sceneID="dls-sI-yc3">
             <objects>
                 <tableViewController storyboardIdentifier="SECReadingHistoryViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="RRd-4q-yyX" customClass="SECReadingHistoryViewController" customModule="SectionReading" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="hgu-h5-hzk">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="hgu-h5-hzk">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <animations/>
-                        <color key="backgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SECReadingHistoryTableViewCell" rowHeight="150" id="vVY-4l-Nb7" customClass="SECReadingHistoryTableViewCell" customModule="SectionReading" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="92" width="375" height="150"/>
+                                <rect key="frame" x="0.0" y="114" width="375" height="150"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="vVY-4l-Nb7" id="8da-W5-oZS">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="149"/>
@@ -224,6 +224,7 @@
                                 <connections>
                                     <outlet property="mAudioPanel" destination="VSu-Jd-Nur" id="VFy-hz-MIL"/>
                                     <outlet property="mAudioPanelHeight" destination="1QF-n4-BvF" id="nky-Xh-PJm"/>
+                                    <outlet property="mAudioPanelTop" destination="pGY-kJ-o70" id="xJZ-df-Am1"/>
                                     <outlet property="mDateLabel" destination="IID-py-OtM" id="hZH-Tl-i5k"/>
                                     <outlet property="mEditButton" destination="Rln-oP-r1g" id="u67-gu-AaK"/>
                                     <outlet property="mShareButton" destination="dAw-9h-f5x" id="mZI-ke-bSD"/>

@@ -19,9 +19,10 @@ enum EvernoteSyncError: ErrorType {
     case FailToCreateNotebook
 }
 
-enum EvernoteSyncType {
+enum EvernoteSyncType: UInt {
     case UP
     case DOWN
+    case UP_AND_DOWN
 }
 
 let ApplicationNotebookName = "SectionReading"
@@ -41,6 +42,19 @@ class SECEvernoteManager: NSObject {
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
+    
+    
+    override init() {
+        super.init()
+        
+        NSNotificationCenter.defaultCenter().addObserverForName(SSAReachabilityDidChangeNotification, object: nil, queue: nil) { [weak self] (note) -> Void in
+            if let strongSelf = self {
+                strongSelf.sync(withType: EvernoteSyncType.UP_AND_DOWN, completion: { (successNumber) -> Void in
+                    print("Evermanager sync up number: \(successNumber)")
+                })
+            }
+        }
+    }
     
     /**
      印象笔记是否授权
@@ -168,10 +182,10 @@ class SECEvernoteManager: NSObject {
     /**
      与印象笔记同步笔记
      
-     - parameter type:       同步类型
-     - parameter completion: 同步成功数量
+     - parameter withTypeMask:      同步类型
+     - parameter completion:        同步成功数量
      */
-    func sync(type: EvernoteSyncType, completion: ((successNumber: Int) -> Void)?) {
+    func sync(withType type: EvernoteSyncType, completion: ((successNumber: Int) -> Void)?) {
         
         if isAuthenticated() == false {
             completion?(successNumber: 0)
@@ -179,10 +193,27 @@ class SECEvernoteManager: NSObject {
         }
         
         switch type {
-        case .UP:
-            syncUp(withCompletion: completion)
-        case .DOWN:
-            syncDown(withCompletion: completion)
+        case .UP :
+            syncUp(withCompletion: { (upNumber) -> Void in
+                completion?(successNumber: upNumber)
+            })
+        case .DOWN :
+            syncDown(withCompletion: { (downNumber) -> Void in
+                completion?(successNumber: downNumber)
+            })
+        case .UP_AND_DOWN :
+            syncUp(withCompletion: { [weak self] (upNumber) -> Void in
+                let strongSelf = self
+                if strongSelf == nil {
+                    return
+                }
+                
+                var syncNumber = upNumber
+                strongSelf!.syncDown(withCompletion: { (downNumber) -> Void in
+                    syncNumber += downNumber
+                    completion?(successNumber: syncNumber)
+                })
+            })
         }
     }
     
@@ -400,7 +431,16 @@ class SECEvernoteManager: NSObject {
     
     private func syncUp(withCompletion completion: ((successNumber: Int) -> Void)?) {
         
-        self.noteSycnOperationQueue.addOperationWithBlock { () -> Void in
+        self.noteSycnOperationQueue.addOperationWithBlock { [weak self] () -> Void in
+            let strongSelf = self
+            if strongSelf == nil {
+                return
+            }
+            
+            if strongSelf!.synchronizing {
+                // TODO
+                return
+            }
             
             let queryOption = ReadingQueryOption()
             queryOption.syncStatus = [.NeedSyncUpload, .NeedSyncDelete]

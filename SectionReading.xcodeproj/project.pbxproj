@@ -44,6 +44,7 @@
 		59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */; };
 		59D9529E1C27F69500FE9B36 /* SECStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 59D9529D1C27F69500FE9B36 /* SECStoryboard.storyboard */; };
 		59D952A31C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D952A21C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift */; };
+		59D952B31C29369E00FE9B36 /* SSASwiftReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D952B21C29369E00FE9B36 /* SSASwiftReachability.swift */; };
 		86FFDDD31BA9B346004DFCD5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD11BA9B346004DFCD5 /* Main.storyboard */; };
 		86FFDDD51BA9B346004DFCD5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD41BA9B346004DFCD5 /* Images.xcassets */; };
 		86FFDDD81BA9B346004DFCD5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86FFDDD61BA9B346004DFCD5 /* LaunchScreen.xib */; };
@@ -108,6 +109,7 @@
 		59C3C93F1BAC015200CC6200 /* MultipleArcTracksView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipleArcTracksView.swift; sourceTree = "<group>"; };
 		59D9529D1C27F69500FE9B36 /* SECStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = SECStoryboard.storyboard; sourceTree = "<group>"; };
 		59D952A21C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECReadingHistoryTableViewCell.swift; sourceTree = "<group>"; };
+		59D952B21C29369E00FE9B36 /* SSASwiftReachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSASwiftReachability.swift; sourceTree = "<group>"; };
 		86FFDDC81BA9B346004DFCD5 /* SectionReading.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SectionReading.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		86FFDDD21BA9B346004DFCD5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		86FFDDD41BA9B346004DFCD5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 		59C3C9381BABAA7500CC6200 /* Vender */ = {
 			isa = PBXGroup;
 			children = (
+				59D952B11C29369E00FE9B36 /* SSASwiftReachability */,
 				599CC7041C1FDEA800147E97 /* LvMultiThreadCoreDataDao */,
 				59C3C9391BABAA7500CC6200 /* RAQRecorder */,
 			);
@@ -216,6 +219,14 @@
 				59C3C93B1BABAA7500CC6200 /* RAQRecorder.m */,
 			);
 			path = RAQRecorder;
+			sourceTree = "<group>";
+		};
+		59D952B11C29369E00FE9B36 /* SSASwiftReachability */ = {
+			isa = PBXGroup;
+			children = (
+				59D952B21C29369E00FE9B36 /* SSASwiftReachability.swift */,
+			);
+			path = SSASwiftReachability;
 			sourceTree = "<group>";
 		};
 		86FFDDBF1BA9B346004DFCD5 = {
@@ -531,6 +542,7 @@
 				592E369D1BEB563500DC8955 /* CircularButton.swift in Sources */,
 				599CC70E1C1FDFBF00147E97 /* MainModel.xcdatamodeld in Sources */,
 				599CC7211C200A0300147E97 /* TReading+CoreDataProperties.swift in Sources */,
+				59D952B31C29369E00FE9B36 /* SSASwiftReachability.swift in Sources */,
 				59D952A31C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -58,6 +58,8 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
         mainDao = LvMultiThreadCoreDataDao()
         mainDao!.setupEnvModel("MainModel", dbFile: "MainDB.sqlite")
         
+        SSASwiftReachability.sharedManager?.startMonitoring()
+        
         return true
     }
 

@@ -15,7 +15,7 @@ import CoreData
 extension TReading {
 
     @NSManaged var fUploadingAudioFilePath: String?
-    @NSManaged var fUploadedAudioUrl: String?
+    @NSManaged var fUploadedAudioGuid: String?
     @NSManaged var fEvernoteGuid: String?
     @NSManaged var fLocalId: String?
     @NSManaged var fCreateTimestamp: NSNumber?

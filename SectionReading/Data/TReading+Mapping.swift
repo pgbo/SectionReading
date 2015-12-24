@@ -15,13 +15,33 @@ extension TReading {
      使用笔记信息填充 Reading
      
      - parameter note: 笔记
+     - parameter onlyFillUnSettedFields: 是否只填充未设置值的字段
      */
-    func fillFields(fromEverNote note: EDAMNote) {
+    func fillFields(fromEverNote note: EDAMNote, onlyFillUnSettedFields: Bool) {
         
-        fEvernoteGuid = note.guid
-        fCreateTimestamp = note.created
-        fModifyTimestamp = note.updated
-        fContent = note.content
+        if onlyFillUnSettedFields {
+            if fEvernoteGuid == nil {
+                fEvernoteGuid = note.guid
+            }
+            if fUploadedAudioGuid == nil {
+                fUploadedAudioGuid = TReading.getAudioResourceGuid(ofNote: note)
+            }
+            if fCreateTimestamp == nil {
+                fCreateTimestamp = NSNumber(integer: note.created.integerValue/1000)
+            }
+            if fModifyTimestamp == nil {
+                fModifyTimestamp = NSNumber(integer: note.updated.integerValue/1000)
+            }
+            if fContent == nil {
+                fContent = TReading.getNotePlainText(ofNote: note)
+            }
+        } else {
+            fEvernoteGuid = note.guid
+            fUploadedAudioGuid = TReading.getAudioResourceGuid(ofNote: note)
+            fCreateTimestamp = NSNumber(integer: note.created.integerValue/1000)
+            fModifyTimestamp = NSNumber(integer: note.updated.integerValue/1000)
+            fContent = TReading.getNotePlainText(ofNote: note)
+        }
     }
     
     /**
@@ -29,34 +49,119 @@ extension TReading {
      
      - parameter note:    笔记
      - parameter reading: 阅读信息
+     - parameter onlyFillUnSettedFields: 是否只填充未设置值的字段
      */
-    static func fillFieldsFor(note: EDAMNote, withReading reading: TReading) {
+    static func fillFieldsFor(note: EDAMNote, withReading reading: TReading, onlyFillUnSettedFields: Bool) {
     
-        note.guid = reading.fEvernoteGuid
+        if onlyFillUnSettedFields {
         
-        var audioRes: EDAMResource?
-        
-        if reading.fUploadingAudioFilePath != nil {
-            if let audioData = NSData(contentsOfFile: reading.fUploadingAudioFilePath!) {
-                audioRes = EDAMResource()
-                audioRes!.data = EDAMData()
-                audioRes!.data.body = audioData
-                audioRes!.data.bodyHash = audioData.enmd5()
-                audioRes!.data.size = NSNumber(integer: audioData.length)
-                
-                var audioMime = ENMIMEUtils.determineMIMETypeForFile(reading.fUploadingAudioFilePath!)
-                print("audioMime: \(audioMime)")
-                if audioMime == nil {
-                    audioMime = "audio/basic"
-                }
-                
-                audioRes!.mime = audioMime
-                
-                note.resources = [audioRes!]
+            if note.guid == nil {
+                note.guid = reading.fEvernoteGuid
             }
+            
+            var noteAudioRes: EDAMResource?
+            if reading.fUploadingAudioFilePath != nil {
+                print("reading.fUploadingAudioFilePath: \(reading.fUploadingAudioFilePath!)")
+                noteAudioRes = TReading.generateNoteResources(withAudioFilePath: reading.fUploadingAudioFilePath!)
+            }
+            
+            if note.resources == nil {
+                if noteAudioRes != nil {
+                    note.resources = [noteAudioRes!]
+                }
+            }
+            
+            if note.content == nil {
+                note.content = TReading.generateEvernoteContent(withAudioResource: noteAudioRes, plainText: reading.fContent)
+            }
+            
+        } else {
+         
+            note.guid = reading.fEvernoteGuid
+            
+            var noteAudioRes: EDAMResource?
+            if reading.fUploadingAudioFilePath != nil {
+                noteAudioRes = TReading.generateNoteResources(withAudioFilePath: reading.fUploadingAudioFilePath!)
+            }
+            if noteAudioRes != nil {
+                note.resources = [noteAudioRes!]
+            }
+            
+            note.content = TReading.generateEvernoteContent(withAudioResource: noteAudioRes, plainText: reading.fContent)
+        }
+    }
+    
+    private static func getNotePlainText(ofNote note: EDAMNote) -> String? {
+        
+        let content = note.content
+        if content == nil {
+            return nil
         }
         
-        note.content = TReading.generateEvernoteContent(withAudioResource: audioRes, plainText: reading.fContent)
+        do {
+            var rgex = try NSRegularExpression(pattern: "<en-note>.*?</en-note>", options: NSRegularExpressionOptions.DotMatchesLineSeparators)
+            let result = rgex.firstMatchInString(content, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, content.characters.count))
+            if result != nil {
+                let range = result!.range
+                let contentNodeTextRange = Range<String.Index>(start: content.startIndex.advancedBy(range.location), end: content.startIndex.advancedBy(range.location + range.length))
+                var contentNodeText = content.substringWithRange(contentNodeTextRange)
+                if let startTagRange = contentNodeText.rangeOfString("<en-note>") {
+                    contentNodeText.removeRange(startTagRange)
+                }
+                if let endTagRange = contentNodeText.rangeOfString("</en-note>") {
+                    contentNodeText.removeRange(endTagRange)
+                }
+                
+                rgex = try NSRegularExpression(pattern: "<en-media.*?/>", options: NSRegularExpressionOptions(rawValue: 0))
+                
+                let targetContent = rgex.stringByReplacingMatchesInString(contentNodeText, options: NSMatchingOptions(rawValue: 0), range: NSMakeRange(0, contentNodeText.characters.count), withTemplate: "")
+                
+                print("targetContent: \(targetContent)")
+
+                return targetContent
+            }
+        } catch let error as NSError {
+            print("error: \(error.localizedDescription)")
+        }
+        
+        print("content:\(content)")
+        return content
+    }
+    
+    private static func getAudioResourceGuid(ofNote note: EDAMNote) -> String? {
+        
+        var audioResourceGuid: String?
+        if let noteResources = note.resources as? [EDAMResource] {
+            for res in noteResources {
+                if res.mime.hasPrefix("audio/") {
+                    audioResourceGuid = res.guid
+                    break
+                }
+            }
+        }
+        return audioResourceGuid
+    }
+    
+    private static func generateNoteResources(withAudioFilePath audioFilePath: String) -> EDAMResource? {
+    
+        if let audioData = NSData(contentsOfFile: audioFilePath) {
+            let audioRes = EDAMResource()
+            audioRes.data = EDAMData()
+            audioRes.data.body = audioData
+            audioRes.data.bodyHash = audioData.enmd5()
+            audioRes.data.size = NSNumber(integer: audioData.length)
+            
+            
+            var audioMime = ENMIMEUtils.determineMIMETypeForFile(audioFilePath)
+            print("audioMime: \(audioMime)")
+            if audioMime == nil {
+                audioMime = "audio/basic"
+            }
+            audioRes.mime = audioMime
+            return audioRes
+        } else {
+            return nil
+        }
     }
     
     private static func generateEvernoteContent(withAudioResource audioResource: EDAMResource?, plainText: String?) -> String? {
@@ -69,7 +174,7 @@ extension TReading {
         noteContent += "<en-note>"
         
         if audioResource != nil {
-            noteContent += "<en-media type=\"\(audioResource!.mime)\" hash=\"\(audioResource!.data.bodyHash.enlowercaseHexDigits())\" /><br />"
+            noteContent += "<en-media type=\"\(audioResource!.mime)\" hash=\"\(audioResource!.data.bodyHash.enlowercaseHexDigits())\" />\n"
         }
         
         if plainText != nil {

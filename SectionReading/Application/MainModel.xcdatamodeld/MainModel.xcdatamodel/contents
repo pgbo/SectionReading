@@ -8,7 +8,7 @@
         <attribute name="fModifyTimestamp" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="fStatus" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="fSyncStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
-        <attribute name="fUploadedAudioUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fUploadedAudioGuid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="fUploadingAudioFilePath" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>

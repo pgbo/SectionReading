@@ -165,15 +165,28 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
                 newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.NeedSyncUpload.rawValue)
                 
                 // 同步
+                let readingLocalid = newReading.fLocalId
                 self.evernoteManager.createNote(withContent: newReading, completion: { (note) -> Void in
-                    SVProgressHUD.dismiss()
-                    if note != nil {
-                        newReading.fillFields(fromEverNote: note!)
-                        newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
-                        print("上传成功")
-                    } else {
+                    if note == nil {
+                        SVProgressHUD.dismiss()
                         print("上传失败")
+                        return
                     }
+                    
+                    let option = ReadingQueryOption()
+                    option.localId = readingLocalid
+                    TReading.filterByOption(option, completion: { (results) -> Void in
+                        print("上传成功")
+                        SVProgressHUD.dismiss()
+                        if results == nil {
+                            return
+                        }
+                        
+                        for result in (results! as [TReading]) {
+                            result.fillFields(fromEverNote: note!, onlyFillUnSettedFields: false)
+                            result.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
+                        }
+                    })
                     
                     // TODO: 到分享页面
                     

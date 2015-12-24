@@ -49,9 +49,11 @@ class SECEvernoteManager: NSObject {
         
         NSNotificationCenter.defaultCenter().addObserverForName(SSAReachabilityDidChangeNotification, object: nil, queue: nil) { [weak self] (note) -> Void in
             if let strongSelf = self {
-                strongSelf.sync(withType: EvernoteSyncType.UP_AND_DOWN, completion: { (successNumber) -> Void in
-                    print("Evermanager sync up number: \(successNumber)")
-                })
+                if SSASwiftReachability.sharedManager != nil && SSASwiftReachability.sharedManager!.isReachable() {
+                    strongSelf.sync(withType: EvernoteSyncType.UP_AND_DOWN, completion: { (successNumber) -> Void in
+                        print("Evermanager sync number: \(successNumber)")
+                    })
+                }
             }
         }
     }
@@ -113,7 +115,7 @@ class SECEvernoteManager: NSObject {
         }
         
         let note = EDAMNote()
-        TReading.fillFieldsFor(note, withReading: content)
+        TReading.fillFieldsFor(note, withReading: content, onlyFillUnSettedFields: true)
         
         note.notebookGuid = appNotebookGuid!
         note.title = "读书记录"
@@ -144,7 +146,7 @@ class SECEvernoteManager: NSObject {
         }
         
         let note = EDAMNote()
-        TReading.fillFieldsFor(note, withReading: newContent)
+        TReading.fillFieldsFor(note, withReading: newContent, onlyFillUnSettedFields: true)
         
         note.guid = guid
         note.title = ""
@@ -192,14 +194,25 @@ class SECEvernoteManager: NSObject {
             return
         }
         
+        if synchronizing {
+            completion?(successNumber: 0)
+            return
+        }
+        
         switch type {
         case .UP :
-            syncUp(withCompletion: { (upNumber) -> Void in
-                completion?(successNumber: upNumber)
+            syncUp(withCompletion: { [weak self] (upNumber) -> Void in
+                if let strongSelf = self {
+                    strongSelf.synchronizing = false
+                    completion?(successNumber: upNumber)
+                }
             })
         case .DOWN :
-            syncDown(withCompletion: { (downNumber) -> Void in
-                completion?(successNumber: downNumber)
+            syncDown(withCompletion: { [weak self] (downNumber) -> Void in
+                if let strongSelf = self {
+                    strongSelf.synchronizing = false
+                    completion?(successNumber: downNumber)
+                }
             })
         case .UP_AND_DOWN :
             syncUp(withCompletion: { [weak self] (upNumber) -> Void in
@@ -209,9 +222,12 @@ class SECEvernoteManager: NSObject {
                 }
                 
                 var syncNumber = upNumber
-                strongSelf!.syncDown(withCompletion: { (downNumber) -> Void in
-                    syncNumber += downNumber
-                    completion?(successNumber: syncNumber)
+                strongSelf!.syncDown(withCompletion: { [weak self] (downNumber) -> Void in
+                    if let strongSelf = self {
+                        syncNumber += downNumber
+                        strongSelf.synchronizing = false
+                        completion?(successNumber: syncNumber)
+                    }
                 })
             })
         }
@@ -261,7 +277,7 @@ class SECEvernoteManager: NSObject {
                         if results == nil || results!.count == 0 {
                             for result in results! {
                                 if result.fModifyTimestamp != nil
-                                    && result.fModifyTimestamp!.integerValue != noteMeta.updated.integerValue {
+                                    && result.fModifyTimestamp!.integerValue != (noteMeta.updated.integerValue/1000) {
                                     
                                     ++needSycnDownNumber
                                     break
@@ -437,11 +453,6 @@ class SECEvernoteManager: NSObject {
                 return
             }
             
-            if strongSelf!.synchronizing {
-                // TODO
-                return
-            }
-            
             let queryOption = ReadingQueryOption()
             queryOption.syncStatus = [.NeedSyncUpload, .NeedSyncDelete]
             TReading.filterByOption(queryOption) { [weak self] (results) -> Void in
@@ -477,7 +488,7 @@ class SECEvernoteManager: NSObject {
                                     
                                     TReading.update(withFilterOption: filterOption, updateBlock: { (readingtoUpdate) -> Void in
                                         
-                                        readingtoUpdate.fillFields(fromEverNote: createdNote!)
+                                        readingtoUpdate.fillFields(fromEverNote: createdNote!, onlyFillUnSettedFields: false)
                                         readingtoUpdate.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
                                     })
                                     
@@ -497,7 +508,7 @@ class SECEvernoteManager: NSObject {
                                     
                                     TReading.update(withFilterOption: filterOption, updateBlock: { (readingtoUpdate) -> Void in
                                         
-                                        readingtoUpdate.fillFields(fromEverNote: updatedNote!)
+                                        readingtoUpdate.fillFields(fromEverNote: updatedNote!, onlyFillUnSettedFields: false)
                                         readingtoUpdate.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
                                     })
                                     
@@ -602,10 +613,10 @@ class SECEvernoteManager: NSObject {
                     
                     dispatch_group_enter(dispatchGroup)
                     TReading.filterByOption(queryOption, completion: { (results) -> Void in
-                        if results == nil || results!.count == 0 {
+                        if results != nil && results!.count != 0 {
                             for result in results! {
                                 if result.fModifyTimestamp != nil
-                                    && result.fModifyTimestamp!.integerValue != noteMeta.updated.integerValue {
+                                    && result.fModifyTimestamp!.integerValue != (noteMeta.updated.integerValue/1000) {
                                     needUpdate = true
                                     break
                                 }
@@ -629,7 +640,7 @@ class SECEvernoteManager: NSObject {
                             dispatch_group_leave(dispatchGroup)
                             
                             }, failure: { (error) -> Void in
-                                print("Fail to findNotesMetadata, error: \(error.localizedDescription)")
+                                print("Fail to getNote, error: \(error.localizedDescription)")
                                 dispatch_group_leave(dispatchGroup)
                         })
                         dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
@@ -645,12 +656,15 @@ class SECEvernoteManager: NSObject {
                         
                         if needCreate {
                             TReading.create(withConstructBlock: { (newReading) -> Void in
-                                newReading.fillFields(fromEverNote: note!)
+                                newReading.fillFields(fromEverNote: note!, onlyFillUnSettedFields: true)
                                 newReading.fLocalId = NSUUID().UUIDString
+                                newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
                             })
                         } else if needUpdate {
                             TReading.update(withFilterOption: queryOption, updateBlock: { (readingtoUpdate) -> Void in
-                                readingtoUpdate.fillFields(fromEverNote: note!)
+                                if readingtoUpdate.fSyncStatus == NSNumber(integer: ReadingSyncStatus.Normal.rawValue) {
+                                    readingtoUpdate.fillFields(fromEverNote: note!, onlyFillUnSettedFields: false)
+                                }
                             })
                         }
                         

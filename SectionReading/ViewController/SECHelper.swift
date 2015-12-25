@@ -50,6 +50,7 @@ class SECHelper: NSObject {
      - returns: 
      */
     static func createFormatTextForRecordDuration(duration: NSTimeInterval) -> String {
+        
         let totalSeconds = Int(duration)
         
         let remaindPart = Int((duration - NSTimeInterval(totalSeconds))*10)
@@ -113,5 +114,19 @@ class SECHelper: NSObject {
         }
         
         return recordStorageDirPath
+    }
+    
+    private struct DefaultCalendar {
+        static var once_token: dispatch_once_t = 0
+        static var defaultClendar: NSCalendar?
+    }
+    
+    static func defaultCalendar() -> NSCalendar {
+        
+        dispatch_once(&DefaultCalendar.once_token) {
+            DefaultCalendar.defaultClendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
+        }
+        
+        return DefaultCalendar.defaultClendar!
     }
 }

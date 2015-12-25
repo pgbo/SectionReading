@@ -60,9 +60,9 @@ extension TReading {
             }
             
             var noteAudioRes: EDAMResource?
-            if reading.fUploadingAudioFilePath != nil {
-                print("reading.fUploadingAudioFilePath: \(reading.fUploadingAudioFilePath!)")
-                noteAudioRes = TReading.generateNoteResources(withAudioFilePath: reading.fUploadingAudioFilePath!)
+            if reading.fLocalAudioFilePath != nil {
+                print("reading.fLocalAudioFilePath: \(reading.fLocalAudioFilePath!)")
+                noteAudioRes = TReading.generateNoteResources(withAudioFilePath: reading.fLocalAudioFilePath!)
             }
             
             if note.resources == nil {
@@ -80,8 +80,8 @@ extension TReading {
             note.guid = reading.fEvernoteGuid
             
             var noteAudioRes: EDAMResource?
-            if reading.fUploadingAudioFilePath != nil {
-                noteAudioRes = TReading.generateNoteResources(withAudioFilePath: reading.fUploadingAudioFilePath!)
+            if reading.fLocalAudioFilePath != nil {
+                noteAudioRes = TReading.generateNoteResources(withAudioFilePath: reading.fLocalAudioFilePath!)
             }
             if noteAudioRes != nil {
                 note.resources = [noteAudioRes!]

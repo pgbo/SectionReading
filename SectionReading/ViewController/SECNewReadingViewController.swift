@@ -469,7 +469,19 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     @objc private func toRecordHistory() {
         
-        // TODO: 到列表页面
+        // 暂停录音
+        pauseRercord()
+        
+        // 暂停播放
+        audioPlayer?.pause()
+        playState = .Paused
+        
+        // 关闭播放定时器
+        playTimming?.invalidate()
+        
+        cutPanel?.isPlaying = false
+        
+        self.showViewController(SECAudioFileListViewController.instanceFromSB(), sender: nil)
     }
     
     @IBAction func clickedScissorsRecordButton(sender: UIButton) {

@@ -155,7 +155,7 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
                 newReading.fContent = textContent
                 
                 if hasAudio && self.attachAudioFilePath != nil {
-                    newReading.fUploadingAudioFilePath = self.attachAudioFilePath
+                    newReading.fLocalAudioFilePath = self.attachAudioFilePath
                 }
                 
                 let time = NSNumber(int: Int32(NSDate().timeIntervalSince1970))

@@ -18,6 +18,13 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
 
     var window: UIWindow?
     
+    var onlySyncNoteUnderWIFI: Bool = true {
+        didSet {
+            NSUserDefaults.standardUserDefaults().setObject(NSNumber(bool: onlySyncNoteUnderWIFI), forKey: kUserDefault_OnlySyncNoteUnderWIFI)
+            evernoteManager?.onlySyncUnderWIFI = onlySyncNoteUnderWIFI
+        }
+    }
+    
     private (set) var evernoteManager: SECEvernoteManager!
     
     private (set) var mainDao: LvMultiThreadCoreDataDao!
@@ -48,16 +55,40 @@ class SECAppDelegate: UIResponder, UIApplicationDelegate, UINavigationBarDelegat
         
         ENSession.setSharedSessionConsumerKey(CONSUMER_KEY, consumerSecret: CONSUMER_SECRET, optionalHost: ENDPOINT_HOST)
         
+        // set up onlySyncNoteUnderWIFI
+        
+        let onlySyncNoteUnderWIFI = NSUserDefaults.standardUserDefaults().objectForKey(kUserDefault_OnlySyncNoteUnderWIFI) as? NSNumber
+        if onlySyncNoteUnderWIFI == nil {
+            self.onlySyncNoteUnderWIFI = OnlySyncNoteUnderWiFiDefaultValue
+        } else {
+            self.onlySyncNoteUnderWIFI = onlySyncNoteUnderWIFI!.boolValue
+        }
+        
         // setup evernoteManager
         
         evernoteManager = SECEvernoteManager()
-        
+        evernoteManager.onlySyncUnderWIFI = self.onlySyncNoteUnderWIFI
+
         
         // setup mainDao
         
         mainDao = LvMultiThreadCoreDataDao()
         mainDao!.setupEnvModel("MainModel", dbFile: "MainDB.sqlite")
         
+        NSNotificationCenter.defaultCenter().addObserverForName(SSAReachabilityDidChangeNotification, object: nil, queue: nil) { [weak self] (note) -> Void in
+            if let strongSelf = self {
+                let isReachableViaWiFi = SSASwiftReachability.sharedManager != nil && SSASwiftReachability.sharedManager!.isReachableViaWiFi()
+                let isReachable = SSASwiftReachability.sharedManager != nil && SSASwiftReachability.sharedManager!.isReachable()
+                strongSelf.evernoteManager?.WiFiReachability = isReachableViaWiFi
+                if isReachable {
+                    strongSelf.evernoteManager?.sync(withType: EvernoteSyncType.UP_AND_DOWN, completion: { (successNumber) -> Void in
+                        print("Evermanager sync number: \(successNumber)")
+                    })
+                }
+            }
+        }
+        
+        SSASwiftReachability.sharedManager?.reachabilityInformationMode = .Advanced
         SSASwiftReachability.sharedManager?.startMonitoring()
         
         return true

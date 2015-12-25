@@ -123,13 +123,16 @@
         <scene sceneID="dls-sI-yc3">
             <objects>
                 <tableViewController storyboardIdentifier="SECReadingHistoryViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="RRd-4q-yyX" customClass="SECReadingHistoryViewController" customModule="SectionReading" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="hgu-h5-hzk">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="hgu-h5-hzk">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <animations/>
-                        <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="separatorColor" red="0.0" green="0.0" blue="0.0" alpha="0.20000000000000001" colorSpace="calibratedRGB"/>
+                        <inset key="separatorInset" minX="12" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        <color key="sectionIndexBackgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SECReadingHistoryTableViewCell" rowHeight="150" id="vVY-4l-Nb7" customClass="SECReadingHistoryTableViewCell" customModule="SectionReading" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="SECReadingHistoryTableViewCell" rowHeight="150" id="vVY-4l-Nb7" customClass="SECReadingHistoryTableViewCell" customModule="SectionReading" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="114" width="375" height="150"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="vVY-4l-Nb7" id="8da-W5-oZS">
@@ -139,6 +142,7 @@
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YVf-Jr-30J">
                                             <rect key="frame" x="12" y="10" width="351" height="55"/>
                                             <animations/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <string key="text">在一起的时间有限，怎么忍心分隔争吵与生气呢？我只想安安稳稳的和你在一起，我很认真，也很走心。
 在一起的时间有限，怎么忍心分隔争吵与生气呢？我只想安安稳稳的和你在一起，我很认真，也很走心。</string>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -156,6 +160,7 @@
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2015/11/28 22:01" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IID-py-OtM">
                                             <rect key="frame" x="12" y="122" width="97" height="15"/>
                                             <animations/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <color key="textColor" red="0.48627450980392156" green="0.48627450980392156" blue="0.48627450980392156" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
@@ -201,6 +206,7 @@
                                         </button>
                                     </subviews>
                                     <animations/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                     <constraints>
                                         <constraint firstItem="IID-py-OtM" firstAttribute="leading" secondItem="8da-W5-oZS" secondAttribute="leading" constant="12" id="Blw-Yn-nvj"/>
                                         <constraint firstItem="YVf-Jr-30J" firstAttribute="top" secondItem="8da-W5-oZS" secondAttribute="top" constant="10" id="DhA-Dq-GDT"/>
@@ -557,6 +563,106 @@
             </objects>
             <point key="canvasLocation" x="1357.5" y="323.5"/>
         </scene>
+        <!--Audio File List View Controller-->
+        <scene sceneID="jPz-cA-YxT">
+            <objects>
+                <tableViewController storyboardIdentifier="SECAudioFileListViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="jsf-az-8dD" customClass="SECAudioFileListViewController" customModule="SectionReading" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" rowHeight="76" sectionHeaderHeight="20" sectionFooterHeight="1" id="Qda-jZ-0SJ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <animations/>
+                        <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="separatorColor" red="0.0" green="0.0" blue="0.0" alpha="0.20000000000000001" colorSpace="calibratedRGB"/>
+                        <inset key="separatorInset" minX="12" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        <color key="sectionIndexBackgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SECAudioFileTableViewCell" id="COA-OZ-zBu" customClass="SECAudioFileTableViewCell" customModule="SectionReading" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="50" width="375" height="76"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="COA-OZ-zBu" id="c8P-Wg-s2e">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="75"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="11月28日" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nXY-aV-JF5">
+                                            <rect key="frame" x="12" y="24" width="70" height="21"/>
+                                            <animations/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" red="0.67843137254901964" green="0.66274509803921566" blue="0.66274509803921566" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2015-11-28," textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="48F-qK-NlO">
+                                            <rect key="frame" x="12" y="52" width="69" height="15"/>
+                                            <animations/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="textColor" red="0.67843137254901964" green="0.66274509803921566" blue="0.66274509803921566" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                            <size key="shadowOffset" width="0.0" height="0.0"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="时长: 00:06" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XE9-e9-mjU">
+                                            <rect key="frame" x="89" y="52" width="65" height="15"/>
+                                            <animations/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10点37分" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7XV-cP-VBZ">
+                                            <rect key="frame" x="86" y="10" width="132" height="36"/>
+                                            <animations/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
+                                            <color key="textColor" red="0.67843137254901964" green="0.66274509803921566" blue="0.66274509803921566" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lu8-8g-fDP">
+                                            <rect key="frame" x="329" y="21" width="34" height="34"/>
+                                            <animations/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="34" id="Ksw-wQ-H8U"/>
+                                                <constraint firstAttribute="width" secondItem="Lu8-8g-fDP" secondAttribute="height" multiplier="1:1" id="xpq-gp-uF1"/>
+                                            </constraints>
+                                            <state key="normal" image="RecordListPlayButton"/>
+                                            <connections>
+                                                <action selector="clickedPlayButton:" destination="COA-OZ-zBu" eventType="touchUpInside" id="Kjt-8G-UQi"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <animations/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <constraints>
+                                        <constraint firstItem="nXY-aV-JF5" firstAttribute="centerY" secondItem="7XV-cP-VBZ" secondAttribute="centerY" constant="6" id="7qm-xK-JN8"/>
+                                        <constraint firstItem="7XV-cP-VBZ" firstAttribute="centerY" secondItem="c8P-Wg-s2e" secondAttribute="centerY" constant="-10" id="HZK-YV-j8f"/>
+                                        <constraint firstAttribute="trailing" secondItem="Lu8-8g-fDP" secondAttribute="trailing" constant="12" id="IGq-UC-WIC"/>
+                                        <constraint firstItem="XE9-e9-mjU" firstAttribute="leading" secondItem="48F-qK-NlO" secondAttribute="trailing" constant="8" id="YS4-bU-m3x"/>
+                                        <constraint firstItem="48F-qK-NlO" firstAttribute="centerY" secondItem="XE9-e9-mjU" secondAttribute="centerY" id="db3-ul-iCY"/>
+                                        <constraint firstItem="nXY-aV-JF5" firstAttribute="leading" secondItem="c8P-Wg-s2e" secondAttribute="leading" constant="12" id="fzA-d5-Yhj"/>
+                                        <constraint firstItem="7XV-cP-VBZ" firstAttribute="leading" secondItem="nXY-aV-JF5" secondAttribute="trailing" constant="4" id="m9R-10-Orz"/>
+                                        <constraint firstItem="XE9-e9-mjU" firstAttribute="top" secondItem="7XV-cP-VBZ" secondAttribute="bottom" constant="6" id="rVQ-Oi-pof"/>
+                                        <constraint firstItem="48F-qK-NlO" firstAttribute="leading" secondItem="c8P-Wg-s2e" secondAttribute="leading" constant="12" id="sg4-dS-Qhl"/>
+                                        <constraint firstItem="Lu8-8g-fDP" firstAttribute="centerY" secondItem="c8P-Wg-s2e" secondAttribute="centerY" id="ufk-YQ-Xje"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <animations/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="mAudioDurationLabel" destination="XE9-e9-mjU" id="4zo-GB-UQd"/>
+                                    <outlet property="mBriefDayLabel" destination="nXY-aV-JF5" id="fay-OZ-qMc"/>
+                                    <outlet property="mDayLabel" destination="48F-qK-NlO" id="GdX-Rv-MnA"/>
+                                    <outlet property="mPlayButton" destination="Lu8-8g-fDP" id="zIw-kd-jnj"/>
+                                    <outlet property="mTimeLabel" destination="7XV-cP-VBZ" id="OVa-bE-ffw"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <sections/>
+                        <connections>
+                            <outlet property="dataSource" destination="jsf-az-8dD" id="jTy-AD-wIq"/>
+                            <outlet property="delegate" destination="jsf-az-8dD" id="DcR-eO-ogR"/>
+                        </connections>
+                    </tableView>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AMy-LP-n4e" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1837.5" y="323.5"/>
+        </scene>
     </scenes>
     <resources>
         <image name="AttachIcon" width="20" height="20"/>
@@ -568,6 +674,7 @@
         <image name="EvernoteIcon" width="30" height="30"/>
         <image name="FavorIcon" width="30" height="30"/>
         <image name="MailIcon" width="30" height="30"/>
+        <image name="RecordListPlayButton" width="34" height="34"/>
         <image name="RecordTextInputAreaBg" width="18" height="56"/>
         <image name="RecordWheelsBg " width="318" height="232"/>
         <image name="ResumeRecordButton" width="70" height="58"/>

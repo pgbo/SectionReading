@@ -8,5 +8,6 @@
 
 import Foundation
 
-// 只在 WIFI 下同步的开关 key
+// 只在 WIFI 下同步的开关 key, value 为 NSNumber
 let kUserDefault_OnlySyncNoteUnderWIFI = "kUserDefault_OnlySyncNoteUnderWIFI"
+let OnlySyncNoteUnderWiFiDefaultValue = true

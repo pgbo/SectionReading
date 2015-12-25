@@ -25,14 +25,43 @@ enum EvernoteSyncType: UInt {
     case UP_AND_DOWN
 }
 
+/// 同步上传状态变化的通知
+let SECEvernoteManagerSycnUpStateDidChangeNotification = "SECEvernoteManagerSycnUpStateDidChangeNotification"
+/// 同步上传的状态
+let SECEvernoteManagerNotificationSycnUpStateItem = "SECEvernoteManagerNotificationSycnUpStateItem"
+/// 同步上传成功的数量
+let SECEvernoteManagerNotificationSuccessSycnUpNoteCountItem = "SECEvernoteManagerNotificationSuccessSycnUpNoteCountItem"
+
+/// 同步下载状态变化的通知
+let SECEvernoteManagerSycnDownStateDidChangeNotification = "SECEvernoteManagerSycnDownStateDidChangeNotification"
+/// 同步下载的状态
+let SECEvernoteManagerNotificationSycnDownStateItem = "SECEvernoteManagerNotificationSycnDownStateItem"
+/// 同步下载成功的数量
+let SECEvernoteManagerNotificationSuccessSycnDownNoteCountItem = "SECEvernoteManagerNotificationSuccessSycnDownNoteCountItem"
+
 let ApplicationNotebookName = "SectionReading"
 let kApplicationNotebookGuid = "kApplicationNotebookGuid"
 let kEvernoteLastUpdateCount = "kEvernoteLastUpdateCount"
 
 class SECEvernoteManager: NSObject {
 
-    // 是否正在同步
-    private (set) var synchronizing = false
+    /// 是否连接 wifi
+    var WiFiReachability: Bool = false
+    
+    /// 是否只在 wifi 下同步
+    var onlySyncUnderWIFI: Bool = true 
+    
+    // 是否正在同步上传
+    private (set) var upSynchronizing = false
+    
+    // 上次同步上传数量
+    private (set) var lastTimeSyncupNoteNumber: Int = 0
+    
+    // 是否正在同步下载
+    private (set) var downSynchronizing = false
+    
+    // 上次同步下载数量
+    private (set) var lastTimeSyncdownNoteNumber: Int = 0
     
     private var noteSession = ENSession.sharedSession()
     private var needSyncDownNoteCount: NSNumber?
@@ -42,21 +71,6 @@ class SECEvernoteManager: NSObject {
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
-    
-    
-    override init() {
-        super.init()
-        
-        NSNotificationCenter.defaultCenter().addObserverForName(SSAReachabilityDidChangeNotification, object: nil, queue: nil) { [weak self] (note) -> Void in
-            if let strongSelf = self {
-                if SSASwiftReachability.sharedManager != nil && SSASwiftReachability.sharedManager!.isReachable() {
-                    strongSelf.sync(withType: EvernoteSyncType.UP_AND_DOWN, completion: { (successNumber) -> Void in
-                        print("Evermanager sync number: \(successNumber)")
-                    })
-                }
-            }
-        }
-    }
     
     /**
      印象笔记是否授权
@@ -96,6 +110,14 @@ class SECEvernoteManager: NSObject {
      印象笔记解除授权
      */
     func unauthenticate() {
+        
+        noteSycnOperationQueue.cancelAllOperations()
+        
+        upSynchronizing = false
+        lastTimeSyncupNoteNumber = 0
+        downSynchronizing = false
+        lastTimeSyncdownNoteNumber = 0
+        needSyncDownNoteCount = nil
         
         noteSession.unauthenticate()
     }
@@ -194,40 +216,26 @@ class SECEvernoteManager: NSObject {
             return
         }
         
-        if synchronizing {
-            completion?(successNumber: 0)
-            return
-        }
-        
         switch type {
         case .UP :
-            syncUp(withCompletion: { [weak self] (upNumber) -> Void in
-                if let strongSelf = self {
-                    strongSelf.synchronizing = false
-                    completion?(successNumber: upNumber)
-                }
+            syncUp(withCompletion: { (upNumber) -> Void in
+                completion?(successNumber: upNumber)
             })
         case .DOWN :
-            syncDown(withCompletion: { [weak self] (downNumber) -> Void in
-                if let strongSelf = self {
-                    strongSelf.synchronizing = false
-                    completion?(successNumber: downNumber)
-                }
+            syncDown(withCompletion: { (downNumber) -> Void in
+                completion?(successNumber: downNumber)
             })
         case .UP_AND_DOWN :
-            syncUp(withCompletion: { [weak self] (upNumber) -> Void in
+            syncDown(withCompletion: { [weak self] (downNumber) -> Void in
                 let strongSelf = self
                 if strongSelf == nil {
                     return
                 }
                 
-                var syncNumber = upNumber
-                strongSelf!.syncDown(withCompletion: { [weak self] (downNumber) -> Void in
-                    if let strongSelf = self {
-                        syncNumber += downNumber
-                        strongSelf.synchronizing = false
-                        completion?(successNumber: syncNumber)
-                    }
+                var syncNumber = downNumber
+                strongSelf!.syncUp(withCompletion: { (upNumber) -> Void in
+                    syncNumber += upNumber
+                    completion?(successNumber: syncNumber)
                 })
             })
         }
@@ -258,6 +266,7 @@ class SECEvernoteManager: NSObject {
             }
             
             if notesMetadata == nil {
+                strongSelf?.needSyncDownNoteCount = NSNumber(integer: 0)
                 success?(0)
                 return
             }
@@ -291,11 +300,31 @@ class SECEvernoteManager: NSObject {
                     dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
                 }
                 
+                strongSelf?.needSyncDownNoteCount = NSNumber(integer: needSycnDownNumber)
                 success?(needSycnDownNumber)
             })
             
-        }) {
-            failure?()
+        }) { [weak self] in
+            if let strongSelf = self {
+                strongSelf.needSyncDownNoteCount = NSNumber(integer: 0)
+                failure?()
+            }
+        }
+    }
+    
+    /**
+     获取资源
+     
+     - parameter resourceGuid: 资源 id
+     - parameter completion:   结果 block
+     */
+    func getResource(withResourceGuid resourceGuid: String, completion: ((NSData?) -> Void)?) {
+    
+        self.noteSession.primaryNoteStore().getResourceDataWithGuid(resourceGuid, success: { (data) -> Void in
+            completion?(data)
+            }) { (error) -> Void in
+                print("error: \(error.localizedDescription)")
+                completion?(nil)
         }
     }
     
@@ -445,13 +474,46 @@ class SECEvernoteManager: NSObject {
     }
     
     
-    private func syncUp(withCompletion completion: ((successNumber: Int) -> Void)?) {
+    private func canSyncronize() -> Bool {
+        
+        if onlySyncUnderWIFI {
+            return WiFiReachability
+        }
+        return true
+    }
+    
+    private func notifyNoteSyncupStateDidChange() {
+        
+        NSNotificationCenter.defaultCenter().postNotificationName(SECEvernoteManagerSycnUpStateDidChangeNotification, object: self, userInfo: [SECEvernoteManagerNotificationSycnUpStateItem: upSynchronizing, SECEvernoteManagerNotificationSuccessSycnUpNoteCountItem: lastTimeSyncupNoteNumber])
+    }
+    
+    private func notifyNoteSyncdownStateDidChange() {
+        
+        NSNotificationCenter.defaultCenter().postNotificationName(SECEvernoteManagerSycnDownStateDidChangeNotification, object: self, userInfo: [SECEvernoteManagerNotificationSycnDownStateItem: downSynchronizing, SECEvernoteManagerNotificationSuccessSycnDownNoteCountItem: lastTimeSyncdownNoteNumber])
+    }
+    
+    private func syncUp(withCompletion completion: ((Int) -> Void)?) {
         
         self.noteSycnOperationQueue.addOperationWithBlock { [weak self] () -> Void in
             let strongSelf = self
             if strongSelf == nil {
                 return
             }
+            
+            if strongSelf!.upSynchronizing {
+                print("Up synchrosizing.")
+                completion?(0)
+                return
+            }
+            
+            if strongSelf!.canSyncronize() == false {
+                print("Can't synchronize.")
+                completion?(0)
+                return
+            }
+            
+            strongSelf!.upSynchronizing = true
+            strongSelf!.notifyNoteSyncupStateDidChange()
             
             let queryOption = ReadingQueryOption()
             queryOption.syncStatus = [.NeedSyncUpload, .NeedSyncDelete]
@@ -462,6 +524,10 @@ class SECEvernoteManager: NSObject {
                     return
                 }
                 if results == nil {
+                    strongSelf?.upSynchronizing = false
+                    strongSelf?.lastTimeSyncupNoteNumber = 0
+                    strongSelf?.notifyNoteSyncupStateDidChange()
+                    completion?(0)
                     return
                 }
                 
@@ -543,13 +609,32 @@ class SECEvernoteManager: NSObject {
                     }
                 }
                 
+                strongSelf?.upSynchronizing = false
+                strongSelf?.lastTimeSyncupNoteNumber = successNumber
+                strongSelf?.notifyNoteSyncupStateDidChange()
+                
                 dispatchGroup = nil
-                completion?(successNumber: successNumber)
+                completion?(successNumber)
             }
         }
     }
     
     private func syncDown(withCompletion completion: ((Int) -> Void)?) {
+        
+        if downSynchronizing {
+            print("Down synchronizing.")
+            completion?(0)
+            return
+        }
+        
+        if canSyncronize() == false {
+            print("Can't synchronize.")
+            completion?(0)
+            return
+        }
+        
+        downSynchronizing = true
+        notifyNoteSyncdownStateDidChange()
         
         let resultSpec = EDAMNotesMetadataResultSpec()
         resultSpec.includeUpdated = true
@@ -562,6 +647,10 @@ class SECEvernoteManager: NSObject {
             }
             
             if notesMetadata == nil {
+                strongSelf?.downSynchronizing = false
+                strongSelf?.lastTimeSyncdownNoteNumber = 0
+                strongSelf?.notifyNoteSyncdownStateDidChange()
+                strongSelf?.needSyncDownNoteCount = NSNumber(integer: 0)
                 completion?(0)
                 return
             }
@@ -592,6 +681,10 @@ class SECEvernoteManager: NSObject {
                 dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
                 
                 if currentUpdateCount <= latestUpdateCount {
+                    strongSelf?.downSynchronizing = false
+                    strongSelf?.lastTimeSyncdownNoteNumber = 0
+                    strongSelf?.notifyNoteSyncdownStateDidChange()
+                    strongSelf?.needSyncDownNoteCount = NSNumber(integer: 0)
                     completion?(0)
                     return
                 }
@@ -672,13 +765,23 @@ class SECEvernoteManager: NSObject {
                     }
                 }
                 
+                strongSelf?.downSynchronizing = false
+                strongSelf?.lastTimeSyncdownNoteNumber = syncDownNumber
+                strongSelf?.notifyNoteSyncdownStateDidChange()
+                strongSelf?.needSyncDownNoteCount = NSNumber(integer: 0)
+                
                 // 保存本次同步计数
                 NSUserDefaults.standardUserDefaults().setInteger(currentUpdateCount, forKey: kEvernoteLastUpdateCount)
                 
                 completion?(syncDownNumber)
             }
-            }, failure: {
-                completion?(0)
+            }, failure: { [weak self] in
+                if let strongSelf = self {
+                    strongSelf.downSynchronizing = false
+                    strongSelf.lastTimeSyncdownNoteNumber = 0
+                    strongSelf.notifyNoteSyncdownStateDidChange()
+                    completion?(0)
+                }
         })
     }
 }

@@ -47,27 +47,72 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
        
         super.viewDidLoad()
         
-        self.clearsSelectionOnViewWillAppear = false
-        
-        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.SingleLine
-        self.tableView.separatorColor = UIColor(white: 0, alpha: 0.2)
-        self.tableView.separatorInset = UIEdgeInsetsZero
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "recvEvernoteManagerSycnDownStateDidChangeNote:", name: SECEvernoteManagerSycnDownStateDidChangeNotification, object: nil)
         
         self.navigationItem.title = "读书记录"
         self.navigationItem.leftBarButtonItem = self.mNewRecordBarItem
         self.navigationItem.rightBarButtonItem = self.mSettingBarItem
         
+        self.refreshControl = UIRefreshControl()
+        self.refreshControl?.addTarget(self, action: "refresh", forControlEvents: UIControlEvents.ValueChanged)
+        
+        self.refreshControl?.beginRefreshing()
         TReading.filterByOption(nil, completion: { [weak self] (results) -> Void in
             if let strongSelf = self {
+                strongSelf.refreshControl?.endRefreshing()
+                
                 print("Reading count: \(results != nil ?results!.count :0)")
                 strongSelf.readings = results
                 strongSelf.tableView.reloadData()
             }
-        })
+            })
+    }
+    
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: SECEvernoteManagerSycnDownStateDidChangeNotification, object: nil)
+    }
+    
+    @objc private func refresh() {
+    
+        TReading.filterByOption(nil, completion: { [weak self] (results) -> Void in
+            if let strongSelf = self {
+                strongSelf.refreshControl?.endRefreshing()
+                
+                print("Reading count: \(results != nil ?results!.count :0)")
+                strongSelf.readings = results
+                strongSelf.tableView.reloadData()
+            }
+            })
+    }
+    
+    @objc private func recvEvernoteManagerSycnDownStateDidChangeNote(note: NSNotification) {
+        
+        print("recv SECEvernoteManagerSycnDownStateDidChangeNotification.")
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            
+            if self.navigationController?.topViewController != self {
+                let currentSyncDownState = note.userInfo?[SECEvernoteManagerNotificationSycnDownStateItem] as? Bool
+                let syncDownNumber = note.userInfo?[SECEvernoteManagerNotificationSuccessSycnDownNoteCountItem] as? Int
+                if currentSyncDownState == false && syncDownNumber > 0 {
+                    TReading.filterByOption(nil, completion: { [weak self] (results) -> Void in
+                        if let strongSelf = self {
+                            print("Reading count: \(results != nil ?results!.count :0)")
+                            strongSelf.readings = results
+                            strongSelf.tableView.reloadData()
+                        }
+                        })
+                }
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     @objc private func toAddNewRecord() {
@@ -108,7 +153,10 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
     // MARK: -  UITableViewDelegate
     
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        
+        return 0.1
+    }
+    
+    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0.1
     }
     

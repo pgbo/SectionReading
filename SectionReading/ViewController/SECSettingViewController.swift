@@ -11,6 +11,8 @@ import UIKit
 class SECSettingViewController: UITableViewController {
 
     private var evernoteManager = SECAppDelegate.SELF()!.evernoteManager
+    private var needSycnDownNoteNumber: Int = 0
+    private var needSycnUpNoteNumber: Int = 0
     
     class func instanceFromSB() -> SECSettingViewController {
         return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewControllerWithIdentifier("SECSettingViewController") as! SECSettingViewController
@@ -35,11 +37,45 @@ class SECSettingViewController: UITableViewController {
         super.didReceiveMemoryWarning()
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        loadAndShowSyncDownAndUpCount()
+    }
+    
+    private func loadAndShowSyncDownAndUpCount() {
+    
+        evernoteManager.getNeedSyncDownNoteCount(withSuccess: { [weak self] (count) -> Void in
+            if let strongSelf = self {
+                dispatch_async(dispatch_get_main_queue()) {
+                    strongSelf.needSycnDownNoteNumber = count
+                    strongSelf.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 2, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+                }
+            }
+            }) { [weak self] () -> Void in
+                if let strongSelf = self {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        strongSelf.needSycnDownNoteNumber = 0
+                        strongSelf.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 2, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+                    }
+                }
+        }
+        
+        let option = ReadingQueryOption()
+        option.syncStatus = [ReadingSyncStatus.NeedSyncDelete, ReadingSyncStatus.NeedSyncUpload]
+        if let needSyncup = TReading.count(withOption: option) {
+            needSycnUpNoteNumber = needSyncup
+        } else {
+            needSycnUpNoteNumber = 0
+        }
+        self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 2, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+    }
+    
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
         
-        // TODO: configure cell
+        //  configure cell
+        
         let cellSection = indexPath.section
         let cellRow = indexPath.row
         
@@ -52,15 +88,27 @@ class SECSettingViewController: UITableViewController {
                 }
             } else if cellRow == 1 {
                 
-                let stillSync = NSUserDefaults.standardUserDefaults().boolForKey(kUserDefault_OnlySyncNoteUnderWIFI)
-                if stillSync {
+                let onlySyncUnderWIFI = SECAppDelegate.SELF()!.onlySyncNoteUnderWIFI
+                if onlySyncUnderWIFI {
                     cell.detailTextLabel?.text = "开启"
                 } else {
                     cell.detailTextLabel?.text = "关闭"
                 }
                 
             } else if cellRow == 2 {
-            
+                
+                var text = ""
+                if needSycnDownNoteNumber > 0 {
+                    text += "\(needSycnDownNoteNumber) 待下载"
+                }
+                if needSycnUpNoteNumber > 0 {
+                    if text.characters.count > 0 {
+                        text += ", "
+                    }
+                    text += "\(needSycnUpNoteNumber) 待上传"
+                }
+                
+                cell.detailTextLabel?.text = text
             }
         } else if cellSection == 1 {
             if cellRow == 0 {
@@ -115,6 +163,9 @@ class SECSettingViewController: UITableViewController {
                 dispatch_async(dispatch_get_main_queue(), {
                     if success {
                         strongSelf.tableView .reloadRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+                        strongSelf.evernoteManager.sync(withType: .UP_AND_DOWN, completion: { (successNumber) -> Void in
+                            print("After login evernote, sync count:\(successNumber)")
+                        })
                     } else {
                         let alert = UIAlertController(title: nil, message: "登录失败", preferredStyle: UIAlertControllerStyle.Alert)
                         alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.Cancel, handler: nil))
@@ -152,8 +203,8 @@ class SECSettingViewController: UITableViewController {
         var alertMesaage: String?
         var actionTitle: String?
         
-        let stillSync = NSUserDefaults.standardUserDefaults().boolForKey(kUserDefault_OnlySyncNoteUnderWIFI)
-        if stillSync {
+        let onlySyncNoteUnderWIFI = SECAppDelegate.SELF()!.onlySyncNoteUnderWIFI
+        if onlySyncNoteUnderWIFI {
             alertMesaage = "需要关闭只在 WIFI 下同步吗？"
             actionTitle = "关闭"
         } else {
@@ -163,8 +214,7 @@ class SECSettingViewController: UITableViewController {
         
         let alert = UIAlertController(title: nil, message: alertMesaage, preferredStyle: UIAlertControllerStyle.ActionSheet)
         alert.addAction(UIAlertAction(title: actionTitle, style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
-            
-            NSUserDefaults.standardUserDefaults().setBool(!stillSync, forKey: kUserDefault_OnlySyncNoteUnderWIFI)
+            SECAppDelegate.SELF()!.onlySyncNoteUnderWIFI = !onlySyncNoteUnderWIFI
             self.tableView .reloadRowsAtIndexPaths([NSIndexPath(forRow: 1, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
         }))
         alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
@@ -187,7 +237,14 @@ class SECSettingViewController: UITableViewController {
         let alert = UIAlertController(title: nil, message: "确认现在同步吗？", preferredStyle: UIAlertControllerStyle.ActionSheet)
         alert.addAction(UIAlertAction(title: "立即同步", style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
             
-            // TODO:
+            // TODO: 进行同步动画或提示
+            self.evernoteManager.sync(withType: .UP_AND_DOWN, completion: { [weak self] (successNumber) -> Void in
+                if let strongSelf = self {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        strongSelf.loadAndShowSyncDownAndUpCount()
+                    }
+                }
+            })
         }))
         alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
         

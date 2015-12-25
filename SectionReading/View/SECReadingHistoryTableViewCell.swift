@@ -112,12 +112,14 @@ class SECReadingHistoryTableViewCell: UITableViewCell, SECAudioPlayViewDelegate 
         mTextLabel.text = reading.fContent
         mDateLabel.text = DateFormatorStatic.formator!.stringFromDate(readingDate!)
         
-        if reading.fUploadingAudioFilePath != nil {
+        if reading.fLocalAudioFilePath != nil || reading.fUploadedAudioGuid != nil {
             mAudioPanelTop.constant = 10.0
             mAudioPanelHeight.constant = 32.0
+            mAudioPanel.hidden = false
         } else {
             mAudioPanelTop.constant = 0
             mAudioPanelHeight.constant = 0
+            mAudioPanel.hidden = true
         }
     }
 }

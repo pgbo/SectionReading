@@ -163,6 +163,10 @@ class TReading: NSManagedObject {
             predicates.append(NSPredicate(format: "(%K == %@)", "fStatus", queryOption!.status!))
         }
         
+        if queryOption!.localAudioFilePath != nil {
+            predicates.append(NSPredicate(format: "(%K == %@)", "fLocalAudioFilePath", queryOption!.localAudioFilePath!))
+        }
+        
         return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 }
@@ -172,4 +176,5 @@ class ReadingQueryOption: NSObject {
     var evernoteGuid: String?
     var syncStatus: [ReadingSyncStatus]?
     var status: String?
+    var localAudioFilePath: String?
 }

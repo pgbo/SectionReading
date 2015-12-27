@@ -17,6 +17,7 @@ import AVFoundation
 class SECAudioFileTableViewCell: UITableViewCell {
 
     weak var delegate: SECAudioFileTableViewCellDelegate?
+    
     var isPlaying: Bool = false {
         didSet {
             var normalImage: UIImage?
@@ -28,16 +29,17 @@ class SECAudioFileTableViewCell: UITableViewCell {
                 normalImage = UIImage(named: "RecordListPlayButton")
                 hlImage = UIImage(named: "RecordListPlayButtonHL")
             }
-            mPlayButton.setImage(normalImage, forState: UIControlState.Normal)
-            mPlayButton.setImage(hlImage, forState: UIControlState.Highlighted)
+            mPlayButton?.setImage(normalImage, forState: UIControlState.Normal)
+            mPlayButton?.setImage(hlImage, forState: UIControlState.Highlighted)
         }
     }
-    
+
     @IBOutlet private weak var mBriefDayLabel: UILabel!
     @IBOutlet private weak var mTimeLabel: UILabel!
     @IBOutlet private weak var mDayLabel: UILabel!
     @IBOutlet private weak var mAudioDurationLabel: UILabel!
-    @IBOutlet private weak var mPlayButton: UIButton!
+    
+    private var mPlayButton: UIButton?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -50,10 +52,18 @@ class SECAudioFileTableViewCell: UITableViewCell {
     
     private func setupAudioFileTableViewCell() {
     
+        mPlayButton = UIButton(type: UIButtonType.Custom)
+        mPlayButton?.frame = CGRectMake(0, 0, 34, 34)
+        mPlayButton?.addTarget(self, action: "clickedPlayButton", forControlEvents: UIControlEvents.TouchUpInside)
+        self.accessoryView = mPlayButton
+        
+        self.editingAccessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+        self.selectionStyle = UITableViewCellSelectionStyle.Default
+        
         isPlaying = false
     }
     
-    @IBAction func clickedPlayButton(sender: AnyObject) {
+    @objc private func clickedPlayButton() {
         delegate?.clickPlayAudioButtonIn?(self)
     }
     
@@ -79,7 +89,7 @@ class SECAudioFileTableViewCell: UITableViewCell {
         
         let asset = AVAsset(URL: NSURL(fileURLWithPath: audioFilePath))
         let duration = CMTimeGetSeconds(asset.duration)
-        mAudioDurationLabel.text = SECHelper.createFormatTextForRecordDuration(duration)
+        mAudioDurationLabel.text = "时长:\(SECHelper.createFormatTextForRecordDuration(duration))"
         
     }
 }

@@ -99,10 +99,17 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
         
         let cell = tableView.dequeueReusableCellWithIdentifier("SECAudioFileTableViewCell", forIndexPath: indexPath) as! SECAudioFileTableViewCell
         
-        cell.configure(withAudioFilePath: "\(audioStoreDirectory!)\(audioFileNameList![indexPath.row])")
+        let row = indexPath.row
+        
+        cell.configure(withAudioFilePath: "\(audioStoreDirectory!)\(audioFileNameList![row])")
         
         cell.delegate = self
-        cell.isPlaying = false
+        
+        if playingAudioIndex != nil && playingAudioIndex!.integerValue == row {
+            cell.isPlaying = true
+        } else {
+            cell.isPlaying = false
+        }
         
         return cell
     }
@@ -114,11 +121,11 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            deleteFile(atIndexPath: indexPath)
+            toDeleteFile(atIndexPath: indexPath)
         }
     }
     
-    private func deleteFile(atIndexPath indexPath: NSIndexPath) {
+    private func toDeleteFile(atIndexPath indexPath: NSIndexPath) {
         
         let deletingFilePath = "\(audioStoreDirectory!)\(audioFileNameList![indexPath.row])"
         let option = ReadingQueryOption()
@@ -126,17 +133,28 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
         option.syncStatus = [ReadingSyncStatus.NeedSyncUpload]
         let count = TReading.count(withOption: option)
         if count == nil || count == 0 {
-            audioFileNameList?.removeAtIndex(indexPath.row)
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            do {
-                try NSFileManager.defaultManager().removeItemAtPath(deletingFilePath)
-            } catch let error as NSError {
-                print("error:\(error.localizedDescription)")
-            }
+            
+            tableViewDidDeleteAudioFile(atIndexPath: indexPath)
+            deleteAudioFileAtPath(deletingFilePath)
+            
         } else {
             let deleteAlert = UIAlertController(title: "重要提醒", message: "该音频文件关联了一些未同步的读书笔记，删除后关联的读书笔记将会丢失录音，确认删除吗？", preferredStyle: UIAlertControllerStyle.Alert)
             deleteAlert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
             deleteAlert.addAction(UIAlertAction(title: "删除", style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
+                TReading.filterByOption(option, completion: { (results) -> Void in
+                    if results == nil {
+                        return
+                    }
+                    for reading in results! {
+                        reading.fLocalAudioFilePath = nil
+                        reading.fModifyTimestamp = NSNumber(integer: Int(NSDate().timeIntervalSince1970))
+                    }
+                    
+                    self.tableViewDidDeleteAudioFile(atIndexPath: indexPath)
+                    self.deleteAudioFileAtPath(deletingFilePath)
+                })
+                
+                
                 self.audioFileNameList?.removeAtIndex(indexPath.row)
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 do {
@@ -146,6 +164,31 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
                 }
             }))
             self.presentViewController(deleteAlert, animated: true, completion: nil)
+        }
+    }
+    
+    private func tableViewDidDeleteAudioFile(atIndexPath indexPath: NSIndexPath) {
+        
+        let deletingRow = indexPath.row
+        if playingAudioIndex != nil {
+            let playingIndex = playingAudioIndex!.integerValue
+            if playingIndex == deletingRow {
+                playingAudioIndex = nil
+            } else if playingIndex > deletingRow {
+                playingAudioIndex = NSNumber(integer: playingIndex - 1)
+            }
+        }
+        
+        audioFileNameList?.removeAtIndex(deletingRow)
+        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+    }
+    
+    private func deleteAudioFileAtPath(filePath: String) {
+
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(filePath)
+        } catch let error as NSError {
+            print("error:\(error.localizedDescription)")
         }
     }
     

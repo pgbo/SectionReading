@@ -591,6 +591,67 @@
             </objects>
             <point key="canvasLocation" x="1837.5" y="323.5"/>
         </scene>
+        <!--Share Reading View Controller-->
+        <scene sceneID="FBc-mT-ONf">
+            <objects>
+                <viewController storyboardIdentifier="SECShareReadingViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="7EL-hL-bj1" customClass="SECShareReadingViewController" customModule="SectionReading" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fwl-3V-tnh"/>
+                        <viewControllerLayoutGuide type="bottom" id="jhY-Ui-qsl"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="XVU-UN-XA7">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jvJ-6m-uAu">
+                                <rect key="frame" x="0.0" y="619" width="375" height="48"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="分享到" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="o9z-Yf-M3h">
+                                        <rect key="frame" x="12" y="13" width="51" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.67843137254901964" green="0.66274509803921566" blue="0.66274509803921566" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ShareWechatButton" translatesAutoresizingMaskIntoConstraints="NO" id="zZm-hS-E5k">
+                                        <rect key="frame" x="71" y="8" width="32" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="32" id="On9-R4-Iy7"/>
+                                            <constraint firstAttribute="width" secondItem="zZm-hS-E5k" secondAttribute="height" multiplier="1:1" id="qxy-3H-yLg"/>
+                                        </constraints>
+                                    </imageView>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ShareWechatGroupButton" translatesAutoresizingMaskIntoConstraints="NO" id="P83-Hx-RzK">
+                                        <rect key="frame" x="111" y="8" width="32" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="P83-Hx-RzK" secondAttribute="height" multiplier="1:1" id="1i6-Cw-yix"/>
+                                            <constraint firstAttribute="width" constant="32" id="TbG-tI-1uc"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" red="0.91764705882352937" green="0.91764705882352937" blue="0.91764705882352937" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstItem="P83-Hx-RzK" firstAttribute="leading" secondItem="zZm-hS-E5k" secondAttribute="trailing" constant="8" id="9GJ-j7-Laz"/>
+                                    <constraint firstAttribute="height" constant="48" id="NwZ-QQ-qBs"/>
+                                    <constraint firstItem="o9z-Yf-M3h" firstAttribute="leading" secondItem="jvJ-6m-uAu" secondAttribute="leading" constant="12" id="SNG-yE-JK9"/>
+                                    <constraint firstItem="zZm-hS-E5k" firstAttribute="leading" secondItem="o9z-Yf-M3h" secondAttribute="trailing" constant="8" id="VL6-kh-0Eu"/>
+                                    <constraint firstItem="zZm-hS-E5k" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="W5R-g5-mvo"/>
+                                    <constraint firstItem="P83-Hx-RzK" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="tGf-wf-L56"/>
+                                    <constraint firstItem="o9z-Yf-M3h" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="tSD-vW-sz9"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="jvJ-6m-uAu" secondAttribute="trailing" id="bSK-eI-Bwh"/>
+                            <constraint firstItem="jvJ-6m-uAu" firstAttribute="leading" secondItem="XVU-UN-XA7" secondAttribute="leading" id="eXe-Qz-8x1"/>
+                            <constraint firstItem="jhY-Ui-qsl" firstAttribute="top" secondItem="jvJ-6m-uAu" secondAttribute="bottom" id="qS7-yL-ALu"/>
+                        </constraints>
+                    </view>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="MfC-h4-WAH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2306.5" y="323.5"/>
+        </scene>
     </scenes>
     <resources>
         <image name="AttachIcon" width="20" height="20"/>
@@ -610,6 +671,8 @@
         <image name="ScissorsRecordButtonHL" width="70" height="58"/>
         <image name="ShareButn" width="20" height="20"/>
         <image name="ShareButnHL" width="20" height="20"/>
+        <image name="ShareWechatButton" width="32" height="32"/>
+        <image name="ShareWechatGroupButton" width="32" height="32"/>
         <image name="StopRecordButton" width="70" height="58"/>
         <image name="StopRecordButtonDisabled" width="70" height="58"/>
         <image name="StopRecordButtonHL" width="70" height="58"/>

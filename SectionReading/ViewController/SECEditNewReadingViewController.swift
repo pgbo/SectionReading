@@ -173,10 +173,11 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
                         return
                     }
                     
+                    print("上传成功")
+                    
                     let option = ReadingQueryOption()
                     option.localId = readingLocalid
                     TReading.filterByOption(option, completion: { (results) -> Void in
-                        print("上传成功")
                         SVProgressHUD.dismiss()
                         if results == nil {
                             return
@@ -186,10 +187,9 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
                             result.fillFields(fromEverNote: note!, onlyFillUnSettedFields: false)
                             result.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
                         }
+                        // TODO: 到分享页面
+                        
                     })
-                    
-                    // TODO: 到分享页面
-                    
                 })
             })
         }

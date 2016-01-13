@@ -15,6 +15,8 @@
 		592E369D1BEB563500DC8955 /* CircularButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592E369C1BEB563500DC8955 /* CircularButton.swift */; };
 		596EB85F1C153FEE00F2C670 /* SECEditReadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */; };
 		596EB8631C16C79900F2C670 /* SECReadingRecordCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596EB8621C16C79900F2C670 /* SECReadingRecordCropper.swift */; };
+		59776EA31C4608EB007A4D28 /* SECShareReadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59776EA21C4608EB007A4D28 /* SECShareReadingViewController.swift */; };
+		59776EA51C460F78007A4D28 /* SECReadingShareLayoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59776EA41C460F78007A4D28 /* SECReadingShareLayoutView.swift */; };
 		5978CBEF1C22EBF500964AF6 /* SECConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5978CBEE1C22EBF500964AF6 /* SECConstants.swift */; };
 		597EBCF01BD7A0440031CE2C /* DismissRecordPlayTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */; };
 		598FD59C1C0FF9ED00FC056B /* ImageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 598FD59B1C0FF9ED00FC056B /* ImageAssets.xcassets */; };
@@ -79,6 +81,8 @@
 		592E369C1BEB563500DC8955 /* CircularButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularButton.swift; sourceTree = "<group>"; };
 		596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECEditReadingViewController.swift; sourceTree = "<group>"; };
 		596EB8621C16C79900F2C670 /* SECReadingRecordCropper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SECReadingRecordCropper.swift; path = SectionReading/ViewController/SECReadingRecordCropper.swift; sourceTree = SOURCE_ROOT; };
+		59776EA21C4608EB007A4D28 /* SECShareReadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECShareReadingViewController.swift; sourceTree = "<group>"; };
+		59776EA41C460F78007A4D28 /* SECReadingShareLayoutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECReadingShareLayoutView.swift; sourceTree = "<group>"; };
 		5978CBEE1C22EBF500964AF6 /* SECConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECConstants.swift; sourceTree = "<group>"; };
 		597EBCEF1BD7A0440031CE2C /* DismissRecordPlayTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissRecordPlayTransition.swift; sourceTree = "<group>"; };
 		598FD59B1C0FF9ED00FC056B /* ImageAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ImageAssets.xcassets; sourceTree = "<group>"; };
@@ -337,6 +341,7 @@
 				599CC7021C1EA03500147E97 /* SECAudioPlayView.xib */,
 				59D952A21C27F8BE00FE9B36 /* SECReadingHistoryTableViewCell.swift */,
 				59D952B61C2D32BC00FE9B36 /* SECAudioFileTableViewCell.swift */,
+				59776EA41C460F78007A4D28 /* SECReadingShareLayoutView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -354,6 +359,7 @@
 				596EB85E1C153FEE00F2C670 /* SECEditReadingViewController.swift */,
 				599CC6FA1C1E7CCB00147E97 /* SECEditNewReadingViewController.swift */,
 				59D952B41C2D21F400FE9B36 /* SECAudioFileListViewController.swift */,
+				59776EA21C4608EB007A4D28 /* SECShareReadingViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -529,6 +535,7 @@
 				598FD59E1C1014F800FC056B /* SECReadingHistoryViewController.swift in Sources */,
 				5995004A1C192B3800EBE225 /* SECReadingRecordCombiner.swift in Sources */,
 				599CC6FB1C1E7CCB00147E97 /* SECEditNewReadingViewController.swift in Sources */,
+				59776EA31C4608EB007A4D28 /* SECShareReadingViewController.swift in Sources */,
 				599CC7241C202A3D00147E97 /* TReading+Mapping.swift in Sources */,
 				59C3C9401BAC015200CC6200 /* MultipleArcTracksView.swift in Sources */,
 				599CC6F91C1E7A9700147E97 /* SECUploadReadingModel.swift in Sources */,
@@ -540,6 +547,7 @@
 				596EB85F1C153FEE00F2C670 /* SECEditReadingViewController.swift in Sources */,
 				86FFDDFD1BAB052B004DFCD5 /* NewRecordVC.swift in Sources */,
 				86FFDDF91BA9B4B4004DFCD5 /* ReadingRecordsVC.swift in Sources */,
+				59776EA51C460F78007A4D28 /* SECReadingShareLayoutView.swift in Sources */,
 				598FD5A41C10268600FC056B /* SECHelper.swift in Sources */,
 				599CC7221C200A0300147E97 /* TReading.swift in Sources */,
 				597EBCF01BD7A0440031CE2C /* DismissRecordPlayTransition.swift in Sources */,

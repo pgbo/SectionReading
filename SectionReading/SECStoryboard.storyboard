@@ -612,41 +612,55 @@
                                         <color key="textColor" red="0.67843137254901964" green="0.66274509803921566" blue="0.66274509803921566" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ShareWechatButton" translatesAutoresizingMaskIntoConstraints="NO" id="zZm-hS-E5k">
-                                        <rect key="frame" x="71" y="8" width="32" height="32"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="32" id="On9-R4-Iy7"/>
-                                            <constraint firstAttribute="width" secondItem="zZm-hS-E5k" secondAttribute="height" multiplier="1:1" id="qxy-3H-yLg"/>
-                                        </constraints>
-                                    </imageView>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ShareWechatGroupButton" translatesAutoresizingMaskIntoConstraints="NO" id="P83-Hx-RzK">
-                                        <rect key="frame" x="111" y="8" width="32" height="32"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" secondItem="P83-Hx-RzK" secondAttribute="height" multiplier="1:1" id="1i6-Cw-yix"/>
-                                            <constraint firstAttribute="width" constant="32" id="TbG-tI-1uc"/>
-                                        </constraints>
-                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5md-XZ-CHt">
+                                        <rect key="frame" x="75" y="8" width="32" height="32"/>
+                                        <state key="normal" image="ShareWechatButton"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rll-gQ-RLR">
+                                        <rect key="frame" x="119" y="8" width="32" height="32"/>
+                                        <state key="normal" image="ShareWechatGroupButton"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Idb-a7-4G6">
+                                        <rect key="frame" x="331" y="8" width="32" height="32"/>
+                                        <state key="normal" image="SaveButtonHL"/>
+                                        <state key="highlighted" image="SaveButton"/>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" red="0.91764705882352937" green="0.91764705882352937" blue="0.91764705882352937" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstItem="P83-Hx-RzK" firstAttribute="leading" secondItem="zZm-hS-E5k" secondAttribute="trailing" constant="8" id="9GJ-j7-Laz"/>
+                                    <constraint firstItem="Idb-a7-4G6" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="4G6-iB-S8t"/>
+                                    <constraint firstItem="Rll-gQ-RLR" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="4cU-iy-HuR"/>
+                                    <constraint firstItem="Rll-gQ-RLR" firstAttribute="leading" secondItem="5md-XZ-CHt" secondAttribute="trailing" constant="12" id="APU-Zg-rqf"/>
+                                    <constraint firstItem="5md-XZ-CHt" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="D9Y-1J-EVB"/>
                                     <constraint firstAttribute="height" constant="48" id="NwZ-QQ-qBs"/>
+                                    <constraint firstItem="5md-XZ-CHt" firstAttribute="leading" secondItem="o9z-Yf-M3h" secondAttribute="trailing" constant="12" id="Olh-6T-lCs"/>
                                     <constraint firstItem="o9z-Yf-M3h" firstAttribute="leading" secondItem="jvJ-6m-uAu" secondAttribute="leading" constant="12" id="SNG-yE-JK9"/>
-                                    <constraint firstItem="zZm-hS-E5k" firstAttribute="leading" secondItem="o9z-Yf-M3h" secondAttribute="trailing" constant="8" id="VL6-kh-0Eu"/>
-                                    <constraint firstItem="zZm-hS-E5k" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="W5R-g5-mvo"/>
-                                    <constraint firstItem="P83-Hx-RzK" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="tGf-wf-L56"/>
                                     <constraint firstItem="o9z-Yf-M3h" firstAttribute="centerY" secondItem="jvJ-6m-uAu" secondAttribute="centerY" id="tSD-vW-sz9"/>
+                                    <constraint firstAttribute="trailing" secondItem="Idb-a7-4G6" secondAttribute="trailing" constant="12" id="uJS-i3-gK2"/>
                                 </constraints>
                             </view>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hc5-zy-qJF">
+                                <rect key="frame" x="0.0" y="20" width="375" height="599"/>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
+                            <constraint firstItem="hc5-zy-qJF" firstAttribute="top" secondItem="fwl-3V-tnh" secondAttribute="bottom" id="1fq-An-gIK"/>
                             <constraint firstAttribute="trailing" secondItem="jvJ-6m-uAu" secondAttribute="trailing" id="bSK-eI-Bwh"/>
                             <constraint firstItem="jvJ-6m-uAu" firstAttribute="leading" secondItem="XVU-UN-XA7" secondAttribute="leading" id="eXe-Qz-8x1"/>
+                            <constraint firstItem="jvJ-6m-uAu" firstAttribute="top" secondItem="hc5-zy-qJF" secondAttribute="bottom" id="k0L-nZ-sjt"/>
                             <constraint firstItem="jhY-Ui-qsl" firstAttribute="top" secondItem="jvJ-6m-uAu" secondAttribute="bottom" id="qS7-yL-ALu"/>
+                            <constraint firstItem="hc5-zy-qJF" firstAttribute="leading" secondItem="XVU-UN-XA7" secondAttribute="leading" id="xaJ-bF-wY1"/>
+                            <constraint firstAttribute="trailing" secondItem="hc5-zy-qJF" secondAttribute="trailing" id="zct-qF-nAR"/>
                         </constraints>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                    <connections>
+                        <outlet property="mPengYQButton" destination="Rll-gQ-RLR" id="vUv-nN-vcA"/>
+                        <outlet property="mSaveShareContentButton" destination="Idb-a7-4G6" id="j7g-zC-XTf"/>
+                        <outlet property="mScrollView" destination="hc5-zy-qJF" id="LY0-MP-RmI"/>
+                        <outlet property="mWechatButton" destination="5md-XZ-CHt" id="YUh-oF-lRs"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MfC-h4-WAH" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -666,6 +680,8 @@
         <image name="RecordTextInputAreaBg" width="18" height="56"/>
         <image name="RecordWheelsBg " width="318" height="232"/>
         <image name="ResumeRecordButton" width="70" height="58"/>
+        <image name="SaveButton" width="32" height="32"/>
+        <image name="SaveButtonHL" width="32" height="32"/>
         <image name="ScissorsRecordButton" width="70" height="58"/>
         <image name="ScissorsRecordButtonDisabled" width="70" height="58"/>
         <image name="ScissorsRecordButtonHL" width="70" height="58"/>

@@ -8,4 +8,5 @@ target 'SectionReading' do
     pod 'SVProgressHUD', '~> 1.1.3'
     pod 'KMPlaceholderTextView', '~> 1.1.1'
     pod 'UITableView+FDTemplateLayoutCell', '~> 1.3'
+    pod 'SnapKit', '~> 0.18.0'
 end

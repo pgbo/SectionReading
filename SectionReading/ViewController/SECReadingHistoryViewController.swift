@@ -182,10 +182,23 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
     func clickShareButtonIn(cell: SECReadingHistoryTableViewCell) {
         
         print("clickShareButtonIn.")
+        let indexPath = indexPathOfCell(cell)
+        if indexPath != nil {
+            if let reading = readings?[indexPath!.row] {
+                self.navigationController?.showViewController(SECShareReadingViewController.instanceFromSB(withShareReadingLocalId: reading.fLocalId!), sender: nil)
+            }
+        }
     }
     
     func clickPlayAudioButtonIn(cell: SECReadingHistoryTableViewCell) {
     
         print("clickPlayAudioButtonIn.")
+    }
+    
+    private func indexPathOfCell(cell: UITableViewCell) -> NSIndexPath? {
+        
+        let cellBounds = cell.bounds
+        let cellCenter = cell.convertPoint(CGPointMake(CGRectGetMidX(cellBounds), CGRectGetMidY(cellBounds)), toView:self.tableView)
+        return self.tableView.indexPathForRowAtPoint(cellCenter)
     }
 }

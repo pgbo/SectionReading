@@ -165,7 +165,6 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
                 newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.NeedSyncUpload.rawValue)
                 
                 // 同步
-                let readingLocalid = newReading.fLocalId
                 self.evernoteManager.createNote(withContent: newReading, completion: { (note) -> Void in
                     if note == nil {
                         SVProgressHUD.dismiss()
@@ -175,20 +174,29 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
                     
                     print("上传成功")
                     
-                    let option = ReadingQueryOption()
-                    option.localId = readingLocalid
-                    TReading.filterByOption(option, completion: { (results) -> Void in
-                        SVProgressHUD.dismiss()
-                        if results == nil {
-                            return
-                        }
-                        
-                        for result in (results! as [TReading]) {
-                            result.fillFields(fromEverNote: note!, onlyFillUnSettedFields: false)
-                            result.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
-                        }
-                        // TODO: 到分享页面
-                        
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        let readingLocalId = newReading.fLocalId;
+                        let option = ReadingQueryOption()
+                        option.localId = readingLocalId
+                        TReading.filterByOption(option, completion: { (results) -> Void in
+                            SVProgressHUD.dismiss()
+                            if results == nil {
+                                return
+                            }
+                            
+                            for result in (results! as [TReading]) {
+                                result.fillFields(fromEverNote: note!, onlyFillUnSettedFields: true)
+                                result.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
+                            }
+                            
+                            let alert = UIAlertController(title: nil, message: "上传成功，赶快分享给大家吧！", preferredStyle: UIAlertControllerStyle.Alert)
+                            alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+                            alert.addAction(UIAlertAction(title: "去分享", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+                                // 到分享页面
+                                self.navigationController?.showViewController(SECShareReadingViewController.instanceFromSB(withShareReadingLocalId: readingLocalId!), sender: nil)
+                            }))
+                            self.presentViewController(alert, animated: true, completion: nil)
+                        })
                     })
                 })
             })

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -13,7 +13,6 @@
             <subviews>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AudioPanelBg" translatesAutoresizingMaskIntoConstraints="NO" id="ijB-jg-a1e">
                     <rect key="frame" x="0.0" y="0.0" width="375" height="32"/>
-                    <animations/>
                     <rect key="contentStretch" x="0.40000000000000002" y="0.0" width="0.20000000000000001" height="1"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="32" id="AOh-Cj-Kwq"/>
@@ -21,7 +20,6 @@
                 </imageView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="69N-tW-CZJ">
                     <rect key="frame" x="10" y="4" width="24" height="24"/>
-                    <animations/>
                     <constraints>
                         <constraint firstAttribute="height" constant="24" id="9HE-vs-ac7"/>
                         <constraint firstAttribute="width" constant="24" id="V6z-my-U5M"/>
@@ -30,19 +28,16 @@
                 </button>
                 <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="akx-xk-o3f">
                     <rect key="frame" x="40" y="15" width="266" height="2"/>
-                    <animations/>
                     <color key="progressTintColor" red="0.32549019607843138" green="0.61568627450980395" blue="0.62352941176470589" alpha="1" colorSpace="calibratedRGB"/>
                     <color key="trackTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </progressView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="120/320 s" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="djI-7R-a8u">
                     <rect key="frame" x="314" y="9" width="53" height="14"/>
-                    <animations/>
                     <fontDescription key="fontDescription" type="system" pointSize="11"/>
                     <color key="textColor" red="0.32549019607843138" green="0.61568627450980395" blue="0.62352941176470589" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
-            <animations/>
             <constraints>
                 <constraint firstItem="akx-xk-o3f" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="EiG-Yc-SnA"/>
                 <constraint firstAttribute="trailing" secondItem="djI-7R-a8u" secondAttribute="trailing" constant="8" id="FDh-dn-50d"/>

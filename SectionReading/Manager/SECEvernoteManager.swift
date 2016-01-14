@@ -554,7 +554,7 @@ class SECEvernoteManager: NSObject {
                                     
                                     TReading.update(withFilterOption: filterOption, updateBlock: { (readingtoUpdate) -> Void in
                                         
-                                        readingtoUpdate.fillFields(fromEverNote: createdNote!, onlyFillUnSettedFields: false)
+                                        readingtoUpdate.fillFields(fromEverNote: createdNote!, onlyFillUnSettedFields: true)
                                         readingtoUpdate.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
                                     })
                                     

@@ -118,7 +118,7 @@
 		59D952B21C29369E00FE9B36 /* SSASwiftReachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSASwiftReachability.swift; sourceTree = "<group>"; };
 		59D952B41C2D21F400FE9B36 /* SECAudioFileListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECAudioFileListViewController.swift; sourceTree = "<group>"; };
 		59D952B61C2D32BC00FE9B36 /* SECAudioFileTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SECAudioFileTableViewCell.swift; sourceTree = "<group>"; };
-		86FFDDC81BA9B346004DFCD5 /* SectionReading.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SectionReading.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		86FFDDC81BA9B346004DFCD5 /* 读书记.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "读书记.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		86FFDDD21BA9B346004DFCD5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		86FFDDD41BA9B346004DFCD5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		86FFDDD71BA9B346004DFCD5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -252,7 +252,7 @@
 		86FFDDC91BA9B346004DFCD5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				86FFDDC81BA9B346004DFCD5 /* SectionReading.app */,
+				86FFDDC81BA9B346004DFCD5 /* 读书记.app */,
 				86FFDDDD1BA9B346004DFCD5 /* SectionReadingTests.xctest */,
 			);
 			name = Products;
@@ -384,7 +384,7 @@
 			);
 			name = SectionReading;
 			productName = SectionReading;
-			productReference = 86FFDDC81BA9B346004DFCD5 /* SectionReading.app */;
+			productReference = 86FFDDC81BA9B346004DFCD5 /* 读书记.app */;
 			productType = "com.apple.product-type.application";
 		};
 		86FFDDDC1BA9B346004DFCD5 /* SectionReadingTests */ = {
@@ -694,7 +694,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pengguangbo.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "读书记";
 				SWIFT_OBJC_BRIDGING_HEADER = "SectionReading-Bridging-Header.h";
 			};
 			name = Debug;
@@ -708,7 +708,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pengguangbo.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "读书记";
 				SWIFT_OBJC_BRIDGING_HEADER = "SectionReading-Bridging-Header.h";
 			};
 			name = Release;

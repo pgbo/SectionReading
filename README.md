@@ -6,6 +6,10 @@
 - 配上文字进行分享到微信；（微信分享功能因为时间原因没法及时做出来）
 - 录音和文字同步到 evernote。
 
+## 实现工具
+编程语言：Swift
+设计工具：Sketch
+
 
 #### 截图1
 ![截图1...](/Snapshoot/SectionReading1.jpg)

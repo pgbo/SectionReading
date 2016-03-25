@@ -33,6 +33,12 @@ class SECReadingHistoryTableViewCell: UITableViewCell, SECAudioPlayViewDelegate 
     @IBOutlet private weak var mAudioPanelTop: NSLayoutConstraint!
     @IBOutlet private weak var mAudioPanelHeight: NSLayoutConstraint!
     
+    var isPlaying: Bool = false {
+        didSet {
+            self.mAudioPlayView?.isPlaying = isPlaying
+        }
+    }
+    
     private var mAudioPlayView: SECAudioPlayView!
     
     override func awakeFromNib() {

@@ -147,60 +147,75 @@ class SECEditNewReadingViewController: UIViewController, SECAudioPlayViewDelegat
         let hasContent = textContent != nil && textContent.isEmpty == false
         let hasAudio = hasAttachAudio && audioPlayer != nil && audioPlayer!.duration != 0
         
-        if hasContent ||  hasAudio{
+        if hasContent == false && hasAudio == false {
+            return
+        }
+        
+        TReading.create(withConstructBlock: { (newReading) -> Void in
+            newReading.fLocalId = "\(NSUUID().UUIDString)"
+            newReading.fContent = textContent
             
-            SVProgressHUD.showWithStatus("", maskType: SVProgressHUDMaskType.Gradient)
-            TReading.create(withConstructBlock: { (newReading) -> Void in
-                newReading.fLocalId = "\(NSUUID().UUIDString)"
-                newReading.fContent = textContent
+            if hasAudio && self.attachAudioFilePath != nil {
+                newReading.fLocalAudioFilePath = self.attachAudioFilePath
+            }
+            
+            let time = NSNumber(int: Int32(NSDate().timeIntervalSince1970))
+            newReading.fCreateTimestamp = time
+            newReading.fModifyTimestamp = time
+            
+            newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.NeedSyncUpload.rawValue)
+            
+            if self.evernoteManager.isAuthenticated() == false {
                 
-                if hasAudio && self.attachAudioFilePath != nil {
-                    newReading.fLocalAudioFilePath = self.attachAudioFilePath
+                // 到分享页面
+                self.tipGotoSharePage(withTipMessage: "保存成功，赶快分享给大家吧！", shareReadingLocalId: newReading.fLocalId!);
+                return
+            }
+            
+            // 同步到 evernote
+            SVProgressHUD.showWithStatus("", maskType: SVProgressHUDMaskType.Gradient)
+            
+            // 同步
+            self.evernoteManager.createNote(withContent: newReading, completion: { (note) -> Void in
+                if note == nil {
+                    SVProgressHUD.dismiss()
+                    print("上传失败")
+                    return
                 }
                 
-                let time = NSNumber(int: Int32(NSDate().timeIntervalSince1970))
-                newReading.fCreateTimestamp = time
-                newReading.fModifyTimestamp = time
+                print("上传成功")
                 
-                newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.NeedSyncUpload.rawValue)
-                
-                // 同步
-                self.evernoteManager.createNote(withContent: newReading, completion: { (note) -> Void in
-                    if note == nil {
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    let readingLocalId = newReading.fLocalId;
+                    let option = ReadingQueryOption()
+                    option.localId = readingLocalId
+                    TReading.filterByOption(option, completion: { (results) -> Void in
                         SVProgressHUD.dismiss()
-                        print("上传失败")
-                        return
-                    }
-                    
-                    print("上传成功")
-                    
-                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        let readingLocalId = newReading.fLocalId;
-                        let option = ReadingQueryOption()
-                        option.localId = readingLocalId
-                        TReading.filterByOption(option, completion: { (results) -> Void in
-                            SVProgressHUD.dismiss()
-                            if results == nil {
-                                return
-                            }
-                            
-                            for result in (results! as [TReading]) {
-                                result.fillFields(fromEverNote: note!, onlyFillUnSettedFields: true)
-                                result.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
-                            }
-                            
-                            let alert = UIAlertController(title: nil, message: "上传成功，赶快分享给大家吧！", preferredStyle: UIAlertControllerStyle.Alert)
-                            alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
-                            alert.addAction(UIAlertAction(title: "去分享", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
-                                // 到分享页面
-                                self.navigationController?.showViewController(SECShareReadingViewController.instanceFromSB(withShareReadingLocalId: readingLocalId!), sender: nil)
-                            }))
-                            self.presentViewController(alert, animated: true, completion: nil)
-                        })
+                        if results == nil {
+                            return
+                        }
+                        
+                        for result in (results! as [TReading]) {
+                            result.fillFields(fromEverNote: note!, onlyFillUnSettedFields: true)
+                            result.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
+                        }
+                        
+                        self.tipGotoSharePage(withTipMessage: "上传成功，赶快分享给大家吧！", shareReadingLocalId: readingLocalId!);
                     })
                 })
             })
-        }
+        })
+    }
+    
+    private func tipGotoSharePage(withTipMessage message: String, shareReadingLocalId readingLocalId: String) {
+        
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "去分享", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+            // 到分享页面
+            self.navigationController?.showViewController(SECShareReadingViewController.instanceFromSB(withShareReadingLocalId: readingLocalId), sender: nil)
+        }))
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     @objc private func clickedClearAudioButton(sender: UIButton) {

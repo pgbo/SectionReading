@@ -130,6 +130,11 @@ class SECEvernoteManager: NSObject {
      */
     func createNote(withContent content: TReading, completion: ((EDAMNote?) -> Void)?) {
         
+        if isAuthenticated() == false {
+            completion?(nil)
+            return
+        }
+        
         let appNotebookGuid = NSUserDefaults.standardUserDefaults().objectForKey(kApplicationNotebookGuid) as? String
         if appNotebookGuid == nil {
             completion?(nil)
@@ -161,6 +166,12 @@ class SECEvernoteManager: NSObject {
      */
     func updateNote(withGuid guid: String, newContent: TReading, completion: ((EDAMNote?) -> Void)?) {
         
+        
+        if isAuthenticated() == false {
+            completion?(nil)
+            return
+        }
+        
         let appNotebookGuid = NSUserDefaults.standardUserDefaults().objectForKey(kApplicationNotebookGuid) as? String
         if appNotebookGuid == nil {
             completion?(nil)
@@ -191,6 +202,11 @@ class SECEvernoteManager: NSObject {
      - parameter completion: 回调 block
      */
     func deleteNote(withGuid guid: String, completion: ((success: Bool) -> Void)?) {
+        
+        if isAuthenticated() == false {
+            completion?(success: false)
+            return
+        }
         
         noteSession.primaryNoteStore().deleteNoteWithGuid(guid, success: { (successNum) -> Void in
             
@@ -248,6 +264,12 @@ class SECEvernoteManager: NSObject {
      - parameter failure: 失败 block
      */
     func getNeedSyncDownNoteCount(withSuccess success: ((Int) -> Void)?, failure: (() -> Void)?) {
+        
+        
+        if isAuthenticated() == false {
+            failure?()
+            return
+        }
         
         if needSyncDownNoteCount != nil {
             success?(needSyncDownNoteCount!.integerValue)
@@ -320,6 +342,12 @@ class SECEvernoteManager: NSObject {
      */
     func getResource(withResourceGuid resourceGuid: String, completion: ((NSData?) -> Void)?) {
     
+        
+        if isAuthenticated() == false {
+            completion?(nil)
+            return
+        }
+        
         self.noteSession.primaryNoteStore().getResourceDataWithGuid(resourceGuid, success: { (data) -> Void in
             completion?(data)
             }) { (error) -> Void in
@@ -329,6 +357,12 @@ class SECEvernoteManager: NSObject {
     }
     
     private func getApplicationAllNotesMetadata(withNotesMetadataResultSpec notesMetadataResultSpec: EDAMNotesMetadataResultSpec, success: (([EDAMNoteMetadata]?) -> Void)?, failure: (() -> Void)?) {
+        
+        
+        if isAuthenticated() == false {
+            failure?()
+            return
+        }
         
         let appNotebookGuid = NSUserDefaults.standardUserDefaults().objectForKey(kApplicationNotebookGuid) as? String
         if appNotebookGuid == nil {
@@ -353,7 +387,7 @@ class SECEvernoteManager: NSObject {
             filter.notebookGuid = appNotebookGuid
             
             dispatch_group_enter(dispatchGroup)
-            strongSelf!.noteSession.primaryNoteStore().findNoteCountsWithFilter(filter, withTrash: false, success: { (noteCollectionCounts) -> Void in
+            strongSelf!.noteSession?.primaryNoteStore().findNoteCountsWithFilter(filter, withTrash: false, success: { (noteCollectionCounts) -> Void in
                 noteCount = noteCollectionCounts.notebookCounts.values.first as? NSNumber
                 findNoteCountsSuccess = true
                 dispatch_group_leave(dispatchGroup)
@@ -385,7 +419,7 @@ class SECEvernoteManager: NSObject {
             var findNotesMetadataSuccess = false
             
             dispatch_group_enter(dispatchGroup)
-            strongSelf!.noteSession.primaryNoteStore().findNotesMetadataWithFilter(filter, maxResults: noteCount!.unsignedIntegerValue, resultSpec: notesMetadataResultSpec, success: { (results) -> Void in
+            strongSelf!.noteSession?.primaryNoteStore().findNotesMetadataWithFilter(filter, maxResults: noteCount!.unsignedIntegerValue, resultSpec: notesMetadataResultSpec, success: { (results) -> Void in
                 
                 noteMetas = results as? [EDAMNoteMetadata]
                 findNotesMetadataSuccess = true
@@ -411,6 +445,12 @@ class SECEvernoteManager: NSObject {
      设置好本应用的笔记本
      */
     private func setupApplicationNotebook(withCompletion completion: ((result: EvernoteSyncError) -> Void)?) {
+        
+        
+        if isAuthenticated() == false {
+            completion?(result:EvernoteSyncError.EvernoteNotAuthenticated)
+            return
+        }
         
         let notebookGuid = NSUserDefaults.standardUserDefaults().objectForKey(kApplicationNotebookGuid) as? String
         if notebookGuid != nil {
@@ -457,6 +497,11 @@ class SECEvernoteManager: NSObject {
     
     private func createApplicationNotebook(withCompletion completion: ((result: EvernoteSyncError) -> Void)?) {
     
+        if isAuthenticated() == false {
+            completion?(result:EvernoteSyncError.EvernoteNotAuthenticated)
+            return
+        }
+        
         let notebook = EDAMNotebook()
         notebook.name = ApplicationNotebookName
         notebook.defaultNotebook = NSNumber(bool: false)
@@ -493,6 +538,11 @@ class SECEvernoteManager: NSObject {
     }
     
     private func syncUp(withCompletion completion: ((Int) -> Void)?) {
+        
+        if isAuthenticated() == false {
+            completion?(0)
+            return
+        }
         
         self.noteSycnOperationQueue.addOperationWithBlock { [weak self] () -> Void in
             let strongSelf = self
@@ -620,6 +670,11 @@ class SECEvernoteManager: NSObject {
     }
     
     private func syncDown(withCompletion completion: ((Int) -> Void)?) {
+        
+        if isAuthenticated() == false {
+            completion?(0)
+            return
+        }
         
         if downSynchronizing {
             print("Down synchronizing.")

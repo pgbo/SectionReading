@@ -11,35 +11,35 @@ import SnapKit
 
 class SECReadingShareLayoutViewDataModel {
     var text: String?
-    var readingDuration: NSTimeInterval?
+    var readingDuration: TimeInterval?
 }
 
 let SECReadingShareLayoutViewTextRowHeight = CGFloat(47)
-let SERReadingShareTextFont = UIFont.systemFontOfSize(17.0)
+let SERReadingShareTextFont = UIFont.systemFont(ofSize: 17.0)
 
 class SECReadingShareLayoutView: UIView {
     
-    private var mSeperatorBackgroudView: UIImageView?
-    private var mLabel: UILabel?
-    private var mLogoMottoImageView: UIImageView?
-    private lazy var mRecordDurationLabel: UILabel = {
+    fileprivate var mSeperatorBackgroudView: UIImageView?
+    fileprivate var mLabel: UILabel?
+    fileprivate var mLogoMottoImageView: UIImageView?
+    fileprivate lazy var mRecordDurationLabel: UILabel = {
         
         let label = UILabel()
-        label.backgroundColor = UIColor.clearColor()
+        label.backgroundColor = UIColor.clear
         label.textColor = UIColor(red: 0xCE/255.0, green: 0xCE/255.0, blue: 0xCE/255.0, alpha: 1)
         var font = UIFont(name: "Yuanti SC Light", size: 13.0)
         if font == nil {
-            font = UIFont.systemFontOfSize(13.0)
+            font = UIFont.systemFont(ofSize: 13.0)
         }
         label.font = font
         label.numberOfLines = 0
         return label
     }()
     
-    private let shareTextFont: UIFont = {
+    fileprivate let shareTextFont: UIFont = {
         var font = UIFont(name: "Yuanti SC Light", size: 17.0)
         if font == nil {
-            font = UIFont.systemFontOfSize(17.0)
+            font = UIFont.systemFont(ofSize: 17.0)
         }
         return font!
     }()
@@ -55,7 +55,7 @@ class SECReadingShareLayoutView: UIView {
         setupShareLayoutView()
     }
     
-    func configureWithModel(model: SECReadingShareLayoutViewDataModel) {
+    func configureWithModel(_ model: SECReadingShareLayoutViewDataModel) {
         
         let showDuration = model.readingDuration != nil
         let trailNewLineStr = showDuration ?"\n\n" :"\n"
@@ -67,25 +67,25 @@ class SECReadingShareLayoutView: UIView {
         
         if showDuration {
             mRecordDurationLabel.text = "本次录音时长 \(SECHelper.createFormatTextForRecordDuration(model.readingDuration!))"
-            mRecordDurationLabel.hidden = false
+            mRecordDurationLabel.isHidden = false
             if mRecordDurationLabel.superview == nil {
                 self.addSubview(mRecordDurationLabel)
-                mRecordDurationLabel.snp_makeConstraints(closure: { (make) -> Void in
+                mRecordDurationLabel.snp_makeConstraints({ (make) -> Void in
                     make.leading.equalTo(22)
                     make.bottom.equalTo(mLabel!.snp_bottom).offset(-((SECReadingShareLayoutViewTextRowHeight + self.shareTextFont.lineHeight)/CGFloat(2.0) + CGFloat(4)))
                 })
             }
         } else {
             mRecordDurationLabel.text = nil
-            mRecordDurationLabel.hidden = true
+            mRecordDurationLabel.isHidden = true
         }
     }
     
-    private func setupShareLayoutView() {
+    fileprivate func setupShareLayoutView() {
     
         // mLabel
         mLabel = UILabel()
-        mLabel!.backgroundColor = UIColor.clearColor()
+        mLabel!.backgroundColor = UIColor.clear
         mLabel!.numberOfLines = 0
         self.addSubview(mLabel!)
         
@@ -97,7 +97,7 @@ class SECReadingShareLayoutView: UIView {
         
         
         // mSeperatorBackgroudView
-        mSeperatorBackgroudView = UIImageView(image: UIImage(named: "ShareTextRowBg")?.resizableImageWithCapInsets(UIEdgeInsetsZero, resizingMode: UIImageResizingMode.Tile))
+        mSeperatorBackgroudView = UIImageView(image: UIImage(named: "ShareTextRowBg")?.resizableImage(withCapInsets: UIEdgeInsets.zero, resizingMode: UIImageResizingMode.tile))
         self.insertSubview(mSeperatorBackgroudView!, belowSubview: mLabel!)
         
         mSeperatorBackgroudView!.snp_makeConstraints { (make) -> Void in
@@ -111,7 +111,7 @@ class SECReadingShareLayoutView: UIView {
         mLogoMottoImageView = UIImageView(image: UIImage(named: "LogoMotto"))
         self.addSubview(mLogoMottoImageView!)
         
-        mLogoMottoImageView!.snp_makeConstraints(closure: { (make) -> Void in
+        mLogoMottoImageView!.snp_makeConstraints({ (make) -> Void in
             make.top.equalTo(mSeperatorBackgroudView!.snp_bottom).offset(20)
             make.centerX.equalTo(0)
         })
@@ -121,7 +121,7 @@ class SECReadingShareLayoutView: UIView {
         }
     }
     
-    private func buildLabelAttributedTextWithText(text: String) -> NSAttributedString {
+    fileprivate func buildLabelAttributedTextWithText(_ text: String) -> NSAttributedString {
         
         let font = self.shareTextFont
         

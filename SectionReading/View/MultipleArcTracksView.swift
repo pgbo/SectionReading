@@ -36,7 +36,7 @@ class MultipleArcTracksView: UIView {
         setNeedsDisplay()
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         
         let trackLineWidthsCount = trackLineWidths != nil ? trackLineWidths!.count:Int(0)
         let trackColorsCount = trackColors != nil ? trackColors!.count:Int(0)
@@ -50,10 +50,10 @@ class MultipleArcTracksView: UIView {
             return
         }
         
-        let center = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect))
+        let center = CGPoint(x: rect.midX, y: rect.midY)
         
         var increaseRadius = CGFloat(0)
-        for var idx = 0; idx < trackLineWidthsCount; ++idx {
+        for idx in 0 ..< trackLineWidthsCount {
             let color = trackColors![idx]
             let lineWidth = trackLineWidths![idx]
             

@@ -13,10 +13,10 @@ import CoreData
  同步状态
  */
 enum ReadingSyncStatus: Int {
-    case Normal
-    case NeedSyncUpload
-    case NeedSyncDelete
-    case SyncingUpload
+    case normal
+    case needSyncUpload
+    case needSyncDelete
+    case syncingUpload
 }
 
 let TReadingEntityName = "TReading"
@@ -29,22 +29,22 @@ class TReading: NSManagedObject {
     
     - parameter constructBlock: 构建记录 Block
     */
-    static func create(withConstructBlock constructBlock: ((newReading: TReading) -> Void)) {
+    static func create(withConstructBlock constructBlock: ((_ newReading: TReading) -> Void)?) {
         
         let mainDao = SECAppDelegate.SELF()?.mainDao
         if mainDao == nil {
             return
         }
         
-        mainDao!.createNewOfManagedObjectClassName(TReadingEntityName, operate: { (managedObj) -> Void in
+        mainDao!.createNew(ofManagedObjectClassName: TReadingEntityName, operate: { (managedObj) -> Void in
             
             let newReading = managedObj as? TReading
             if newReading != nil {
                 
-                constructBlock(newReading: newReading!)
+                constructBlock?(newReading!)
                 
                 if newReading!.fModifyTimestamp == nil {
-                    newReading!.fModifyTimestamp = NSNumber(int: Int32(NSDate().timeIntervalSince1970))
+                    newReading!.fModifyTimestamp = NSNumber(value: Int32(Date().timeIntervalSince1970) as Int32)
                 }
             }
         })
@@ -56,19 +56,22 @@ class TReading: NSManagedObject {
      - parameter filterOption: 过滤条件
      - parameter updateBlock:  修改 Block
      */
-    static func update(withFilterOption filterOption: ReadingQueryOption, updateBlock: ((readingtoUpdate: TReading) -> Void)) {
+    static func update(withFilterOption filterOption: ReadingQueryOption, updateBlock: ((_ readingtoUpdate: TReading) -> Void)?) {
         
         let mainDao = SECAppDelegate.SELF()?.mainDao
         if mainDao == nil {
             return
         }
         
-        let fetchReq = NSFetchRequest(entityName: TReadingEntityName)
+        let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: TReadingEntityName)
         fetchReq.predicate = createFetchRequestPredicate(fromReadingQueryOption: filterOption)
         
-        mainDao!.filterObjectWithFetchRequest(fetchReq) { (results, error) -> Void in
-            for reading in results {
-                updateBlock(readingtoUpdate: (reading as! TReading))
+        mainDao!.filterObject(with: fetchReq) { (results, error) -> Void in
+            if results?.count == 0 {
+                return
+            }
+            for reading in results! {
+                updateBlock?((reading as! TReading))
             }
         }
     }
@@ -78,17 +81,17 @@ class TReading: NSManagedObject {
      
      - parameter option: 删除记录的查询条件
      */
-    static func deleteByOption(option: ReadingQueryOption?) {
+    static func deleteByOption(_ option: ReadingQueryOption?) {
         
         let mainDao = SECAppDelegate.SELF()?.mainDao
         if mainDao == nil {
             return
         }
         
-        let fetchReq = NSFetchRequest(entityName: TReadingEntityName)
+        let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: TReadingEntityName)
         fetchReq.predicate = createFetchRequestPredicate(fromReadingQueryOption: option)
         
-        mainDao!.delObjectWithFetchRequest(fetchReq)
+        mainDao!.delObject(with: fetchReq)
     }
     
     /**
@@ -97,20 +100,20 @@ class TReading: NSManagedObject {
      - parameter option:     查询条件
      - parameter completion: 查询结果处理 Block
      */
-    static func filterByOption(option: ReadingQueryOption?, completion: ((results: [TReading]?) -> Void)?) {
+    static func filterByOption(_ option: ReadingQueryOption?, completion: ((_ results: [TReading]?) -> Void)?) {
         
         let mainDao = SECAppDelegate.SELF()?.mainDao
         if mainDao == nil {
-            completion?(results: nil)
+            completion?(nil)
             return
         }
         
-        let fetchReq = NSFetchRequest(entityName: TReadingEntityName)
+        let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: TReadingEntityName)
         fetchReq.predicate = createFetchRequestPredicate(fromReadingQueryOption: option)
         
-        mainDao!.filterObjectWithFetchRequest(fetchReq, handler: { (results, error) -> Void in
+        mainDao!.filterObject(with: fetchReq, handler: { (results, error) -> Void in
             
-            completion?(results: (results as? [TReading]))
+            completion?((results as? [TReading]))
         })
     }
     
@@ -126,14 +129,14 @@ class TReading: NSManagedObject {
             return nil
         }
         
-        let fetchReq = NSFetchRequest(entityName: TReadingEntityName)
+        let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: TReadingEntityName)
         fetchReq.predicate = createFetchRequestPredicate(fromReadingQueryOption: option)
         
-        return mainDao!.countWithFetchRequest(fetchReq)
+        return mainDao!.count(with: fetchReq)
     }
 
     
-    private static func createFetchRequestPredicate(fromReadingQueryOption queryOption: ReadingQueryOption?) -> NSPredicate? {
+    fileprivate static func createFetchRequestPredicate(fromReadingQueryOption queryOption: ReadingQueryOption?) -> NSPredicate? {
         
         if queryOption == nil {
             return nil
@@ -152,7 +155,7 @@ class TReading: NSManagedObject {
         if queryOption!.syncStatus != nil {
             var syncStatusPredicates: [NSPredicate] = []
             for syncStatus in queryOption!.syncStatus! {
-                syncStatusPredicates.append(NSPredicate(format: "(%K == %@)", "fSyncStatus", NSNumber(integer: syncStatus.rawValue)))
+                syncStatusPredicates.append(NSPredicate(format: "(%K == %@)", "fSyncStatus", NSNumber(value: syncStatus.rawValue as Int)))
             }
             if syncStatusPredicates.count > 0 {
                 predicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: syncStatusPredicates))

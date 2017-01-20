@@ -11,7 +11,7 @@ import AngleGradientLayer
 
 class ScopeGradientView: UIView {
 
-    override class func layerClass() -> AnyClass {
+    override class var layerClass : AnyClass {
         return AngleGradientLayer.self
     }
     
@@ -30,11 +30,11 @@ class ScopeGradientView: UIView {
         setColor(self.tintColor)
     }
     
-    private func setColor(color: UIColor) {
-        let alpha = CGColorGetAlpha(color.CGColor)
+    fileprivate func setColor(_ color: UIColor) {
+        let alpha = color.cgColor.alpha
         
         let l: AngleGradientLayer = self.layer as! AngleGradientLayer
-        l.colors = [color.CGColor, color.colorWithAlphaComponent(alpha*(CGFloat(0.1)/CGFloat(0.6))).CGColor, UIColor.clearColor().CGColor]
+        l.colors = [color.cgColor, color.withAlphaComponent(alpha*(CGFloat(0.1)/CGFloat(0.6))).cgColor, UIColor.clear.cgColor]
         
         if l.locations == nil || l.locations!.count == 0 {
             l.locations = [0, 0.1, 1]

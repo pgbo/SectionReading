@@ -12,11 +12,11 @@ import AVFoundation
 /// 读书录音组合器，将多段录音组合起来
 class SECReadingRecordCombiner: NSObject {
 
-    private (set) var sourceAudioFilePaths: [String]?
-    private (set) var destinationFilePath: String?
+    fileprivate (set) var sourceAudioFilePaths: [String]?
+    fileprivate (set) var destinationFilePath: String?
     
-    lazy private var oprerateQueue: NSOperationQueue = {
-        let queue = NSOperationQueue()
+    lazy fileprivate var oprerateQueue: OperationQueue = {
+        let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
@@ -26,9 +26,9 @@ class SECReadingRecordCombiner: NSObject {
         self.destinationFilePath = destinationFilePath
     }
     
-    func combineWithCompletion(completion: ((success: Bool) -> Void)?) {
+    func combineWithCompletion(_ completion: ((_ success: Bool) -> Void)?) {
         
-        self.oprerateQueue.addOperationWithBlock { [weak self] () -> Void in
+        self.oprerateQueue.addOperation { [weak self] () -> Void in
             
             let strongSelf = self
             if strongSelf == nil {
@@ -39,42 +39,42 @@ class SECReadingRecordCombiner: NSObject {
             let destinationFilePath = strongSelf!.destinationFilePath
             if strongSelf!.sourceAudioFilePaths == nil || sourceAudioFilePaths!.count == 0 || strongSelf!.destinationFilePath == nil {
                 print("Fail to combine, cuase sourceAudioFilePaths or destinationFilePath is nil, or sourceAudioFilePaths is empty.")
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: false)
+                DispatchQueue.main.async(execute: {
+                    completion?(false)
                 })
                 return
             }
             
             if sourceAudioFilePaths!.count == 1 {
                 do {
-                    try NSFileManager.defaultManager().copyItemAtPath(sourceAudioFilePaths!.first!, toPath: destinationFilePath!)
+                    try FileManager.default.copyItem(atPath: sourceAudioFilePaths!.first!, toPath: destinationFilePath!)
                 } catch (let error as NSError) {
                     print("Fail to copy audio record file.error:\(error.localizedDescription)")
-                    dispatch_async(dispatch_get_main_queue(), {
-                        completion?(success: false)
+                    DispatchQueue.main.async(execute: {
+                        completion?(false)
                     })
                     return
                 }
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: true)
+                DispatchQueue.main.async(execute: {
+                    completion?(true)
                 })
                 return
             }
         
             let composition = AVMutableComposition()
-            let compositionAudioTrack = composition.addMutableTrackWithMediaType(AVMediaTypeAudio, preferredTrackID:Int32(kCMPersistentTrackID_Invalid))
+            let compositionAudioTrack = composition.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID:Int32(kCMPersistentTrackID_Invalid))
             
             var nextClipStartTime = kCMTimeZero
             for audioFile in sourceAudioFilePaths! {
-                let asset = AVAsset(URL: NSURL(fileURLWithPath: audioFile))
-                let tracks = asset.tracksWithMediaType(AVMediaTypeAudio)
+                let asset = AVAsset(url: URL(fileURLWithPath: audioFile))
+                let tracks = asset.tracks(withMediaType: AVMediaTypeAudio)
                 if tracks.count == 0 {
                     continue
                 }
                 let duration = asset.duration
                 
                 do {
-                    try compositionAudioTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, duration), ofTrack: tracks.first!, atTime: nextClipStartTime)
+                    try compositionAudioTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, duration), of: tracks.first!, at: nextClipStartTime)
                     nextClipStartTime = CMTimeAdd(nextClipStartTime, duration)
                 } catch let error as NSError {
                     print("insertTimeRange failed, err: \(error.localizedDescription)")
@@ -83,24 +83,24 @@ class SECReadingRecordCombiner: NSObject {
             
             if CMTimeCompare(nextClipStartTime, kCMTimeZero) == 0 {
                 print("fail to combineAudioFiles.")
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: false)
+                DispatchQueue.main.async(execute: {
+                    completion?(false)
                 })
                 return
             }
             
             // export
             
-            let combindFileURL = NSURL(fileURLWithPath: destinationFilePath!)
-            let fileMan = NSFileManager.defaultManager()
-            if fileMan.fileExistsAtPath(destinationFilePath!) {
+            let combindFileURL = URL(fileURLWithPath: destinationFilePath!)
+            let fileMan = FileManager.default
+            if fileMan.fileExists(atPath: destinationFilePath!) {
                 // remove it
                 do {
-                    try fileMan.removeItemAtURL(combindFileURL)
+                    try fileMan.removeItem(at: combindFileURL)
                 } catch let error as NSError {
                     print("remove exist combine file failed, err: \(error.localizedDescription)")
-                    dispatch_async(dispatch_get_main_queue(), {
-                        completion?(success: false)
+                    DispatchQueue.main.async(execute: {
+                        completion?(false)
                     })
                     return
                 }
@@ -109,8 +109,8 @@ class SECReadingRecordCombiner: NSObject {
             let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A)
             if exporter == nil {
                 print("Fail to combine audio files, fail to initialize AVAssetExportSession.")
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: false)
+                DispatchQueue.main.async(execute: {
+                    completion?(false)
                 })
                 return
             }
@@ -119,26 +119,26 @@ class SECReadingRecordCombiner: NSObject {
             exporter!.outputURL = combindFileURL
             
             // do it
-            exporter!.exportAsynchronouslyWithCompletionHandler({ [weak self] () -> Void in
+            exporter!.exportAsynchronously(completionHandler: { [weak self] () -> Void in
                 
                 let strongSelf = self
                 if strongSelf == nil {
                     return
                 }
                 
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                DispatchQueue.main.async(execute: { () -> Void in
                     switch exporter!.status {
-                    case .Failed:
+                    case .failed:
                         print("export failed \(exporter!.error)")
-                        completion?(success: false)
+                        completion?(false)
                         
-                    case .Cancelled:
+                    case .cancelled:
                         print("export cancelled \(exporter!.error)")
-                        completion?(success: false)
+                        completion?(false)
                         
                     default:
                         print("export complete")
-                        completion?(success: true)
+                        completion?(true)
                     }
                 })
             })

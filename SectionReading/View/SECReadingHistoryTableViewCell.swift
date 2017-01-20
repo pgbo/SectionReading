@@ -10,28 +10,34 @@ import UIKit
 
 @objc protocol SECReadingHistoryTableViewCellDelegate {
     
-    optional func clickEditButtonIn(cell: SECReadingHistoryTableViewCell)
+    @objc optional func clickEditButtonIn(_ cell: SECReadingHistoryTableViewCell)
     
-    optional func clickTrashButtonIn(cell: SECReadingHistoryTableViewCell)
+    @objc optional func clickTrashButtonIn(_ cell: SECReadingHistoryTableViewCell)
     
-    optional func clickShareButtonIn(cell: SECReadingHistoryTableViewCell)
+    @objc optional func clickShareButtonIn(_ cell: SECReadingHistoryTableViewCell)
     
-    optional func clickPlayAudioButtonIn(cell: SECReadingHistoryTableViewCell)
+    @objc optional func clickPlayAudioButtonIn(_ cell: SECReadingHistoryTableViewCell)
 }
 
 class SECReadingHistoryTableViewCell: UITableViewCell, SECAudioPlayViewDelegate {
 
+    private static var __once: () = {
+            DateFormatorStatic.formator = DateFormatter()
+            DateFormatorStatic.formator!.dateStyle = DateFormatter.Style.short
+            DateFormatorStatic.formator!.timeStyle = DateFormatter.Style.medium
+        }()
+
     weak var delegate: SECReadingHistoryTableViewCellDelegate?
     
-    @IBOutlet private weak var mTextLabel: UILabel!
-    @IBOutlet private weak var mDateLabel: UILabel!
-    @IBOutlet private weak var mEditButton: UIButton!
-    @IBOutlet private weak var mTrashButton: UIButton!
-    @IBOutlet private weak var mShareButton: UIButton!
+    @IBOutlet fileprivate weak var mTextLabel: UILabel!
+    @IBOutlet fileprivate weak var mDateLabel: UILabel!
+    @IBOutlet fileprivate weak var mEditButton: UIButton!
+    @IBOutlet fileprivate weak var mTrashButton: UIButton!
+    @IBOutlet fileprivate weak var mShareButton: UIButton!
     
-    @IBOutlet private weak var mAudioPanel: UIView!
-    @IBOutlet private weak var mAudioPanelTop: NSLayoutConstraint!
-    @IBOutlet private weak var mAudioPanelHeight: NSLayoutConstraint!
+    @IBOutlet fileprivate weak var mAudioPanel: UIView!
+    @IBOutlet fileprivate weak var mAudioPanelTop: NSLayoutConstraint!
+    @IBOutlet fileprivate weak var mAudioPanelHeight: NSLayoutConstraint!
     
     var isPlaying: Bool = false {
         didSet {
@@ -39,7 +45,7 @@ class SECReadingHistoryTableViewCell: UITableViewCell, SECAudioPlayViewDelegate 
         }
     }
     
-    private var mAudioPlayView: SECAudioPlayView!
+    fileprivate var mAudioPlayView: SECAudioPlayView!
     
     override func awakeFromNib() {
         
@@ -47,13 +53,13 @@ class SECReadingHistoryTableViewCell: UITableViewCell, SECAudioPlayViewDelegate 
         setupReadingHistoryTableViewCell()
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
     
-    private func setupReadingHistoryTableViewCell() {
+    fileprivate func setupReadingHistoryTableViewCell() {
         
-        mAudioPanel.backgroundColor = UIColor.clearColor()
+        mAudioPanel.backgroundColor = UIColor.clear
         mAudioPanel.clipsToBounds = true
         
         mAudioPlayView = SECAudioPlayView.instanceFromNib()
@@ -65,11 +71,11 @@ class SECReadingHistoryTableViewCell: UITableViewCell, SECAudioPlayViewDelegate 
         mAudioPlayView.translatesAutoresizingMaskIntoConstraints = false
         
         let views = ["mAudioPlayView":mAudioPlayView!]
-        mAudioPanel.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[mAudioPlayView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
-        mAudioPanel.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[mAudioPlayView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        mAudioPanel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[mAudioPlayView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        mAudioPanel.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[mAudioPlayView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
     }
 
-    @IBAction func clickedActionButton(sender: AnyObject) {
+    @IBAction func clickedActionButton(_ sender: AnyObject) {
         
         if sender.isEqual(mEditButton) {
             delegate?.clickEditButtonIn?(self)
@@ -89,43 +95,39 @@ class SECReadingHistoryTableViewCell: UITableViewCell, SECAudioPlayViewDelegate 
     
     // MARK: - SECAudioPlayViewDelegate
     
-    func clickedPlayButtonOnAudioPlayView(view: SECAudioPlayView) {
+    func clickedPlayButtonOnAudioPlayView(_ view: SECAudioPlayView) {
     
         delegate?.clickPlayAudioButtonIn?(self)
     }
     
     struct DateFormatorStatic {
-        static var onceToken : dispatch_once_t = 0
-        static var formator : NSDateFormatter?
+        static var onceToken : Int = 0
+        static var formator : DateFormatter?
     }
     
     func configure(withReading reading: TReading) {
     
-        dispatch_once(&DateFormatorStatic.onceToken) {
-            DateFormatorStatic.formator = NSDateFormatter()
-            DateFormatorStatic.formator!.dateStyle = NSDateFormatterStyle.ShortStyle
-            DateFormatorStatic.formator!.timeStyle = NSDateFormatterStyle.MediumStyle
-        }
-        var readingDate: NSDate?
+        _ = SECReadingHistoryTableViewCell.__once
+        var readingDate: Date?
         if reading.fModifyTimestamp != nil {
-            readingDate = NSDate(timeIntervalSince1970: NSTimeInterval(reading.fModifyTimestamp!.integerValue))
+            readingDate = Date(timeIntervalSince1970: TimeInterval(reading.fModifyTimestamp!.intValue))
         } else if reading.fCreateTimestamp != nil {
-            readingDate = NSDate(timeIntervalSince1970: NSTimeInterval(reading.fCreateTimestamp!.integerValue))
+            readingDate = Date(timeIntervalSince1970: TimeInterval(reading.fCreateTimestamp!.intValue))
         } else {
-            readingDate = NSDate()
+            readingDate = Date()
         }
         
         mTextLabel.text = reading.fContent
-        mDateLabel.text = DateFormatorStatic.formator!.stringFromDate(readingDate!)
+        mDateLabel.text = DateFormatorStatic.formator!.string(from: readingDate!)
         
         if reading.fLocalAudioFilePath != nil || reading.fUploadedAudioGuid != nil {
             mAudioPanelTop.constant = 10.0
             mAudioPanelHeight.constant = 32.0
-            mAudioPanel.hidden = false
+            mAudioPanel.isHidden = false
         } else {
             mAudioPanelTop.constant = 0
             mAudioPanelHeight.constant = 0
-            mAudioPanel.hidden = true
+            mAudioPanel.isHidden = true
         }
     }
 }

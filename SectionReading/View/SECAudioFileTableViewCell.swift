@@ -11,7 +11,7 @@ import AVFoundation
 
 @objc protocol SECAudioFileTableViewCellDelegate {
     
-    optional func clickPlayAudioButtonIn(cell: SECAudioFileTableViewCell)
+    @objc optional func clickPlayAudioButtonIn(_ cell: SECAudioFileTableViewCell)
 }
 
 class SECAudioFileTableViewCell: UITableViewCell {
@@ -29,52 +29,52 @@ class SECAudioFileTableViewCell: UITableViewCell {
                 normalImage = UIImage(named: "RecordListPlayButton")
                 hlImage = UIImage(named: "RecordListPlayButtonHL")
             }
-            mPlayButton?.setImage(normalImage, forState: UIControlState.Normal)
-            mPlayButton?.setImage(hlImage, forState: UIControlState.Highlighted)
+            mPlayButton?.setImage(normalImage, for: UIControlState())
+            mPlayButton?.setImage(hlImage, for: UIControlState.highlighted)
         }
     }
 
-    @IBOutlet private weak var mBriefDayLabel: UILabel!
-    @IBOutlet private weak var mTimeLabel: UILabel!
-    @IBOutlet private weak var mDayLabel: UILabel!
-    @IBOutlet private weak var mAudioDurationLabel: UILabel!
+    @IBOutlet fileprivate weak var mBriefDayLabel: UILabel!
+    @IBOutlet fileprivate weak var mTimeLabel: UILabel!
+    @IBOutlet fileprivate weak var mDayLabel: UILabel!
+    @IBOutlet fileprivate weak var mAudioDurationLabel: UILabel!
     
-    private var mPlayButton: UIButton?
+    fileprivate var mPlayButton: UIButton?
     
     override func awakeFromNib() {
         super.awakeFromNib()
         setupAudioFileTableViewCell()
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
     
-    private func setupAudioFileTableViewCell() {
+    fileprivate func setupAudioFileTableViewCell() {
     
-        mPlayButton = UIButton(type: UIButtonType.Custom)
-        mPlayButton?.frame = CGRectMake(0, 0, 34, 34)
-        mPlayButton?.addTarget(self, action: "clickedPlayButton", forControlEvents: UIControlEvents.TouchUpInside)
+        mPlayButton = UIButton(type: UIButtonType.custom)
+        mPlayButton?.frame = CGRect(x: 0, y: 0, width: 34, height: 34)
+        mPlayButton?.addTarget(self, action: #selector(SECAudioFileTableViewCell.clickedPlayButton), for: UIControlEvents.touchUpInside)
         self.accessoryView = mPlayButton
         
-        self.editingAccessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-        self.selectionStyle = UITableViewCellSelectionStyle.Default
+        self.editingAccessoryType = UITableViewCellAccessoryType.disclosureIndicator
+        self.selectionStyle = UITableViewCellSelectionStyle.default
         
         isPlaying = false
     }
     
-    @objc private func clickedPlayButton() {
+    @objc fileprivate func clickedPlayButton() {
         delegate?.clickPlayAudioButtonIn?(self)
     }
     
     func configure(withAudioFilePath audioFilePath: String) {
         
         do {
-            let attr = try NSFileManager.defaultManager().attributesOfItemAtPath(audioFilePath)
-            let modificationDate = attr[NSFileModificationDate] as! NSDate
+            let attr = try FileManager.default.attributesOfItem(atPath: audioFilePath)
+            let modificationDate = attr[FileAttributeKey.modificationDate] as! Date
             
             let defaultCalendar = SECHelper.defaultCalendar()
-            let dateComponents = defaultCalendar.components(NSCalendarUnit(rawValue: NSCalendarUnit.Year.rawValue|NSCalendarUnit.Month.rawValue|NSCalendarUnit.Day.rawValue|NSCalendarUnit.Hour.rawValue|NSCalendarUnit.Minute.rawValue), fromDate: modificationDate)
+            let dateComponents = (defaultCalendar as NSCalendar).components(NSCalendar.Unit(rawValue: NSCalendar.Unit.year.rawValue|NSCalendar.Unit.month.rawValue|NSCalendar.Unit.day.rawValue|NSCalendar.Unit.hour.rawValue|NSCalendar.Unit.minute.rawValue), from: modificationDate)
             
             mBriefDayLabel.text = "\(dateComponents.month)月\(dateComponents.day)日"
             mTimeLabel.text = "\(dateComponents.hour)点\(dateComponents.minute)分"
@@ -87,7 +87,7 @@ class SECAudioFileTableViewCell: UITableViewCell {
             mDayLabel.text = "-----)"
         }
         
-        let asset = AVAsset(URL: NSURL(fileURLWithPath: audioFilePath))
+        let asset = AVAsset(url: URL(fileURLWithPath: audioFilePath))
         let duration = CMTimeGetSeconds(asset.duration)
         mAudioDurationLabel.text = "时长:\(SECHelper.createFormatTextForRecordDuration(duration))"
         

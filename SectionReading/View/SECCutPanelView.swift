@@ -15,28 +15,28 @@ import UIKit
      
      - parameter panel:
      */
-    optional func clickedBackButtonOnCutPanel(panel: SECCutPanelView)
+    @objc optional func clickedBackButtonOnCutPanel(_ panel: SECCutPanelView)
     
     /**
      点击播放按钮
      
      - parameter panel:
      */
-    optional func clickedPlayRecordButtonOnCutPanel(panel: SECCutPanelView)
+    @objc optional func clickedPlayRecordButtonOnCutPanel(_ panel: SECCutPanelView)
     
     /**
      点击裁剪按钮
      
      - parameter panel:
      */
-    optional func clickedScissorsButtonOnCutPanel(panel: SECCutPanelView)
+    @objc optional func clickedScissorsButtonOnCutPanel(_ panel: SECCutPanelView)
     
     /**
      将要滑动范围选择滑块
      
      - parameter panel:
      */
-    optional func willSlideScopeHandleOnCutPanel(panel: SECCutPanelView)
+    @objc optional func willSlideScopeHandleOnCutPanel(_ panel: SECCutPanelView)
     
     /**
      已选择范围
@@ -44,7 +44,7 @@ import UIKit
      - parameter panel:
      - parameter selectedScopeRange: 已选范围
      */
-    optional func selectedScopeOnCutPanel(panel: SECCutPanelView, selectedScopeRange: SECRecordRange)
+    @objc optional func selectedScopeOnCutPanel(_ panel: SECCutPanelView, selectedScopeRange: SECRecordRange)
 }
 
 
@@ -53,20 +53,20 @@ import UIKit
  */
 class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
     
-    @IBOutlet private weak var mSelectScopeContainnerView: UIView!
-    @IBOutlet private weak var mSelectScopeBackgroundImageView: UIImageView!
-    @IBOutlet private weak var mBackButton: UIButton!
-    @IBOutlet private weak var mPlayButton: UIButton!
-    @IBOutlet private weak var mScissorsButton: UIButton!
-    @IBOutlet private weak var mLeftSlideHandle: UIImageView!
-    @IBOutlet private weak var mRightSlideHandle: UIImageView!
-    @IBOutlet private weak var mSelectedRangeOverlay: UIView!
-    @IBOutlet private weak var mBackgroundTrackLine: UIView!
-    @IBOutlet private weak var mActiveTrackLine: UIView!
+    @IBOutlet fileprivate weak var mSelectScopeContainnerView: UIView!
+    @IBOutlet fileprivate weak var mSelectScopeBackgroundImageView: UIImageView!
+    @IBOutlet fileprivate weak var mBackButton: UIButton!
+    @IBOutlet fileprivate weak var mPlayButton: UIButton!
+    @IBOutlet fileprivate weak var mScissorsButton: UIButton!
+    @IBOutlet fileprivate weak var mLeftSlideHandle: UIImageView!
+    @IBOutlet fileprivate weak var mRightSlideHandle: UIImageView!
+    @IBOutlet fileprivate weak var mSelectedRangeOverlay: UIView!
+    @IBOutlet fileprivate weak var mBackgroundTrackLine: UIView!
+    @IBOutlet fileprivate weak var mActiveTrackLine: UIView!
     
-    @IBOutlet private weak var mActiveTrackLineWidth: NSLayoutConstraint!
-    @IBOutlet private weak var mLeftSlideHandleTrailing: NSLayoutConstraint!
-    @IBOutlet private weak var mRightSlideHandleLeading: NSLayoutConstraint!
+    @IBOutlet fileprivate weak var mActiveTrackLineWidth: NSLayoutConstraint!
+    @IBOutlet fileprivate weak var mLeftSlideHandleTrailing: NSLayoutConstraint!
+    @IBOutlet fileprivate weak var mRightSlideHandleLeading: NSLayoutConstraint!
     @IBOutlet weak var mBackgroundTrackLineLeading: NSLayoutConstraint!
     @IBOutlet weak var mBackgroundTrackLineTrailing: NSLayoutConstraint!
     
@@ -78,10 +78,10 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
      - Left:  向左
      - Right: 向右
      */
-    private enum HorizonPanDirection {
-        case None
-        case Left
-        case Right
+    fileprivate enum HorizonPanDirection {
+        case none
+        case left
+        case right
     }
     
     // 代理
@@ -99,7 +99,7 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
             self.mRightSlideHandleLeading.constant = self.mLeftSlideHandleTrailing.constant + defaultSelectedRange.length * trackTotalWidth
             
             // 更新进度
-            self.mActiveTrackLineWidth.constant = CGRectGetWidth(self.mSelectedRangeOverlay.bounds) * playProgress
+            self.mActiveTrackLineWidth.constant = self.mSelectedRangeOverlay.bounds.width * playProgress
         }
     }
     
@@ -110,7 +110,7 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
         didSet {
             
             // 更新进度
-            self.mActiveTrackLineWidth.constant = CGRectGetWidth(self.mSelectedRangeOverlay.bounds) * playProgress
+            self.mActiveTrackLineWidth.constant = self.mSelectedRangeOverlay.bounds.width * playProgress
         }
     }
     
@@ -131,21 +131,21 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
                 playButtonHLImage = UIImage(named: "CutPanelPlayButtonHL")
                 playButtonDisabledImage = UIImage(named: "CutPanelPlayButtonDisabled")
             }
-            self.mPlayButton.setImage(playButtonImage, forState: UIControlState.Normal)
-            self.mPlayButton.setImage(playButtonHLImage, forState: UIControlState.Highlighted)
-            self.mPlayButton.setImage(playButtonDisabledImage, forState: UIControlState.Disabled)
+            self.mPlayButton.setImage(playButtonImage, for: UIControlState())
+            self.mPlayButton.setImage(playButtonHLImage, for: UIControlState.highlighted)
+            self.mPlayButton.setImage(playButtonDisabledImage, for: UIControlState.disabled)
         }
     }
     
-    @IBAction func clickedBackButton(button: UIButton) {
+    @IBAction func clickedBackButton(_ button: UIButton) {
         self.delegate?.clickedBackButtonOnCutPanel?(self)
     }
     
-    @IBAction func clickedPlayButton(button: UIButton) {
+    @IBAction func clickedPlayButton(_ button: UIButton) {
         self.delegate?.clickedPlayRecordButtonOnCutPanel?(self)
     }
     
-    @IBAction func clickedScissorsButton(button: UIButton) {
+    @IBAction func clickedScissorsButton(_ button: UIButton) {
         self.delegate?.clickedScissorsButtonOnCutPanel?(self)
     }
     
@@ -154,15 +154,15 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
      
      - parameter recognizer:
      */
-    @IBAction func leftSlideHandlePanRecognized(recognizer: UIPanGestureRecognizer) {
+    @IBAction func leftSlideHandlePanRecognized(_ recognizer: UIPanGestureRecognizer) {
         
         print("leftSlideHandlePanRecognized")
         
-        let translation = recognizer.translationInView(recognizer.view)
+        let translation = recognizer.translation(in: recognizer.view)
         let state = recognizer.state
         
         switch state {
-        case .Changed:
+        case .changed:
             
             let leftSlideHandleFrame = mLeftSlideHandle.frame
             let rightSlideHandleFrame = mRightSlideHandle.frame
@@ -170,11 +170,11 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
             print("leftSlideHandleFrame:\(leftSlideHandleFrame), rightSlideHandleFrame:\(rightSlideHandleFrame)")
             
             
-            let slideHorizonSpacing = CGRectGetMinX(rightSlideHandleFrame) - CGRectGetMaxX(leftSlideHandleFrame)
-            let leftSlideLeadingSpacing = CGRectGetMinX(leftSlideHandleFrame)
+            let slideHorizonSpacing = rightSlideHandleFrame.minX - leftSlideHandleFrame.maxX
+            let leftSlideLeadingSpacing = leftSlideHandleFrame.minX
             
             var translationX = translation.x
-            var panDir = HorizonPanDirection.None
+            var panDir = HorizonPanDirection.none
             
             // 判断滑动方向
             if slideHorizonSpacing > 0 {
@@ -182,45 +182,45 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
                     // 可左可右滑动
                     if translationX > 0 {
                         // 右滑
-                        panDir = .Right
+                        panDir = .right
                     } else {
                         // 左滑
-                        panDir = .Left
+                        panDir = .left
                     }
                 } else {
                     // 只能向右滑动
                     if translationX > 0 {
-                        panDir = .Right
+                        panDir = .right
                     }
                 }
             } else {
                 // 只能向左滑动
                 if leftSlideLeadingSpacing > 0 && translationX < 0 {
-                    panDir = .Left
+                    panDir = .left
                 }
             }
             
             switch panDir {
-            case .Right:
+            case .right:
                 let caculateNextTimeSlideSpacing = slideHorizonSpacing - translationX
                 if caculateNextTimeSlideSpacing < 0 {
                     translationX = slideHorizonSpacing
                 }
-            case .Left:
+            case .left:
                 let caculateNextTimeLeftSlideLeadingSpacing = leftSlideLeadingSpacing + translationX
                 if caculateNextTimeLeftSlideLeadingSpacing < 0 {
                     translationX = -leftSlideLeadingSpacing
                 }
-            case .None:
+            case .none:
                 translationX = 0
             }
             
             if translationX != 0 {
                 self.mLeftSlideHandleTrailing.constant += translationX
-                recognizer.setTranslation(CGPointMake(0, translation.y), inView: recognizer.view)
+                recognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: recognizer.view)
             }
     
-        case .Ended:
+        case .ended:
             
             delegate?.selectedScopeOnCutPanel?(self, selectedScopeRange: caculateSelectScopeRange())
             
@@ -234,27 +234,27 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
      
      - parameter recognizer:
      */
-    @IBAction func rightSlideHandlePanRecognized(recognizer: UIPanGestureRecognizer) {
+    @IBAction func rightSlideHandlePanRecognized(_ recognizer: UIPanGestureRecognizer) {
         
         print("rightSlideHandlePanRecognized")
         
-        let translation = recognizer.translationInView(recognizer.view)
+        let translation = recognizer.translation(in: recognizer.view)
         let state = recognizer.state
         
         switch state {
-        case .Changed:
+        case .changed:
             
             let leftSlideHandleFrame = mLeftSlideHandle.frame
             let rightSlideHandleFrame = mRightSlideHandle.frame
             
             print("leftSlideHandleFrame:\(leftSlideHandleFrame), rightSlideHandleFrame:\(rightSlideHandleFrame)")
             
-            let slideHorizonSpacing = CGRectGetMinX(rightSlideHandleFrame) - CGRectGetMaxX(leftSlideHandleFrame)
-            let rightSlideTrailingSpacing = CGRectGetMaxX(self.mSelectScopeContainnerView.bounds) - CGRectGetMaxX(rightSlideHandleFrame)
+            let slideHorizonSpacing = rightSlideHandleFrame.minX - leftSlideHandleFrame.maxX
+            let rightSlideTrailingSpacing = self.mSelectScopeContainnerView.bounds.maxX - rightSlideHandleFrame.maxX
             
             var translationX = translation.x
             
-            var panDir = HorizonPanDirection.None
+            var panDir = HorizonPanDirection.none
             
             // 判断滑动方向
             if slideHorizonSpacing > 0 {
@@ -262,46 +262,46 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
                     // 可左可右滑动
                     if translationX > 0 {
                         // 右滑
-                        panDir = .Right
+                        panDir = .right
                     } else {
                         // 左滑
-                        panDir = .Left
+                        panDir = .left
                     }
                 } else {
                     // 只能向左滑动
                     if translationX < 0 {
-                        panDir = .Left
+                        panDir = .left
                     }
                 }
                 
             } else {
                 // 只能向右滑动
                 if rightSlideTrailingSpacing > 0 && translationX > 0 {
-                    panDir = .Right
+                    panDir = .right
                 }
             }
             
             switch panDir {
-            case .Right:
+            case .right:
                 let caculateNextTimeRightSlideTrailingSpacing = rightSlideTrailingSpacing - translationX
                 if caculateNextTimeRightSlideTrailingSpacing < 0 {
                     translationX = rightSlideTrailingSpacing
                 }
-            case .Left:
+            case .left:
                 let caculateNextTimeSlideSpacing = slideHorizonSpacing + translationX
                 if caculateNextTimeSlideSpacing < 0 {
                     translationX = -slideHorizonSpacing
                 }
-            case .None:
+            case .none:
                 translationX = 0
             }
             
             if translationX != 0 {
                 self.mRightSlideHandleLeading.constant += translationX
-                recognizer.setTranslation(CGPointMake(0, translation.y), inView: recognizer.view)
+                recognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: recognizer.view)
             }
             
-        case .Ended:
+        case .ended:
         
             delegate?.selectedScopeOnCutPanel?(self, selectedScopeRange: caculateSelectScopeRange())
             
@@ -311,14 +311,14 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
     }
     
     class func instanceFromNib() -> SECCutPanelView {
-        return UINib(nibName: "SECCutPanelView", bundle: nil).instantiateWithOwner(nil, options: nil).first as! SECCutPanelView
+        return UINib(nibName: "SECCutPanelView", bundle: nil).instantiate(withOwner: nil, options: nil).first as! SECCutPanelView
     }
     
     override func awakeFromNib() {
         setupCutPanelView()
     }
     
-    private func setupCutPanelView() {
+    fileprivate func setupCutPanelView() {
         self.playProgress = 0
         self.defaultSelectedRange = SECRecordRange(location: 0.0, length: 0)
         self.isPlaying = false
@@ -327,9 +327,9 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
     /**
      轨迹总长度
      */
-    private func trackTotalWidth() -> CGFloat {
+    fileprivate func trackTotalWidth() -> CGFloat {
         
-        return CGRectGetWidth(self.mSelectScopeContainnerView.bounds) - self.mBackgroundTrackLineLeading.constant - self.mBackgroundTrackLineTrailing.constant;
+        return self.mSelectScopeContainnerView.bounds.width - self.mBackgroundTrackLineLeading.constant - self.mBackgroundTrackLineTrailing.constant;
     }
     
     /**
@@ -337,7 +337,7 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
      
      - returns:
      */
-    private func shouldSlideLeftHandle() -> Bool {
+    fileprivate func shouldSlideLeftHandle() -> Bool {
         return true
     }
     
@@ -346,7 +346,7 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
      
      - returns:
      */
-    private func shouldSlideRightHandle() -> Bool {
+    fileprivate func shouldSlideRightHandle() -> Bool {
         return true
     }
     
@@ -355,11 +355,11 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
      
      - returns:
      */
-    private func caculateSelectScopeRange() -> SECRecordRange {
+    fileprivate func caculateSelectScopeRange() -> SECRecordRange {
         
         let trackTotalWidth = self.trackTotalWidth()
-        let selectedScopeWidth = CGRectGetWidth(self.mSelectedRangeOverlay.frame)
-        let leftSlideHandleMinX = CGRectGetMinX(self.mLeftSlideHandle.frame)
+        let selectedScopeWidth = self.mSelectedRangeOverlay.frame.width
+        let leftSlideHandleMinX = self.mLeftSlideHandle.frame.minX
         
         if trackTotalWidth > 0 {
             return SECRecordRange(location: leftSlideHandleMinX/trackTotalWidth, length: selectedScopeWidth/trackTotalWidth)
@@ -370,9 +370,9 @@ class SECCutPanelView: UIView, UIGestureRecognizerDelegate {
     
     // MARK: - UIGestureRecognizerDelegate
     
-    override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         
-        if gestureRecognizer.isKindOfClass(UIPanGestureRecognizer) == false {
+        if gestureRecognizer.isKind(of: UIPanGestureRecognizer.self) == false {
             return false
         }
         

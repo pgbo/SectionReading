@@ -10,8 +10,8 @@ import UIKit
 import AVFoundation
 
 class SECRecordRange: NSObject {
-    private (set) var location: CGFloat = 0
-    private (set) var length: CGFloat = 0
+    fileprivate (set) var location: CGFloat = 0
+    fileprivate (set) var length: CGFloat = 0
     
     init(location: CGFloat, length: CGFloat) {
         self.location = location
@@ -23,16 +23,16 @@ class SECRecordRange: NSObject {
 class SECReadingRecordCropper: NSObject {
 
     // 源文件路径
-    private (set) var sourceRecordFilePath: String?
+    fileprivate (set) var sourceRecordFilePath: String?
     
     // 裁切范围
-    private (set) var cropRange: SECRecordRange?
+    fileprivate (set) var cropRange: SECRecordRange?
     
     // 目标裁切文件存放路径
-    private (set) var destinationCroppedFilePath: String?
+    fileprivate (set) var destinationCroppedFilePath: String?
     
-    lazy private var oprerateQueue: NSOperationQueue = {
-        let queue = NSOperationQueue()
+    lazy fileprivate var oprerateQueue: OperationQueue = {
+        let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
@@ -48,9 +48,9 @@ class SECReadingRecordCropper: NSObject {
      
      - parameter completion:
      */
-    func cropWithCompletion(completion: ((success: Bool) -> Void)?) {
+    func cropWithCompletion(_ completion: ((_ success: Bool) -> Void)?) {
         
-        self.oprerateQueue.addOperationWithBlock { [weak self] () -> Void in
+        self.oprerateQueue.addOperation { [weak self] () -> Void in
             
             let strongSelf = self
             if strongSelf == nil {
@@ -63,20 +63,20 @@ class SECReadingRecordCropper: NSObject {
             
             if sourceRecordFilePath == nil || cropRange == nil || destinationCroppedFilePath == nil {
                 print("Fail to crop audio, cause sourceRecordFilePath, cropRange or destinationCroppedFilePath is nil.")
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: false)
+                DispatchQueue.main.async(execute: {
+                    completion?(false)
                 })
                 return
             }
             
             // 截去中间选中的部分
             
-            let asset = AVAsset(URL: NSURL(fileURLWithPath: sourceRecordFilePath!))
-            let tracks = asset.tracksWithMediaType(AVMediaTypeAudio)
+            let asset = AVAsset(url: URL(fileURLWithPath: sourceRecordFilePath!))
+            let tracks = asset.tracks(withMediaType: AVMediaTypeAudio)
             if tracks.count == 0 {
                 print("Fail to crop audio, cause tracks is empty.")
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: false)
+                DispatchQueue.main.async(execute: {
+                    completion?(false)
                 })
                 return
             }
@@ -84,8 +84,8 @@ class SECReadingRecordCropper: NSObject {
             let duration = asset.duration
             if duration.seconds == 0  {
                 print("Fail to crop audio, cause duration is 0.")
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: false)
+                DispatchQueue.main.async(execute: {
+                    completion?(false)
                 })
                 return
             }
@@ -111,20 +111,20 @@ class SECReadingRecordCropper: NSObject {
             
             if insertTimeRanges.count == 0 {
                 // 没有选取裁切区域
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: true)
+                DispatchQueue.main.async(execute: {
+                    completion?(true)
                 })
                 return
             }
             
             let composition = AVMutableComposition()
-            let compositionAudioTrack = composition.addMutableTrackWithMediaType(AVMediaTypeAudio, preferredTrackID:Int32(kCMPersistentTrackID_Invalid))
+            let compositionAudioTrack = composition.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID:Int32(kCMPersistentTrackID_Invalid))
             
             do {
                 var nextClipStartTime = kCMTimeZero
                 for timeRange in insertTimeRanges {
                 
-                    try compositionAudioTrack.insertTimeRange(timeRange, ofTrack: tracks.first!, atTime: nextClipStartTime)
+                    try compositionAudioTrack.insertTimeRange(timeRange, of: tracks.first!, at: nextClipStartTime)
                     nextClipStartTime = CMTimeAdd(nextClipStartTime, timeRange.duration)
                     
 //                    print("timeRange:\(timeRange), timeRange.start:\(CMTimeGetSeconds(timeRange.start)), timeRange.duration:\(CMTimeGetSeconds(timeRange.duration))")
@@ -132,8 +132,8 @@ class SECReadingRecordCropper: NSObject {
                 
             } catch let error as NSError {
                 print("Fail to crop audio, err: \(error.localizedDescription)")
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: false)
+                DispatchQueue.main.async(execute: {
+                    completion?(false)
                 })
                 return
             }
@@ -142,44 +142,44 @@ class SECReadingRecordCropper: NSObject {
             let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A)
             if exporter == nil {
                 print("Fail to crop audio, initialize AVAssetExportSession failed.")
-                dispatch_async(dispatch_get_main_queue(), {
-                    completion?(success: false)
+                DispatchQueue.main.async(execute: {
+                    completion?(false)
                 })
                 return
             }
             
             exporter!.outputFileType = AVFileTypeAppleM4A
-            exporter!.outputURL = NSURL(fileURLWithPath: destinationCroppedFilePath!)
+            exporter!.outputURL = URL(fileURLWithPath: destinationCroppedFilePath!)
             
             // do it
-            exporter!.exportAsynchronouslyWithCompletionHandler({ [weak self] () -> Void in
+            exporter!.exportAsynchronously(completionHandler: { [weak self] () -> Void in
                 
                 let strongSelf = self
                 if strongSelf == nil {
                     return
                 }
                 
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                DispatchQueue.main.async(execute: { () -> Void in
                     switch exporter!.status {
-                    case .Failed:
+                    case .failed:
                         print("export failed \(exporter!.error)")
-                        completion?(success: false)
+                        completion?(false)
                         
-                    case .Cancelled:
+                    case .cancelled:
                         print("export cancelled \(exporter!.error)")
-                        completion?(success: false)
+                        completion?(false)
                         
                     default:
                         print("export complete")
-                        completion?(success: true)
+                        completion?(true)
                     }
                 })
             })
         }
     }
     
-    private func randomObtainTemporaryAudioFilePath() -> String {
-        return NSTemporaryDirectory().stringByAppendingString("\(NSUUID().UUIDString).caf")
+    fileprivate func randomObtainTemporaryAudioFilePath() -> String {
+        return NSTemporaryDirectory() + "\(UUID().uuidString).caf"
     }
     
     /**
@@ -190,12 +190,12 @@ class SECReadingRecordCropper: NSObject {
      - parameter exportDestinationFilePath: 导出目的文件路径
      - parameter completion:  结束 block
      */
-    private static func exportPartForAudioAsset(sourceAsset: AVAsset, exportRange: SECRecordRange, exportDestinationFilePath: String, completion: ((success:Bool) -> Void)?) {
+    fileprivate static func exportPartForAudioAsset(_ sourceAsset: AVAsset, exportRange: SECRecordRange, exportDestinationFilePath: String, completion: ((_ success:Bool) -> Void)?) {
         
         // 导出第一段
         let exporter = AVAssetExportSession(asset: sourceAsset, presetName: AVAssetExportPresetAppleM4A)
         exporter!.outputFileType = AVFileTypeAppleM4A
-        exporter!.outputURL = NSURL(fileURLWithPath: exportDestinationFilePath)
+        exporter!.outputURL = URL(fileURLWithPath: exportDestinationFilePath)
         
         let timeScale = Int32(10)
         let startTime = CMTimeMake(Int64(exportRange.location * CGFloat(timeScale)), timeScale)
@@ -203,37 +203,37 @@ class SECReadingRecordCropper: NSObject {
         exporter!.timeRange = CMTimeRangeFromTimeToTime(startTime, endTime)
         
         // set up the audio mix
-        let tracks = sourceAsset.tracksWithMediaType(AVMediaTypeAudio)
+        let tracks = sourceAsset.tracks(withMediaType: AVMediaTypeAudio)
         if tracks.count == 0 {
             print("Fail to exportPartForAudioAsset, cause tracks is empty.")
-            dispatch_async(dispatch_get_main_queue(), {
-                completion?(success: false)
+            DispatchQueue.main.async(execute: {
+                completion?(false)
             })
             return
         }
         
         let exportAudioMix = AVMutableAudioMix()
         let exportAudioMixInputParameters = AVMutableAudioMixInputParameters(track: tracks.first!)
-        exportAudioMixInputParameters.setVolume(1.0, atTime: CMTimeMake(0, 1))
+        exportAudioMixInputParameters.setVolume(1.0, at: CMTimeMake(0, 1))
         exportAudioMix.inputParameters = [exportAudioMixInputParameters]
         exporter!.audioMix = exportAudioMix
         
         
         // do it
-        exporter!.exportAsynchronouslyWithCompletionHandler({ () -> Void in
+        exporter!.exportAsynchronously(completionHandler: { () -> Void in
 
             switch exporter!.status {
-            case .Failed:
+            case .failed:
                 print("export failed \(exporter!.error)")
-                completion?(success: false)
+                completion?(false)
                 
-            case .Cancelled:
+            case .cancelled:
                 print("export cancelled \(exporter!.error)")
-                completion?(success: false)
+                completion?(false)
                 
             default:
                 print("export complete")
-                completion?(success: true)
+                completion?(true)
             }
         })
         

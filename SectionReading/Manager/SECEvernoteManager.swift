@@ -12,17 +12,17 @@ import evernote_cloud_sdk_ios
 /**
  印象笔记同步错误
  */
-enum EvernoteSyncError: ErrorType {
-    case NoError
-    case EvernoteNotAuthenticated
-    case FailToListNotebooks
-    case FailToCreateNotebook
+enum EvernoteSyncError: Error {
+    case noError
+    case evernoteNotAuthenticated
+    case failToListNotebooks
+    case failToCreateNotebook
 }
 
 enum EvernoteSyncType: UInt {
-    case UP
-    case DOWN
-    case UP_AND_DOWN
+    case up
+    case down
+    case up_AND_DOWN
 }
 
 /// 同步上传状态变化的通知
@@ -52,22 +52,22 @@ class SECEvernoteManager: NSObject {
     var onlySyncUnderWIFI: Bool = true 
     
     // 是否正在同步上传
-    private (set) var upSynchronizing = false
+    fileprivate (set) var upSynchronizing = false
     
     // 上次同步上传数量
-    private (set) var lastTimeSyncupNoteNumber: Int = 0
+    fileprivate (set) var lastTimeSyncupNoteNumber: Int = 0
     
     // 是否正在同步下载
-    private (set) var downSynchronizing = false
+    fileprivate (set) var downSynchronizing = false
     
     // 上次同步下载数量
-    private (set) var lastTimeSyncdownNoteNumber: Int = 0
+    fileprivate (set) var lastTimeSyncdownNoteNumber: Int = 0
     
-    private var noteSession = ENSession.sharedSession()
-    private var needSyncDownNoteCount: NSNumber?
+    fileprivate var noteSession = ENSession.shared
+    fileprivate var needSyncDownNoteCount: NSNumber?
     
-    private lazy var noteSycnOperationQueue: NSOperationQueue = {
-        let queue = NSOperationQueue()
+    fileprivate lazy var noteSycnOperationQueue: OperationQueue = {
+        let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
@@ -88,19 +88,19 @@ class SECEvernoteManager: NSObject {
      - parameter viewController:
      - parameter completion:
      */
-    func authenticate(withViewController viewController: UIViewController, completion:((success: Bool) -> Void)?) {
+    func authenticate(withViewController viewController: UIViewController, completion:((_ success: Bool) -> Void)?) {
         
-        noteSession.authenticateWithViewController(viewController, preferRegistration: false) { [weak self] (error) -> Void in
+        noteSession.authenticate(with: viewController, preferRegistration: false) { [weak self] (error) -> Void in
             if let strongSelf = self {
                 if error == nil {
                     // 设置笔记本
                     strongSelf.setupApplicationNotebook(withCompletion: { (result) -> Void in
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                            completion?(success: result == .NoError)
-                        })
+                        DispatchQueue.main.async {
+                            completion?(result == EvernoteSyncError.noError)
+                        }
                     })
                 } else {
-                    completion?(success: false)
+                    completion?(false)
                 }
             }
         }
@@ -135,26 +135,38 @@ class SECEvernoteManager: NSObject {
             return
         }
         
-        let appNotebookGuid = NSUserDefaults.standardUserDefaults().objectForKey(kApplicationNotebookGuid) as? String
-        if appNotebookGuid == nil {
-            completion?(nil)
-            return
-        }
-        
-        let note = EDAMNote()
-        TReading.fillFieldsFor(note, withReading: content, onlyFillUnSettedFields: true)
-        
-        note.notebookGuid = appNotebookGuid!
-        note.title = "读书记录"
-        
-        noteSession.primaryNoteStore().createNote(note, success: { (createdNote) -> Void in
-            
-            completion?(createdNote)
-            
-            }, failure: { (error) -> Void in
-                print("Fail to createNote, error: \(error.localizedDescription)")
+        // 先设置笔记本
+        self.setupApplicationNotebook { [weak self] (err) in
+            let strongSelf = self
+            if strongSelf == nil {
+                return
+            }
+            if err != .noError {
                 completion?(nil)
-        })
+                return
+            }
+            
+            let appNotebookGuid = UserDefaults.standard.object(forKey: kApplicationNotebookGuid) as? String
+            if appNotebookGuid == nil {
+                completion?(nil)
+                return
+            }
+            
+            let note = EDAMNote()
+            TReading.fillFieldsFor(note, withReading: content, onlyFillUnSettedFields: true)
+            
+            note.notebookGuid = appNotebookGuid!
+            note.title = "读书记录"
+            
+            strongSelf!.noteSession.primaryNoteStore()?.create(note, completion: { (createdNote, error) in
+                if error != nil {
+                    print("Fail to createNote, error: \(error!.localizedDescription)")
+                    completion?(nil)
+                } else {
+                    completion?(createdNote)
+                }
+            })
+        }
     }
     
     /**
@@ -172,7 +184,7 @@ class SECEvernoteManager: NSObject {
             return
         }
         
-        let appNotebookGuid = NSUserDefaults.standardUserDefaults().objectForKey(kApplicationNotebookGuid) as? String
+        let appNotebookGuid = UserDefaults.standard.object(forKey: kApplicationNotebookGuid) as? String
         if appNotebookGuid == nil {
             completion?(nil)
             return
@@ -185,14 +197,14 @@ class SECEvernoteManager: NSObject {
         note.title = ""
         note.notebookGuid = appNotebookGuid!
         
-        noteSession.primaryNoteStore().updateNote(note, success: { (updatedNote) -> Void in
-            
-            completion?(updatedNote)
-            
-            }) { (error) -> Void in
-                print("Fail to createNote, error: \(error.localizedDescription)")
+        noteSession.primaryNoteStore()?.update(note, completion: { (updatedNote, error) in
+            if error != nil {
+                print("Fail to createNote, error: \(error!.localizedDescription)")
                 completion?(nil)
-        }
+            } else {
+                completion?(updatedNote)
+            }
+        })
     }
     
     /**
@@ -201,21 +213,21 @@ class SECEvernoteManager: NSObject {
      - parameter guid:       笔记 guid
      - parameter completion: 回调 block
      */
-    func deleteNote(withGuid guid: String, completion: ((success: Bool) -> Void)?) {
+    func deleteNote(withGuid guid: String, completion: ((_ success: Bool) -> Void)?) {
         
         if isAuthenticated() == false {
-            completion?(success: false)
+            completion?(false)
             return
         }
         
-        noteSession.primaryNoteStore().deleteNoteWithGuid(guid, success: { (successNum) -> Void in
-            
-            completion?(success: true)
-            
-            }) { (error) -> Void in
-                print("Fail to deleteNote, error: \(error.localizedDescription)")
-                completion?(success: false)
-        }
+        noteSession.primaryNoteStore()?.deleteNote(withGuid: guid, completion: { (successNum, error) in
+            if error != nil {
+                print("Fail to createNote, error: \(error!.localizedDescription)")
+                completion?(false)
+            } else {
+                completion?(true)
+            }
+        })
     }
     
     
@@ -225,23 +237,23 @@ class SECEvernoteManager: NSObject {
      - parameter withTypeMask:      同步类型
      - parameter completion:        同步成功数量
      */
-    func sync(withType type: EvernoteSyncType, completion: ((successNumber: Int) -> Void)?) {
+    func sync(withType type: EvernoteSyncType, completion: ((_ successNumber: Int) -> Void)?) {
         
         if isAuthenticated() == false {
-            completion?(successNumber: 0)
+            completion?(0)
             return
         }
         
         switch type {
-        case .UP :
+        case .up :
             syncUp(withCompletion: { (upNumber) -> Void in
-                completion?(successNumber: upNumber)
+                completion?(upNumber)
             })
-        case .DOWN :
+        case .down :
             syncDown(withCompletion: { (downNumber) -> Void in
-                completion?(successNumber: downNumber)
+                completion?(downNumber)
             })
-        case .UP_AND_DOWN :
+        case .up_AND_DOWN :
             syncDown(withCompletion: { [weak self] (downNumber) -> Void in
                 let strongSelf = self
                 if strongSelf == nil {
@@ -251,7 +263,7 @@ class SECEvernoteManager: NSObject {
                 var syncNumber = downNumber
                 strongSelf!.syncUp(withCompletion: { (upNumber) -> Void in
                     syncNumber += upNumber
-                    completion?(successNumber: syncNumber)
+                    completion?(syncNumber)
                 })
             })
         }
@@ -272,7 +284,7 @@ class SECEvernoteManager: NSObject {
         }
         
         if needSyncDownNoteCount != nil {
-            success?(needSyncDownNoteCount!.integerValue)
+            success?(needSyncDownNoteCount!.intValue)
             return
         }
         
@@ -288,47 +300,47 @@ class SECEvernoteManager: NSObject {
             }
             
             if notesMetadata == nil {
-                strongSelf?.needSyncDownNoteCount = NSNumber(integer: 0)
+                strongSelf?.needSyncDownNoteCount = NSNumber(value: 0)
                 success?(0)
                 return
             }
             
-            strongSelf!.noteSycnOperationQueue.addOperationWithBlock({ () -> Void in
+            strongSelf!.noteSycnOperationQueue.addOperation({ () -> Void in
               
                 var needSycnDownNumber = 0
-                let dispatchGroup = dispatch_group_create()
+                let dispatchGroup = DispatchGroup()
                 
                 for noteMeta in notesMetadata! {
                     
                     let queryOption = ReadingQueryOption()
                     queryOption.evernoteGuid = noteMeta.guid
                     
-                    dispatch_group_enter(dispatchGroup)
+                    dispatchGroup.enter()
                     TReading.filterByOption(queryOption, completion: { (results) -> Void in
                         if results == nil || results!.count == 0 {
                             for result in results! {
                                 if result.fModifyTimestamp != nil
-                                    && result.fModifyTimestamp!.integerValue != (noteMeta.updated.integerValue/1000) {
+                                    && result.fModifyTimestamp!.intValue != (noteMeta.updated.intValue/1000) {
                                     
-                                    ++needSycnDownNumber
+                                    needSycnDownNumber += 1
                                     break
                                 }
                             }
                         } else {
-                            ++needSycnDownNumber
+                            needSycnDownNumber += 1
                         }
-                        dispatch_group_leave(dispatchGroup)
+                        dispatchGroup.leave()
                     })
-                    dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+                    dispatchGroup.wait(timeout: DispatchTime.distantFuture)
                 }
                 
-                strongSelf?.needSyncDownNoteCount = NSNumber(integer: needSycnDownNumber)
+                strongSelf?.needSyncDownNoteCount = NSNumber(value: needSycnDownNumber)
                 success?(needSycnDownNumber)
             })
             
         }) { [weak self] in
             if let strongSelf = self {
-                strongSelf.needSyncDownNoteCount = NSNumber(integer: 0)
+                strongSelf.needSyncDownNoteCount = NSNumber(value: 0)
                 failure?()
             }
         }
@@ -340,7 +352,7 @@ class SECEvernoteManager: NSObject {
      - parameter resourceGuid: 资源 id
      - parameter completion:   结果 block
      */
-    func getResource(withResourceGuid resourceGuid: String, completion: ((NSData?) -> Void)?) {
+    func getResource(withResourceGuid resourceGuid: String, completion: ((Data?) -> Void)?) {
     
         
         if isAuthenticated() == false {
@@ -348,15 +360,17 @@ class SECEvernoteManager: NSObject {
             return
         }
         
-        self.noteSession.primaryNoteStore().getResourceDataWithGuid(resourceGuid, success: { (data) -> Void in
-            completion?(data)
-            }) { (error) -> Void in
-                print("error: \(error.localizedDescription)")
+        self.noteSession.primaryNoteStore()?.fetchResourceData(withGuid: resourceGuid, completion: { (data, error) in
+            if error != nil {
+                print("error: \(error!.localizedDescription)")
                 completion?(nil)
-        }
+            } else {
+                completion?(data)
+            }
+        })
     }
     
-    private func getApplicationAllNotesMetadata(withNotesMetadataResultSpec notesMetadataResultSpec: EDAMNotesMetadataResultSpec, success: (([EDAMNoteMetadata]?) -> Void)?, failure: (() -> Void)?) {
+    fileprivate func getApplicationAllNotesMetadata(withNotesMetadataResultSpec notesMetadataResultSpec: EDAMNotesMetadataResultSpec, success: (([EDAMNoteMetadata]?) -> Void)?, failure: (() -> Void)?) {
         
         
         if isAuthenticated() == false {
@@ -364,20 +378,20 @@ class SECEvernoteManager: NSObject {
             return
         }
         
-        let appNotebookGuid = NSUserDefaults.standardUserDefaults().objectForKey(kApplicationNotebookGuid) as? String
+        let appNotebookGuid = UserDefaults.standard.object(forKey: kApplicationNotebookGuid) as? String
         if appNotebookGuid == nil {
             failure?()
             return
         }
         
-        self.noteSycnOperationQueue.addOperationWithBlock { [weak self] () -> Void in
+        self.noteSycnOperationQueue.addOperation { [weak self] () -> Void in
             
             var strongSelf = self
             if strongSelf == nil {
                 return
             }
             
-            let dispatchGroup = dispatch_group_create()
+            let dispatchGroup = DispatchGroup()
             
             // 获取笔记数量
             
@@ -386,24 +400,29 @@ class SECEvernoteManager: NSObject {
             let filter = EDAMNoteFilter()
             filter.notebookGuid = appNotebookGuid
             
-            dispatch_group_enter(dispatchGroup)
-            strongSelf!.noteSession?.primaryNoteStore().findNoteCountsWithFilter(filter, withTrash: false, success: { (noteCollectionCounts) -> Void in
-                noteCount = noteCollectionCounts.notebookCounts.values.first as? NSNumber
-                findNoteCountsSuccess = true
-                dispatch_group_leave(dispatchGroup)
-                
-                }, failure: { (error) -> Void in
-                    print("Fail to findNoteCounts, error: \(error.localizedDescription)")
-                    dispatch_group_leave(dispatchGroup)
+            dispatchGroup.enter()
+            strongSelf!.noteSession.primaryNoteStore()?.findNoteCounts(with: filter, includingTrash: false, completion: { (noteCollectionCounts, error) in
+                if error != nil {
+                    print("Fail to findNoteCounts, error: \(error!.localizedDescription)")
+                    dispatchGroup.leave()
+                } else {
+                    noteCount = noteCollectionCounts!.notebookCounts.values.first
+                    findNoteCountsSuccess = true
+                    dispatchGroup.leave()
+                }
             })
-            dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+            var waitResult = dispatchGroup.wait(timeout: DispatchTime.distantFuture)
+            if waitResult == DispatchTimeoutResult.timedOut {
+                failure?()
+                return
+            }
             
             if findNoteCountsSuccess == false {
                 failure?()
                 return
             }
             
-            if noteCount == nil || noteCount!.integerValue == 0 {
+            if noteCount == nil || noteCount!.intValue == 0 {
                 success?(nil)
                 return
             }
@@ -418,19 +437,23 @@ class SECEvernoteManager: NSObject {
             var noteMetas: [EDAMNoteMetadata]?
             var findNotesMetadataSuccess = false
             
-            dispatch_group_enter(dispatchGroup)
-            strongSelf!.noteSession?.primaryNoteStore().findNotesMetadataWithFilter(filter, maxResults: noteCount!.unsignedIntegerValue, resultSpec: notesMetadataResultSpec, success: { (results) -> Void in
+            dispatchGroup.enter()
+            strongSelf!.noteSession.primaryNoteStore()?.findNotesMetadata(with: filter, maxResults: noteCount!.uintValue, resultSpec: notesMetadataResultSpec, success: { (results) -> Void in
                 
-                noteMetas = results as? [EDAMNoteMetadata]
+                noteMetas = results
                 findNotesMetadataSuccess = true
                 
-                dispatch_group_leave(dispatchGroup)
+                dispatchGroup.leave()
                 
                 }, failure: { (error) -> Void in
-                    print("Fail to findNotesMetadata, error: \(error.localizedDescription)")
-                    dispatch_group_leave(dispatchGroup)
+                    print("Fail to findNotesMetadata, error: \(error?.localizedDescription)")
+                    dispatchGroup.leave()
             })
-            dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+            waitResult = dispatchGroup.wait(timeout: DispatchTime.distantFuture)
+            if waitResult == DispatchTimeoutResult.timedOut {
+                failure?()
+                return
+            }
             
             if findNotesMetadataSuccess == false {
                 failure?()
@@ -444,82 +467,84 @@ class SECEvernoteManager: NSObject {
     /**
      设置好本应用的笔记本
      */
-    private func setupApplicationNotebook(withCompletion completion: ((result: EvernoteSyncError) -> Void)?) {
+    fileprivate func setupApplicationNotebook(withCompletion completion: ((_ result: EvernoteSyncError) -> Void)?) {
         
         
         if isAuthenticated() == false {
-            completion?(result:EvernoteSyncError.EvernoteNotAuthenticated)
+            completion?(EvernoteSyncError.evernoteNotAuthenticated)
             return
         }
         
-        let notebookGuid = NSUserDefaults.standardUserDefaults().objectForKey(kApplicationNotebookGuid) as? String
+        let notebookGuid = UserDefaults.standard.object(forKey: kApplicationNotebookGuid) as? String
         if notebookGuid != nil {
-            noteSession.primaryNoteStore().getNotebookWithGuid(notebookGuid!, success: { [weak self] (notebook) -> Void in
-                
-                if let strongSelf = self {
-                    if notebook.name != ApplicationNotebookName {
+            noteSession.primaryNoteStore()?.fetchNotebook(withGuid: notebookGuid!, completion: { [weak self] (notebook, error) in
+                if error != nil {
+                    print("Fail to getNotebook, error: \(error!.localizedDescription)")
+                    if let strongSelf = self {
                         strongSelf.createApplicationNotebook(withCompletion: completion)
-                        return
                     }
-                    completion?(result: EvernoteSyncError.NoError)
-                }
-            }, failure: { [weak self] (error) -> Void in
-                print("Fail to getNotebook, error: \(error.localizedDescription)")
-                if let strongSelf = self {
-                    strongSelf.createApplicationNotebook(withCompletion: completion)
+                } else {
+                    if let strongSelf = self {
+                        if notebook!.name != ApplicationNotebookName {
+                            strongSelf.createApplicationNotebook(withCompletion: completion)
+                            return
+                        }
+                        completion?(EvernoteSyncError.noError)
+                    }
                 }
             })
         } else {
-            noteSession.primaryNoteStore().listNotebooksWithSuccess({ [weak self] (books) -> Void in
-                
-                if let strongSelf = self {
-                    var targetNotebook: EDAMNotebook?
-                    for notebook in books {
-                        if notebook.name == ApplicationNotebookName {
-                            targetNotebook = notebook as? EDAMNotebook
-                            break
+            noteSession.primaryNoteStore()?.listNotebooks(completion: { [weak self] (books, error) in
+                if error != nil {
+                    print("Fail to listNotebooks, error: \(error!.localizedDescription)")
+                    completion?(EvernoteSyncError.failToListNotebooks)
+                } else {
+                    if let strongSelf = self {
+                        var targetNotebook: EDAMNotebook?
+                        for notebook in books! {
+                            if notebook.name == ApplicationNotebookName {
+                                targetNotebook = notebook
+                                break
+                            }
                         }
+                        if targetNotebook != nil {
+                            UserDefaults.standard.set(targetNotebook!.guid, forKey: kApplicationNotebookGuid)
+                            completion?(EvernoteSyncError.noError)
+                            return
+                        }
+                        
+                        strongSelf.createApplicationNotebook(withCompletion: completion)
                     }
-                    if targetNotebook != nil {
-                        NSUserDefaults.standardUserDefaults().setObject(targetNotebook!.guid, forKey: kApplicationNotebookGuid)
-                        completion?(result: EvernoteSyncError.NoError)
-                        return
-                    }
-                    
-                    strongSelf.createApplicationNotebook(withCompletion: completion)
                 }
-            }, failure: { (error) -> Void in
-                print("Fail to listNotebooks, error: \(error.localizedDescription)")
-                completion?(result: EvernoteSyncError.FailToListNotebooks)
             })
         }
     }
     
-    private func createApplicationNotebook(withCompletion completion: ((result: EvernoteSyncError) -> Void)?) {
+    fileprivate func createApplicationNotebook(withCompletion completion: ((_ result: EvernoteSyncError) -> Void)?) {
     
         if isAuthenticated() == false {
-            completion?(result:EvernoteSyncError.EvernoteNotAuthenticated)
+            completion?(EvernoteSyncError.evernoteNotAuthenticated)
             return
         }
         
         let notebook = EDAMNotebook()
         notebook.name = ApplicationNotebookName
-        notebook.defaultNotebook = NSNumber(bool: false)
-        noteSession.primaryNoteStore().createNotebook(notebook, success: { (notebook) -> Void in
-            
-            print("Success to createNotebook, guid: \(notebook.guid), name: \(notebook.name)")
-            
-            NSUserDefaults.standardUserDefaults().setObject(notebook.guid, forKey: kApplicationNotebookGuid)
-            completion?(result: EvernoteSyncError.NoError)
-            
-            }) { (error) -> Void in
-                print("Fail to createNotebook, error: \(error.localizedDescription)")
-                completion?(result: EvernoteSyncError.FailToCreateNotebook)
-        }
+        notebook.defaultNotebook = NSNumber(value: false)
+        noteSession.primaryNoteStore()?.create(notebook, completion: { (notebook, error) in
+            if error != nil {
+                print("Fail to createNotebook, error: \(error!.localizedDescription)")
+                completion?(EvernoteSyncError.failToCreateNotebook)
+            } else {
+                print("Success to createNotebook, guid: \(notebook!.guid), name: \(notebook!.name)")
+                
+                UserDefaults.standard.set(notebook!.guid, forKey: kApplicationNotebookGuid)
+                completion?(EvernoteSyncError.noError)
+            }
+        })
     }
     
     
-    private func canSyncronize() -> Bool {
+    fileprivate func canSyncronize() -> Bool {
         
         if onlySyncUnderWIFI {
             return WiFiReachability
@@ -527,24 +552,24 @@ class SECEvernoteManager: NSObject {
         return true
     }
     
-    private func notifyNoteSyncupStateDidChange() {
+    fileprivate func notifyNoteSyncupStateDidChange() {
         
-        NSNotificationCenter.defaultCenter().postNotificationName(SECEvernoteManagerSycnUpStateDidChangeNotification, object: self, userInfo: [SECEvernoteManagerNotificationSycnUpStateItem: upSynchronizing, SECEvernoteManagerNotificationSuccessSycnUpNoteCountItem: lastTimeSyncupNoteNumber])
+        NotificationCenter.default.post(name: Notification.Name(rawValue: SECEvernoteManagerSycnUpStateDidChangeNotification), object: self, userInfo: [SECEvernoteManagerNotificationSycnUpStateItem: upSynchronizing, SECEvernoteManagerNotificationSuccessSycnUpNoteCountItem: lastTimeSyncupNoteNumber])
     }
     
-    private func notifyNoteSyncdownStateDidChange() {
+    fileprivate func notifyNoteSyncdownStateDidChange() {
         
-        NSNotificationCenter.defaultCenter().postNotificationName(SECEvernoteManagerSycnDownStateDidChangeNotification, object: self, userInfo: [SECEvernoteManagerNotificationSycnDownStateItem: downSynchronizing, SECEvernoteManagerNotificationSuccessSycnDownNoteCountItem: lastTimeSyncdownNoteNumber])
+        NotificationCenter.default.post(name: Notification.Name(rawValue: SECEvernoteManagerSycnDownStateDidChangeNotification), object: self, userInfo: [SECEvernoteManagerNotificationSycnDownStateItem: downSynchronizing, SECEvernoteManagerNotificationSuccessSycnDownNoteCountItem: lastTimeSyncdownNoteNumber])
     }
     
-    private func syncUp(withCompletion completion: ((Int) -> Void)?) {
+    fileprivate func syncUp(withCompletion completion: ((Int) -> Void)?) {
         
         if isAuthenticated() == false {
             completion?(0)
             return
         }
         
-        self.noteSycnOperationQueue.addOperationWithBlock { [weak self] () -> Void in
+        self.noteSycnOperationQueue.addOperation { [weak self] () -> Void in
             let strongSelf = self
             if strongSelf == nil {
                 return
@@ -566,7 +591,7 @@ class SECEvernoteManager: NSObject {
             strongSelf!.notifyNoteSyncupStateDidChange()
             
             let queryOption = ReadingQueryOption()
-            queryOption.syncStatus = [.NeedSyncUpload, .NeedSyncDelete]
+            queryOption.syncStatus = [.needSyncUpload, .needSyncDelete]
             TReading.filterByOption(queryOption) { [weak self] (results) -> Void in
                 
                 let strongSelf = self
@@ -582,7 +607,7 @@ class SECEvernoteManager: NSObject {
                 }
                 
                 var successNumber = 0
-                var dispatchGroup = dispatch_group_create()
+                var dispatchGroup = DispatchGroup()
                 
                 for reading in results! {
                     
@@ -591,11 +616,11 @@ class SECEvernoteManager: NSObject {
                         continue
                     }
                     
-                    if syncStatus!.integerValue == ReadingSyncStatus.NeedSyncUpload.rawValue {
+                    if syncStatus!.intValue == ReadingSyncStatus.needSyncUpload.rawValue {
                         
                         if reading.fEvernoteGuid == nil {
                             // create
-                            dispatch_group_enter(dispatchGroup)
+                            dispatchGroup.enter()
                             strongSelf?.createNote(withContent: reading, completion: { (createdNote) -> Void in
                                 if createdNote != nil {
                                     // 更新本地数据
@@ -605,17 +630,17 @@ class SECEvernoteManager: NSObject {
                                     TReading.update(withFilterOption: filterOption, updateBlock: { (readingtoUpdate) -> Void in
                                         
                                         readingtoUpdate.fillFields(fromEverNote: createdNote!, onlyFillUnSettedFields: true)
-                                        readingtoUpdate.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
+                                        readingtoUpdate.fSyncStatus = NSNumber(value: ReadingSyncStatus.normal.rawValue)
                                     })
                                     
-                                    ++successNumber
+                                    successNumber += 1
                                 }
-                                dispatch_group_leave(dispatchGroup)
+                                dispatchGroup.leave()
                             })
-                            dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+                            dispatchGroup.wait(timeout: DispatchTime.distantFuture)
                         } else {
                             // update
-                            dispatch_group_enter(dispatchGroup)
+                            dispatchGroup.enter()
                             strongSelf?.updateNote(withGuid: reading.fEvernoteGuid!, newContent: reading, completion: { (updatedNote) -> Void in
                                 if updatedNote != nil {
                                     // 更新本地数据
@@ -625,24 +650,24 @@ class SECEvernoteManager: NSObject {
                                     TReading.update(withFilterOption: filterOption, updateBlock: { (readingtoUpdate) -> Void in
                                         
                                         readingtoUpdate.fillFields(fromEverNote: updatedNote!, onlyFillUnSettedFields: false)
-                                        readingtoUpdate.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
+                                        readingtoUpdate.fSyncStatus = NSNumber(value: ReadingSyncStatus.normal.rawValue)
                                     })
                                     
-                                    ++successNumber
+                                    successNumber += 1
                                 }
-                                dispatch_group_leave(dispatchGroup)
+                                dispatchGroup.leave()
                             })
-                            dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+                            dispatchGroup.wait(timeout: DispatchTime.distantFuture)
                         }
                         
-                    } else if syncStatus!.integerValue == ReadingSyncStatus.NeedSyncDelete.rawValue {
+                    } else if syncStatus!.intValue == ReadingSyncStatus.needSyncDelete.rawValue {
                         
                         if reading.fEvernoteGuid == nil {
                             continue
                         }
                         
                         // delete
-                        dispatch_group_enter(dispatchGroup)
+                        dispatchGroup.enter()
                         strongSelf?.deleteNote(withGuid: reading.fEvernoteGuid!, completion: { (success) -> Void in
                             if success {
                                 // 删除本地数据
@@ -651,11 +676,11 @@ class SECEvernoteManager: NSObject {
                                 
                                 TReading.deleteByOption(filterOption)
                                 
-                                ++successNumber
+                                successNumber += 1
                             }
-                            dispatch_group_leave(dispatchGroup)
+                            dispatchGroup.leave()
                         })
-                        dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+                        dispatchGroup.wait(timeout: DispatchTime.distantFuture)
                     }
                 }
                 
@@ -663,13 +688,12 @@ class SECEvernoteManager: NSObject {
                 strongSelf?.lastTimeSyncupNoteNumber = successNumber
                 strongSelf?.notifyNoteSyncupStateDidChange()
                 
-                dispatchGroup = nil
                 completion?(successNumber)
             }
         }
     }
     
-    private func syncDown(withCompletion completion: ((Int) -> Void)?) {
+    fileprivate func syncDown(withCompletion completion: ((Int) -> Void)?) {
         
         if isAuthenticated() == false {
             completion?(0)
@@ -705,41 +729,42 @@ class SECEvernoteManager: NSObject {
                 strongSelf?.downSynchronizing = false
                 strongSelf?.lastTimeSyncdownNoteNumber = 0
                 strongSelf?.notifyNoteSyncdownStateDidChange()
-                strongSelf?.needSyncDownNoteCount = NSNumber(integer: 0)
+                strongSelf?.needSyncDownNoteCount = NSNumber(value: 0)
                 completion?(0)
                 return
             }
             
-            strongSelf!.noteSycnOperationQueue.addOperationWithBlock { [weak self] () -> Void in
+            strongSelf!.noteSycnOperationQueue.addOperation { [weak self] () -> Void in
                 
                 var strongSelf = self
                 if strongSelf == nil {
                     return
                 }
                 
-                let dispatchGroup = dispatch_group_create()
+                let dispatchGroup = DispatchGroup()
                 
                 // 考虑是否需要向下同步
                 
-                let latestUpdateCount = NSUserDefaults.standardUserDefaults().integerForKey(kEvernoteLastUpdateCount)
+                let latestUpdateCount = UserDefaults.standard.integer(forKey: kEvernoteLastUpdateCount)
                 var currentUpdateCount = 0
                 
-                dispatch_group_enter(dispatchGroup)
-                strongSelf!.noteSession.primaryNoteStore().getSyncStateWithSuccess({ (syncState) -> Void in
-                    currentUpdateCount = syncState.updateCount.integerValue
-                    dispatch_group_leave(dispatchGroup)
-                    
-                    }, failure: { (error) -> Void in
-                        print("Fail to getSyncState, error: \(error.localizedDescription)")
-                        dispatch_group_leave(dispatchGroup)
+                dispatchGroup.enter()
+                strongSelf!.noteSession.primaryNoteStore()?.fetchSyncState(completion: { (syncState, error) in
+                    if error != nil {
+                        print("Fail to getSyncState, error: \(error!.localizedDescription)")
+                        dispatchGroup.leave()
+                    } else {
+                        currentUpdateCount = syncState!.updateCount.intValue
+                        dispatchGroup.leave()
+                    }
                 })
-                dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+                dispatchGroup.wait(timeout: DispatchTime.distantFuture)
                 
                 if currentUpdateCount <= latestUpdateCount {
                     strongSelf?.downSynchronizing = false
                     strongSelf?.lastTimeSyncdownNoteNumber = 0
                     strongSelf?.notifyNoteSyncdownStateDidChange()
-                    strongSelf?.needSyncDownNoteCount = NSNumber(integer: 0)
+                    strongSelf?.needSyncDownNoteCount = NSNumber(value: 0)
                     completion?(0)
                     return
                 }
@@ -759,12 +784,12 @@ class SECEvernoteManager: NSObject {
                     let queryOption = ReadingQueryOption()
                     queryOption.evernoteGuid = noteMeta.guid
                     
-                    dispatch_group_enter(dispatchGroup)
+                    dispatchGroup.enter()
                     TReading.filterByOption(queryOption, completion: { (results) -> Void in
                         if results != nil && results!.count != 0 {
                             for result in results! {
                                 if result.fModifyTimestamp != nil
-                                    && result.fModifyTimestamp!.integerValue != (noteMeta.updated.integerValue/1000) {
+                                    && result.fModifyTimestamp!.intValue != (noteMeta.updated.intValue/1000) {
                                     needUpdate = true
                                     break
                                 }
@@ -772,9 +797,9 @@ class SECEvernoteManager: NSObject {
                         } else {
                             needCreate = true
                         }
-                        dispatch_group_leave(dispatchGroup)
+                        dispatchGroup.leave()
                     })
-                    dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+                    dispatchGroup.wait(timeout: DispatchTime.distantFuture)
                 
                     if needCreate || needUpdate {
                         
@@ -782,16 +807,17 @@ class SECEvernoteManager: NSObject {
                         
                         var note: EDAMNote?
                         
-                        dispatch_group_enter(dispatchGroup)
-                        strongSelf!.noteSession.primaryNoteStore().getNoteWithGuid(noteMeta.guid, withContent: true, withResourcesData: false, withResourcesRecognition: false, withResourcesAlternateData: false, success: { (result) -> Void in
-                            note = result
-                            dispatch_group_leave(dispatchGroup)
-                            
-                            }, failure: { (error) -> Void in
-                                print("Fail to getNote, error: \(error.localizedDescription)")
-                                dispatch_group_leave(dispatchGroup)
+                        dispatchGroup.enter()
+                        strongSelf!.noteSession.primaryNoteStore()?.fetchNote(withGuid: noteMeta.guid, includingContent: true, resourceOptions: ENResourceFetchOption.includeData, completion: { (result, error) in
+                            if error != nil {
+                                print("Fail to getNote, error: \(error!.localizedDescription)")
+                                dispatchGroup.leave()
+                            } else {
+                                note = result
+                                dispatchGroup.leave()
+                            }
                         })
-                        dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER)
+                        dispatchGroup.wait(timeout: DispatchTime.distantFuture)
                         
                         strongSelf = self
                         if strongSelf == nil {
@@ -805,28 +831,28 @@ class SECEvernoteManager: NSObject {
                         if needCreate {
                             TReading.create(withConstructBlock: { (newReading) -> Void in
                                 newReading.fillFields(fromEverNote: note!, onlyFillUnSettedFields: true)
-                                newReading.fLocalId = NSUUID().UUIDString
-                                newReading.fSyncStatus = NSNumber(integer: ReadingSyncStatus.Normal.rawValue)
+                                newReading.fLocalId = NSUUID().uuidString
+                                newReading.fSyncStatus = NSNumber(value: ReadingSyncStatus.normal.rawValue)
                             })
                         } else if needUpdate {
                             TReading.update(withFilterOption: queryOption, updateBlock: { (readingtoUpdate) -> Void in
-                                if readingtoUpdate.fSyncStatus == NSNumber(integer: ReadingSyncStatus.Normal.rawValue) {
+                                if readingtoUpdate.fSyncStatus == NSNumber(value: ReadingSyncStatus.normal.rawValue) {
                                     readingtoUpdate.fillFields(fromEverNote: note!, onlyFillUnSettedFields: false)
                                 }
                             })
                         }
                         
-                        ++syncDownNumber
+                        syncDownNumber += 1
                     }
                 }
                 
                 strongSelf?.downSynchronizing = false
                 strongSelf?.lastTimeSyncdownNoteNumber = syncDownNumber
                 strongSelf?.notifyNoteSyncdownStateDidChange()
-                strongSelf?.needSyncDownNoteCount = NSNumber(integer: 0)
+                strongSelf?.needSyncDownNoteCount = NSNumber(value: 0)
                 
                 // 保存本次同步计数
-                NSUserDefaults.standardUserDefaults().setInteger(currentUpdateCount, forKey: kEvernoteLastUpdateCount)
+                UserDefaults.standard.set(currentUpdateCount, forKey: kEvernoteLastUpdateCount)
                 
                 completion?(syncDownNumber)
             }

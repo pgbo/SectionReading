@@ -1,36 +1,37 @@
 PODS:
   - AngleGradientLayer (1.2.3)
   - evernote-cloud-sdk-ios (2.0.6)
-  - KMPlaceholderTextView (1.1.1)
-  - SnapKit (0.18.0)
+  - KMPlaceholderTextView (1.3.0)
+  - SnapKit (3.1.2)
   - SVProgressHUD (1.1.3)
   - UITableView+FDTemplateLayoutCell (1.3)
 
 DEPENDENCIES:
   - AngleGradientLayer (~> 1.0)
-  - evernote-cloud-sdk-ios (from `https://github.com/evernote/evernote-cloud-sdk-ios.git`,
-    tag `2.0.8`)
-  - KMPlaceholderTextView (~> 1.1.1)
-  - SnapKit (~> 0.18.0)
+  - evernote-cloud-sdk-ios (from `https://github.com/pilky/evernote-cloud-sdk-ios.git`, commit `c02e4ba689514708759e393827d2aa75fc26673c`)
+  - KMPlaceholderTextView (~> 1.3.0)
+  - SnapKit (~> 3.1.2)
   - SVProgressHUD (~> 1.1.3)
   - UITableView+FDTemplateLayoutCell (~> 1.3)
 
 EXTERNAL SOURCES:
   evernote-cloud-sdk-ios:
-    :git: https://github.com/evernote/evernote-cloud-sdk-ios.git
-    :tag: 2.0.8
+    :commit: c02e4ba689514708759e393827d2aa75fc26673c
+    :git: https://github.com/pilky/evernote-cloud-sdk-ios.git
 
 CHECKOUT OPTIONS:
   evernote-cloud-sdk-ios:
-    :git: https://github.com/evernote/evernote-cloud-sdk-ios.git
-    :tag: 2.0.8
+    :commit: c02e4ba689514708759e393827d2aa75fc26673c
+    :git: https://github.com/pilky/evernote-cloud-sdk-ios.git
 
 SPEC CHECKSUMS:
   AngleGradientLayer: 085302f7f9764735762f83642e86cababfec1d37
-  evernote-cloud-sdk-ios: f06bffce4094225030c83a9b7dcb96ca98b40288
-  KMPlaceholderTextView: 686edec818f5727728eaf8c2e9e70177692d3d53
-  SnapKit: e1f090a6d47b1dd4bd89b73f72b6746a7835ef3c
+  evernote-cloud-sdk-ios: 6221df3d13c3b8835f4a27bfae81fda1d46e94d7
+  KMPlaceholderTextView: 2bbcd19a273648a80a61e1e48f9743a24d8930e3
+  SnapKit: 12b24f569cb7c143acc9c22b9d91b23e7b1c84a2
   SVProgressHUD: 748080e4f36e603f6c02aec292664239df5279c1
   UITableView+FDTemplateLayoutCell: d5be6056b5060313f5955a2590ecd33142ad713d
 
-COCOAPODS: 0.39.0
+PODFILE CHECKSUM: 45bb3dbd8687a606a4947a1fbc2c4453e48d3a9a
+
+COCOAPODS: 1.1.0.rc.3

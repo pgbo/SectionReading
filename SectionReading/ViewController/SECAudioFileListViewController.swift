@@ -11,30 +11,30 @@ import AVFoundation
 
 class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelegate, SECAudioFileTableViewCellDelegate {
 
-    private var audioStoreDirectory = SECHelper.readingRecordStoreDirectory()
-    private var audioFileNameList: [String]?
+    fileprivate var audioStoreDirectory = SECHelper.readingRecordStoreDirectory()
+    fileprivate var audioFileNameList: [String]?
     
-    private var audioPlayer: AVAudioPlayer?
+    fileprivate var audioPlayer: AVAudioPlayer?
     
     // 正在播放的音频索引，为空表示没有正在播放的音频
-    private var playingAudioIndex: NSNumber?
+    fileprivate var playingAudioIndex: NSNumber?
     
-    private lazy var mEditBarItem: UIBarButtonItem = {
-        let item = UIBarButtonItem(title: "编辑", style: UIBarButtonItemStyle.Plain, target: self, action: "toggleEdit")
+    fileprivate lazy var mEditBarItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(title: "编辑", style: UIBarButtonItemStyle.plain, target: self, action: #selector(SECAudioFileListViewController.toggleEdit))
         return item
     }()
     
     class func instanceFromSB() -> SECAudioFileListViewController {
         
-        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewControllerWithIdentifier("SECAudioFileListViewController") as! SECAudioFileListViewController
+        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewController(withIdentifier: "SECAudioFileListViewController") as! SECAudioFileListViewController
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
     
     override init(style: UITableViewStyle) {
-        super.init(style: UITableViewStyle.Grouped)
+        super.init(style: UITableViewStyle.grouped)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -50,7 +50,7 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
         
         if audioStoreDirectory != nil {
             do {
-                audioFileNameList = try NSFileManager.defaultManager().contentsOfDirectoryAtPath(audioStoreDirectory!)
+                audioFileNameList = try FileManager.default.contentsOfDirectory(atPath: audioStoreDirectory!)
                 print("audioFileNameList:\(audioFileNameList!)")
                 self.tableView.reloadData()
             } catch let error as NSError {
@@ -64,9 +64,9 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
         // Dispose of any resources that can be recreated.
     }
     
-    @objc private func toggleEdit() {
+    @objc fileprivate func toggleEdit() {
     
-        if self.tableView.editing {
+        if self.tableView.isEditing {
             self.tableView .setEditing(false, animated: true)
             mEditBarItem.title = "编辑"
         } else {
@@ -78,34 +78,34 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
 
     // MARK: - Table view data source
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return audioFileNameList != nil ?audioFileNameList!.count :0
     }
     
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0.1
     }
     
-    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0.1
     }
     
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 76
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("SECAudioFileTableViewCell", forIndexPath: indexPath) as! SECAudioFileTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "SECAudioFileTableViewCell", for: indexPath) as! SECAudioFileTableViewCell
         
-        let row = indexPath.row
+        let row = (indexPath as NSIndexPath).row
         
         cell.configure(withAudioFilePath: "\(audioStoreDirectory!)\(audioFileNameList![row])")
         
         cell.delegate = self
         
-        if playingAudioIndex != nil && playingAudioIndex!.integerValue == row {
+        if playingAudioIndex != nil && playingAudioIndex!.intValue == row {
             cell.isPlaying = true
         } else {
             cell.isPlaying = false
@@ -114,23 +114,23 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
         return cell
     }
     
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
 
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
             toDeleteFile(atIndexPath: indexPath)
         }
     }
     
-    private func toDeleteFile(atIndexPath indexPath: NSIndexPath) {
+    fileprivate func toDeleteFile(atIndexPath indexPath: IndexPath) {
         
-        let deletingFilePath = "\(audioStoreDirectory!)\(audioFileNameList![indexPath.row])"
+        let deletingFilePath = "\(audioStoreDirectory!)\(audioFileNameList![(indexPath as NSIndexPath).row])"
         let option = ReadingQueryOption()
         option.localAudioFilePath = deletingFilePath
-        option.syncStatus = [ReadingSyncStatus.NeedSyncUpload]
+        option.syncStatus = [ReadingSyncStatus.needSyncUpload]
         let count = TReading.count(withOption: option)
         if count == nil || count == 0 {
             
@@ -138,16 +138,16 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
             deleteAudioFileAtPath(deletingFilePath)
             
         } else {
-            let deleteAlert = UIAlertController(title: "重要提醒", message: "该音频文件关联了一些未同步的读书笔记，删除后关联的读书笔记将会丢失录音，确认删除吗？", preferredStyle: UIAlertControllerStyle.Alert)
-            deleteAlert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
-            deleteAlert.addAction(UIAlertAction(title: "删除", style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
+            let deleteAlert = UIAlertController(title: "重要提醒", message: "该音频文件关联了一些未同步的读书笔记，删除后关联的读书笔记将会丢失录音，确认删除吗？", preferredStyle: UIAlertControllerStyle.alert)
+            deleteAlert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.cancel, handler: nil))
+            deleteAlert.addAction(UIAlertAction(title: "删除", style: UIAlertActionStyle.destructive, handler: { (action) -> Void in
                 TReading.filterByOption(option, completion: { (results) -> Void in
                     if results == nil {
                         return
                     }
                     for reading in results! {
                         reading.fLocalAudioFilePath = nil
-                        reading.fModifyTimestamp = NSNumber(integer: Int(NSDate().timeIntervalSince1970))
+                        reading.fModifyTimestamp = NSNumber(value: Int(Date().timeIntervalSince1970) as Int)
                     }
                     
                     self.tableViewDidDeleteAudioFile(atIndexPath: indexPath)
@@ -155,38 +155,38 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
                 })
                 
                 
-                self.audioFileNameList?.removeAtIndex(indexPath.row)
-                self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                self.audioFileNameList?.remove(at: (indexPath as NSIndexPath).row)
+                self.tableView.deleteRows(at: [indexPath], with: .fade)
                 do {
-                    try NSFileManager.defaultManager().removeItemAtPath(deletingFilePath)
+                    try FileManager.default.removeItem(atPath: deletingFilePath)
                 } catch let error as NSError {
                     print("error:\(error.localizedDescription)")
                 }
             }))
-            self.presentViewController(deleteAlert, animated: true, completion: nil)
+            self.present(deleteAlert, animated: true, completion: nil)
         }
     }
     
-    private func tableViewDidDeleteAudioFile(atIndexPath indexPath: NSIndexPath) {
+    fileprivate func tableViewDidDeleteAudioFile(atIndexPath indexPath: IndexPath) {
         
-        let deletingRow = indexPath.row
+        let deletingRow = (indexPath as NSIndexPath).row
         if playingAudioIndex != nil {
-            let playingIndex = playingAudioIndex!.integerValue
+            let playingIndex = playingAudioIndex!.intValue
             if playingIndex == deletingRow {
                 playingAudioIndex = nil
             } else if playingIndex > deletingRow {
-                playingAudioIndex = NSNumber(integer: playingIndex - 1)
+                playingAudioIndex = NSNumber(value: playingIndex - 1 as Int)
             }
         }
         
-        audioFileNameList?.removeAtIndex(deletingRow)
-        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+        audioFileNameList?.remove(at: deletingRow)
+        tableView.deleteRows(at: [indexPath], with: .fade)
     }
     
-    private func deleteAudioFileAtPath(filePath: String) {
+    fileprivate func deleteAudioFileAtPath(_ filePath: String) {
 
         do {
-            try NSFileManager.defaultManager().removeItemAtPath(filePath)
+            try FileManager.default.removeItem(atPath: filePath)
         } catch let error as NSError {
             print("error:\(error.localizedDescription)")
         }
@@ -194,39 +194,39 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
     
     // MARK: - table view delegate
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
         
-        if tableView.editing == false {
+        if tableView.isEditing == false {
             return
         }
         
         // 到发布页面
-        let selectionFilePath = "\(audioStoreDirectory!)\(audioFileNameList![indexPath.row])"
-        self.showViewController(SECEditNewReadingViewController.instanceFromSB(selectionFilePath), sender: nil)
+        let selectionFilePath = "\(audioStoreDirectory!)\(audioFileNameList![(indexPath as NSIndexPath).row])"
+        self.show(SECEditNewReadingViewController.instanceFromSB(selectionFilePath), sender: nil)
     }
     
-    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
         
-        return UITableViewCellEditingStyle.Delete
+        return UITableViewCellEditingStyle.delete
     }
     
     // MARK: - SECAudioFileTableViewCellDelegate
     
-    func clickPlayAudioButtonIn(cell: SECAudioFileTableViewCell) {
+    func clickPlayAudioButtonIn(_ cell: SECAudioFileTableViewCell) {
         
         let cellBounds = cell.bounds
-        let cellCenter = cell.convertPoint(CGPointMake(CGRectGetMidX(cellBounds), CGRectGetMidY(cellBounds)), toView: self.tableView)
-        let cellIndexPath = self.tableView.indexPathForRowAtPoint(cellCenter)
+        let cellCenter = cell.convert(CGPoint(x: cellBounds.midX, y: cellBounds.midY), to: self.tableView)
+        let cellIndexPath = self.tableView.indexPathForRow(at: cellCenter)
         if cellIndexPath == nil {
             return
         }
         
         if playingAudioIndex != nil {
-            if cellIndexPath!.row == playingAudioIndex!.integerValue {
+            if (cellIndexPath! as NSIndexPath).row == playingAudioIndex!.intValue {
                 if audioPlayer != nil {
-                    if audioPlayer!.playing {
+                    if audioPlayer!.isPlaying {
                         audioPlayer!.pause()
                         cell.isPlaying = false
                     } else {
@@ -241,50 +241,50 @@ class SECAudioFileListViewController: UITableViewController, AVAudioPlayerDelega
         audioPlayer?.stop()
         
         if playingAudioIndex != nil {
-            let lastPlayCell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: playingAudioIndex!.integerValue, inSection: 0)) as? SECAudioFileTableViewCell
+            let lastPlayCell = tableView.cellForRow(at: IndexPath(row: playingAudioIndex!.intValue, section: 0)) as? SECAudioFileTableViewCell
             lastPlayCell?.isPlaying = false
             playingAudioIndex = nil
         }
         
-        let playAudioFilePath = "\(audioStoreDirectory!)\(audioFileNameList![cellIndexPath!.row])"
+        let playAudioFilePath = "\(audioStoreDirectory!)\(audioFileNameList![(cellIndexPath! as NSIndexPath).row])"
         
         do {
             
             // 创建新的播放器
-            try audioPlayer = AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: playAudioFilePath))
+            try audioPlayer = AVAudioPlayer(contentsOf: URL(fileURLWithPath: playAudioFilePath))
             audioPlayer!.delegate = self
             
             audioPlayer!.prepareToPlay()
             audioPlayer!.play()
             
             cell.isPlaying = true
-            playingAudioIndex = NSNumber(integer: cellIndexPath!.row)
+            playingAudioIndex = NSNumber(value: (cellIndexPath! as NSIndexPath).row as Int)
             
         } catch let error as NSError {
             
             print("Fail to init AVAudioPlayer, error:\(error.localizedDescription)")
             
-            let alert = UIAlertController(title: nil, message: "出故障了, 请联系 App 运营人员", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            let alert = UIAlertController(title: nil, message: "出故障了, 请联系 App 运营人员", preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
     // MARK: - AVAudioPlayerDelegate
     
-    func audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
+    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         
         if playingAudioIndex != nil {
-            let lastPlayCell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: playingAudioIndex!.integerValue, inSection: 0)) as? SECAudioFileTableViewCell
+            let lastPlayCell = tableView.cellForRow(at: IndexPath(row: playingAudioIndex!.intValue, section: 0)) as? SECAudioFileTableViewCell
             lastPlayCell?.isPlaying = false
             playingAudioIndex = nil
         }
     }
     
-    func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         
         if playingAudioIndex != nil {
-            let lastPlayCell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: playingAudioIndex!.integerValue, inSection: 0)) as? SECAudioFileTableViewCell
+            let lastPlayCell = tableView.cellForRow(at: IndexPath(row: playingAudioIndex!.intValue, section: 0)) as? SECAudioFileTableViewCell
             lastPlayCell?.isPlaying = false
             playingAudioIndex = nil
         }

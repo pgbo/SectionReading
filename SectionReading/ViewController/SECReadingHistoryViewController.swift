@@ -9,6 +9,26 @@
 import UIKit
 import AVFoundation
 import UITableView_FDTemplateLayoutCell
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 /**
  *  读书纪录列表页面
@@ -16,38 +36,38 @@ import UITableView_FDTemplateLayoutCell
  */
 class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryTableViewCellDelegate, AVAudioPlayerDelegate {
 
-    private var readings: [TReading]?
+    fileprivate var readings: [TReading]?
     
-    private lazy var mNewRecordBarItem: UIBarButtonItem = {
-        let item = UIBarButtonItem(title: "新建", style: UIBarButtonItemStyle.Plain, target: self, action: "toAddNewRecord")
+    fileprivate lazy var mNewRecordBarItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(title: "新建", style: UIBarButtonItemStyle.plain, target: self, action: #selector(SECReadingHistoryViewController.toAddNewRecord))
         return item
     }()
     
-    private lazy var mSettingBarItem: UIBarButtonItem = {
-        let item = UIBarButtonItem(title: "设置", style: UIBarButtonItemStyle.Plain, target: self, action: "toSetting")
+    fileprivate lazy var mSettingBarItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(title: "设置", style: UIBarButtonItemStyle.plain, target: self, action: #selector(SECReadingHistoryViewController.toSetting))
         return item
     }()
     
-    private lazy var mEvernoteManager: SECEvernoteManager = {
-        return (UIApplication.sharedApplication().delegate as! SECAppDelegate).evernoteManager
+    fileprivate lazy var mEvernoteManager: SECEvernoteManager = {
+        return (UIApplication.shared.delegate as! SECAppDelegate).evernoteManager
     }()
     
-    private var audioPlayer: AVAudioPlayer?
+    fileprivate var audioPlayer: AVAudioPlayer?
     
     // 正在播放的音频索引，为空表示没有正在播放的音频
-    private var playingAudioIndex: NSNumber?
-    private var willPlayAudioIndex: NSNumber?
+    fileprivate var playingAudioIndex: NSNumber?
+    fileprivate var willPlayAudioIndex: NSNumber?
     
     class func instanceFromSB() -> SECReadingHistoryViewController {
-        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewControllerWithIdentifier("SECReadingHistoryViewController") as! SECReadingHistoryViewController
+        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewController(withIdentifier: "SECReadingHistoryViewController") as! SECReadingHistoryViewController
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
     
     override init(style: UITableViewStyle) {
-        super.init(style: UITableViewStyle.Grouped)
+        super.init(style: UITableViewStyle.grouped)
     }
   
     required init?(coder aDecoder: NSCoder) {
@@ -58,14 +78,14 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
        
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "recvEvernoteManagerSycnDownStateDidChangeNote:", name: SECEvernoteManagerSycnDownStateDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SECReadingHistoryViewController.recvEvernoteManagerSycnDownStateDidChangeNote(_:)), name: NSNotification.Name(rawValue: SECEvernoteManagerSycnDownStateDidChangeNotification), object: nil)
         
         self.navigationItem.title = "读书记录"
         self.navigationItem.leftBarButtonItem = self.mNewRecordBarItem
         self.navigationItem.rightBarButtonItem = self.mSettingBarItem
         
         self.refreshControl = UIRefreshControl()
-        self.refreshControl?.addTarget(self, action: "refresh", forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl?.addTarget(self, action: #selector(SECReadingHistoryViewController.refresh), for: UIControlEvents.valueChanged)
         
         self.refreshControl?.beginRefreshing()
         TReading.filterByOption(nil, completion: { [weak self] (results) -> Void in
@@ -80,10 +100,10 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: SECEvernoteManagerSycnDownStateDidChangeNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: SECEvernoteManagerSycnDownStateDidChangeNotification), object: nil)
     }
     
-    @objc private func refresh() {
+    @objc fileprivate func refresh() {
     
         TReading.filterByOption(nil, completion: { [weak self] (results) -> Void in
             if let strongSelf = self {
@@ -96,15 +116,15 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
             })
     }
     
-    @objc private func recvEvernoteManagerSycnDownStateDidChangeNote(note: NSNotification) {
+    @objc fileprivate func recvEvernoteManagerSycnDownStateDidChangeNote(_ note: Notification) {
         
         print("recv SECEvernoteManagerSycnDownStateDidChangeNotification.")
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             
             if self.navigationController?.topViewController != self {
-                let currentSyncDownState = note.userInfo?[SECEvernoteManagerNotificationSycnDownStateItem] as? Bool
-                let syncDownNumber = note.userInfo?[SECEvernoteManagerNotificationSuccessSycnDownNoteCountItem] as? Int
+                let currentSyncDownState = (note as NSNotification).userInfo?[SECEvernoteManagerNotificationSycnDownStateItem] as? Bool
+                let syncDownNumber = (note as NSNotification).userInfo?[SECEvernoteManagerNotificationSuccessSycnDownNoteCountItem] as? Int
                 if currentSyncDownState == false && syncDownNumber > 0 {
                     TReading.filterByOption(nil, completion: { [weak self] (results) -> Void in
                         if let strongSelf = self {
@@ -122,32 +142,32 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
         super.didReceiveMemoryWarning()
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
     
-    @objc private func toAddNewRecord() {
+    @objc fileprivate func toAddNewRecord() {
         
         let nav = UINavigationController(rootViewController: SECNewReadingViewController.instanceFromSB())
-        self.presentViewController(nav, animated: true, completion: nil)
+        self.present(nav, animated: true, completion: nil)
     }
     
-    @objc private func toSetting() {
+    @objc fileprivate func toSetting() {
        
-        self.navigationController?.showViewController(SECSettingViewController.instanceFromSB(), sender: nil)
+        self.navigationController?.show(SECSettingViewController.instanceFromSB(), sender: nil)
     }
     
 
     // MARK: - Table view data source
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return readings != nil ?readings!.count :0
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     
-        let cell = tableView.dequeueReusableCellWithIdentifier("SECReadingHistoryTableViewCell", forIndexPath: indexPath) as! SECReadingHistoryTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "SECReadingHistoryTableViewCell", for: indexPath) as! SECReadingHistoryTableViewCell
         cell.delegate = self
         
         configureCell(cell, atIndexPath: indexPath)
@@ -155,46 +175,46 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
         return cell
     }
     
-    private func configureCell(cell: SECReadingHistoryTableViewCell, atIndexPath indexPath: NSIndexPath) {
+    fileprivate func configureCell(_ cell: SECReadingHistoryTableViewCell, atIndexPath indexPath: IndexPath) {
     
-        let reading = readings![indexPath.row]
+        let reading = readings![(indexPath as NSIndexPath).row]
         cell.configure(withReading: reading)
     }
     
     // MARK: -  UITableViewDelegate
     
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0.1
     }
     
-    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0.1
     }
     
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        return tableView.fd_heightForCellWithIdentifier("SECReadingHistoryTableViewCell", cacheByIndexPath: indexPath, configuration: { (cell) -> Void in
+        return tableView.fd_heightForCell(withIdentifier: "SECReadingHistoryTableViewCell", cacheBy: indexPath, configuration: { (cell) -> Void in
             self.configureCell(cell as! SECReadingHistoryTableViewCell, atIndexPath: indexPath)
         })
     }
     
     // MARK: - SECReadingHistoryTableViewCellDelegate
     
-    func clickEditButtonIn(cell: SECReadingHistoryTableViewCell) {
+    func clickEditButtonIn(_ cell: SECReadingHistoryTableViewCell) {
         
         print("clickEditButtonIn.")
         // TODO: 到编辑页面
     }
     
-    func clickTrashButtonIn(cell: SECReadingHistoryTableViewCell) {
+    func clickTrashButtonIn(_ cell: SECReadingHistoryTableViewCell) {
         
         print("clickTrashButtonIn.")
         let indexPath = indexPathOfCell(cell)
         if indexPath != nil {
-            if let reading = readings?[indexPath!.row] {
+            if let reading = readings?[(indexPath! as NSIndexPath).row] {
                 
-                self.readings?.removeAtIndex(indexPath!.row)
-                self.tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: indexPath!.row, inSection: 0)], withRowAnimation: UITableViewRowAnimation.Fade)
+                self.readings?.remove(at: (indexPath! as NSIndexPath).row)
+                self.tableView.deleteRows(at: [IndexPath(row: (indexPath! as NSIndexPath).row, section: 0)], with: UITableViewRowAnimation.fade)
                 
                 if reading.fEvernoteGuid != nil {
                     mEvernoteManager.deleteNote(withGuid: reading.fEvernoteGuid!, completion: { (success) -> Void in
@@ -209,18 +229,18 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
         }
     }
     
-    func clickShareButtonIn(cell: SECReadingHistoryTableViewCell) {
+    func clickShareButtonIn(_ cell: SECReadingHistoryTableViewCell) {
         
         print("clickShareButtonIn.")
         let indexPath = indexPathOfCell(cell)
         if indexPath != nil {
-            if let reading = readings?[indexPath!.row] {
-                self.navigationController?.showViewController(SECShareReadingViewController.instanceFromSB(withShareReadingLocalId: reading.fLocalId!), sender: nil)
+            if let reading = readings?[(indexPath! as NSIndexPath).row] {
+                self.navigationController?.show(SECShareReadingViewController.instanceFromSB(withShareReadingLocalId: reading.fLocalId!), sender: nil)
             }
         }
     }
     
-    func clickPlayAudioButtonIn(cell: SECReadingHistoryTableViewCell) {
+    func clickPlayAudioButtonIn(_ cell: SECReadingHistoryTableViewCell) {
     
         print("clickPlayAudioButtonIn.")
         let cellIndexPath = indexPathOfCell(cell)
@@ -229,9 +249,9 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
         }
         
         if playingAudioIndex != nil {
-            if cellIndexPath!.row == playingAudioIndex!.integerValue {
+            if (cellIndexPath! as NSIndexPath).row == playingAudioIndex!.intValue {
                 if audioPlayer != nil {
-                    if audioPlayer!.playing {
+                    if audioPlayer!.isPlaying {
                         audioPlayer!.pause()
                         cell.isPlaying = false
                     } else {
@@ -243,11 +263,11 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
             }
         }
         
-        let reading = self.readings![cellIndexPath!.row]
+        let reading = self.readings![(cellIndexPath! as NSIndexPath).row]
         let playAudioFilePath = reading.fLocalAudioFilePath
         if playAudioFilePath != nil {
             
-            self.willPlayAudioIndex = NSNumber(integer: cellIndexPath!.row)
+            self.willPlayAudioIndex = NSNumber(value: (cellIndexPath! as NSIndexPath).row as Int)
             self.playReadingAudio(cellIndexPath!, withAudioFilePath: playAudioFilePath!)
             
         } else {
@@ -260,7 +280,7 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
                return
             }
             
-            self.willPlayAudioIndex = NSNumber(integer: cellIndexPath!.row)
+            self.willPlayAudioIndex = NSNumber(value: (cellIndexPath! as NSIndexPath).row as Int)
             self.mEvernoteManager.getResource(withResourceGuid: audioResorceGuid!, completion: { [weak self] (data) -> Void in
                 if let strongSelf = self {
                     if data == nil {
@@ -269,11 +289,11 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
                     if strongSelf.willPlayAudioIndex == nil {
                         return
                     }
-                    if strongSelf.willPlayAudioIndex!.integerValue == cellIndexPath!.row {
+                    if strongSelf.willPlayAudioIndex!.intValue == (cellIndexPath! as NSIndexPath).row {
                         // 保存到本地
                         let readingRecordDir = SECHelper.readingRecordStoreDirectory()
-                        let newAudioFilePath = readingRecordDir?.stringByAppendingString("\(NSUUID().UUIDString).caf")
-                        if (NSFileManager.defaultManager().createFileAtPath(newAudioFilePath!, contents: data, attributes: nil)) {
+                        let newAudioFilePath = (readingRecordDir)! + "\(UUID().uuidString).caf"
+                        if (FileManager.default.createFile(atPath: newAudioFilePath, contents: data as Data?, attributes: nil)) {
                             // 更新本地记录
                             let updateOption = ReadingQueryOption()
                             updateOption.localId = reading.fLocalId
@@ -281,7 +301,7 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
                                 readingtoUpdate.fLocalAudioFilePath = newAudioFilePath
                             })
                             // 播放
-                            strongSelf.playReadingAudio(cellIndexPath!, withAudioFilePath: newAudioFilePath!)
+                            strongSelf.playReadingAudio(cellIndexPath!, withAudioFilePath: newAudioFilePath)
                         }
                     }
                 }
@@ -289,10 +309,10 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
         }
     }
     
-    private func playReadingAudio(atIndexPath: NSIndexPath, withAudioFilePath audioFilePath: String) {
+    fileprivate func playReadingAudio(_ atIndexPath: IndexPath, withAudioFilePath audioFilePath: String) {
         
         if playingAudioIndex != nil {
-            if atIndexPath.row == playingAudioIndex!.integerValue {
+            if (atIndexPath as NSIndexPath).row == playingAudioIndex!.intValue {
                 return
             }
         }
@@ -300,7 +320,7 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
         audioPlayer?.stop()
         
         if playingAudioIndex != nil {
-            let lastPlayCell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: playingAudioIndex!.integerValue, inSection: 0)) as? SECAudioFileTableViewCell
+            let lastPlayCell = tableView.cellForRow(at: IndexPath(row: playingAudioIndex!.intValue, section: 0)) as? SECAudioFileTableViewCell
             lastPlayCell?.isPlaying = false
             playingAudioIndex = nil
         }
@@ -308,14 +328,14 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
         do {
             
             // 创建新的播放器
-            try audioPlayer = AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: audioFilePath))
+            try audioPlayer = AVAudioPlayer(contentsOf: URL(fileURLWithPath: audioFilePath))
             audioPlayer!.delegate = self
             
             audioPlayer!.prepareToPlay()
             audioPlayer!.play()
             
-            (self.tableView.cellForRowAtIndexPath(atIndexPath) as? SECAudioFileTableViewCell)?.isPlaying = true
-            playingAudioIndex = NSNumber(integer: atIndexPath.row)
+            (self.tableView.cellForRow(at: atIndexPath) as? SECAudioFileTableViewCell)?.isPlaying = true
+            playingAudioIndex = NSNumber(value: (atIndexPath as NSIndexPath).row as Int)
             
         } catch let error as NSError {
             
@@ -323,28 +343,28 @@ class SECReadingHistoryViewController: UITableViewController, SECReadingHistoryT
         }
     }
     
-    private func indexPathOfCell(cell: UITableViewCell) -> NSIndexPath? {
+    fileprivate func indexPathOfCell(_ cell: UITableViewCell) -> IndexPath? {
         
         let cellBounds = cell.bounds
-        let cellCenter = cell.convertPoint(CGPointMake(CGRectGetMidX(cellBounds), CGRectGetMidY(cellBounds)), toView:self.tableView)
-        return self.tableView.indexPathForRowAtPoint(cellCenter)
+        let cellCenter = cell.convert(CGPoint(x: cellBounds.midX, y: cellBounds.midY), to:self.tableView)
+        return self.tableView.indexPathForRow(at: cellCenter)
     }
     
     // MARK: - AVAudioPlayerDelegate
     
-    func audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
+    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         
         if playingAudioIndex != nil {
-            let lastPlayCell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: playingAudioIndex!.integerValue, inSection: 0)) as? SECAudioFileTableViewCell
+            let lastPlayCell = tableView.cellForRow(at: IndexPath(row: playingAudioIndex!.intValue, section: 0)) as? SECAudioFileTableViewCell
             lastPlayCell?.isPlaying = false
             playingAudioIndex = nil
         }
     }
     
-    func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         
         if playingAudioIndex != nil {
-            let lastPlayCell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: playingAudioIndex!.integerValue, inSection: 0)) as? SECAudioFileTableViewCell
+            let lastPlayCell = tableView.cellForRow(at: IndexPath(row: playingAudioIndex!.intValue, section: 0)) as? SECAudioFileTableViewCell
             lastPlayCell?.isPlaying = false
             playingAudioIndex = nil
         }

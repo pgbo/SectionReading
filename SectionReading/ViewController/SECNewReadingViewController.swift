@@ -12,19 +12,19 @@ import SVProgressHUD
 
 /// 录音音频状态
 enum SECRecordAudioState {
-    case Stopped
-    case Recording
-    case Paused
+    case stopped
+    case recording
+    case paused
 }
 
 /// 播放音频状态
 enum SECPlayAudioState {
-    case Stopped
-    case Playing
-    case Paused
+    case stopped
+    case playing
+    case paused
 }
 
-let MininumRecordAudioSecondsToScissors = NSTimeInterval(3)
+let MininumRecordAudioSecondsToScissors = TimeInterval(3)
 
 /**
  *  建立新读书记录页面
@@ -38,48 +38,48 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     @IBOutlet weak var mResumeRecordButton: UIButton!
     @IBOutlet weak var mScissorsRecordButton: UIButton!
     
-    private lazy var mCancelBarItem: UIBarButtonItem = {
-        let item = UIBarButtonItem(title: "取消", style: UIBarButtonItemStyle.Plain, target: self, action: "toClosePage")
+    fileprivate lazy var mCancelBarItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(title: "取消", style: UIBarButtonItemStyle.plain, target: self, action: #selector(SECNewReadingViewController.toClosePage))
         return item
     }()
     
-    private lazy var mRecordHistoryBarItem: UIBarButtonItem = {
-        let item = UIBarButtonItem(title: "列表", style: UIBarButtonItemStyle.Plain, target: self, action: "toRecordHistory")
+    fileprivate lazy var mRecordHistoryBarItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(title: "列表", style: UIBarButtonItemStyle.plain, target: self, action: #selector(SECNewReadingViewController.toRecordHistory))
         return item
     }()
     
-    private var cutPanel: SECCutPanelView?
+    fileprivate var cutPanel: SECCutPanelView?
     
-    private var cutPanelLeading: NSLayoutConstraint?
-    private var cutPanelTrailing: NSLayoutConstraint?
-    private var cutPanelWidth: NSLayoutConstraint?
-    private var cutPanelHidden = true
+    fileprivate var cutPanelLeading: NSLayoutConstraint?
+    fileprivate var cutPanelTrailing: NSLayoutConstraint?
+    fileprivate var cutPanelWidth: NSLayoutConstraint?
+    fileprivate var cutPanelHidden = true
     
-    private var recordState: SECRecordAudioState = .Stopped
-    private var recordDuration: NSTimeInterval = 0.0
-    private var wheelsLastTimeAngle: CGFloat = 0
-    private var recordTimming: NSTimer?
+    fileprivate var recordState: SECRecordAudioState = .stopped
+    fileprivate var recordDuration: TimeInterval = 0.0
+    fileprivate var wheelsLastTimeAngle: CGFloat = 0
+    fileprivate var recordTimming: Timer?
     
-    private var audioRecorder: AVAudioRecorder?             /** 录音器 */
-    private var currentRecordFilePath: String?              /** 当前录音文件路径 */
+    fileprivate var audioRecorder: AVAudioRecorder?             /** 录音器 */
+    fileprivate var currentRecordFilePath: String?              /** 当前录音文件路径 */
     
     /** 选中的将要剪切的区域 */
-    private var selectedWillScissorsScopeRange: SECRecordRange?
+    fileprivate var selectedWillScissorsScopeRange: SECRecordRange?
     
-    private var audioPlayer: AVAudioPlayer?                 /** 播放器 */
-    private var playState: SECPlayAudioState = .Stopped
-    private var playTimming: NSTimer?
+    fileprivate var audioPlayer: AVAudioPlayer?                 /** 播放器 */
+    fileprivate var playState: SECPlayAudioState = .stopped
+    fileprivate var playTimming: Timer?
     
     /** 录音文件路径片段集合 */
-    private var audioRecordFilePathSnippets: [String] = []
-    private var audioCombiner: SECReadingRecordCombiner?
-    private var audioCropper: SECReadingRecordCropper?
+    fileprivate var audioRecordFilePathSnippets: [String] = []
+    fileprivate var audioCombiner: SECReadingRecordCombiner?
+    fileprivate var audioCropper: SECReadingRecordCropper?
 
     class func instanceFromSB() -> SECNewReadingViewController {
-        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewControllerWithIdentifier("SECNewReadingViewController") as! SECNewReadingViewController
+        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewController(withIdentifier: "SECNewReadingViewController") as! SECNewReadingViewController
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         fatalError("init(nibName:, bundle:) has not been implemented")
     }
 
@@ -96,15 +96,15 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         self.navigationItem.rightBarButtonItem = self.mRecordHistoryBarItem
         
         updateResumeRecordButtonImageForRecordState(recordState)
-        self.mStopRecordButton.enabled = false
-        self.mScissorsRecordButton.enabled = false
+        self.mStopRecordButton.isEnabled = false
+        self.mScissorsRecordButton.isEnabled = false
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    private func createCutPanel() -> SECCutPanelView {
+    fileprivate func createCutPanel() -> SECCutPanelView {
         // 创建 cutPanel
         let cutPanel = SECCutPanelView.instanceFromNib()
         self.view.addSubview(cutPanel)
@@ -114,39 +114,39 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         cutPanel.translatesAutoresizingMaskIntoConstraints = false
         let views = ["cutPanel": cutPanel]
         
-        self.cutPanelLeading = NSLayoutConstraint(item: cutPanel, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.Leading, multiplier: 1, constant: 0)
+        self.cutPanelLeading = NSLayoutConstraint(item: cutPanel, attribute: NSLayoutAttribute.leading, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.leading, multiplier: 1, constant: 0)
         self.view.addConstraint(self.cutPanelLeading!)
         self.cutPanelLeading?.identifier = "$_cutPanelLeading"
         
-        self.cutPanelTrailing = NSLayoutConstraint(item: cutPanel, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 0)
+        self.cutPanelTrailing = NSLayoutConstraint(item: cutPanel, attribute: NSLayoutAttribute.trailing, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.trailing, multiplier: 1, constant: 0)
         self.view.addConstraint(self.cutPanelTrailing!)
         self.cutPanelTrailing?.identifier = "$_cutPanelTrailing"
         
-        self.cutPanelWidth = NSLayoutConstraint(item: cutPanel, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 0, constant: 0)
+        self.cutPanelWidth = NSLayoutConstraint(item: cutPanel, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 0, constant: 0)
         
-        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:[cutPanel(180)]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[cutPanel(180)]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: views))
         
         return cutPanel
     }
     
-    private func updateResumeRecordButtonImageForRecordState(state: SECRecordAudioState) {
+    fileprivate func updateResumeRecordButtonImageForRecordState(_ state: SECRecordAudioState) {
         switch state {
-        case .Stopped, .Paused:
+        case .stopped, .paused:
             let buttonImage = UIImage(named: "ResumeRecordButton")
             let buttonImageHL = UIImage(named: "ResumeRecordButtonHL")
             
-            mResumeRecordButton.setImage(buttonImage, forState: UIControlState.Normal)
-            mResumeRecordButton.setImage(buttonImageHL, forState: UIControlState.Highlighted)
-        case .Recording:
+            mResumeRecordButton.setImage(buttonImage, for: UIControlState())
+            mResumeRecordButton.setImage(buttonImageHL, for: UIControlState.highlighted)
+        case .recording:
             let buttonImage = UIImage(named: "PauseRecordButton")
             let buttonImageHL = UIImage(named: "PauseRecordButtonHL")
             
-            mResumeRecordButton.setImage(buttonImage, forState: UIControlState.Normal)
-            mResumeRecordButton.setImage(buttonImageHL, forState: UIControlState.Highlighted)
+            mResumeRecordButton.setImage(buttonImage, for: UIControlState())
+            mResumeRecordButton.setImage(buttonImageHL, for: UIControlState.highlighted)
         }
     }
     
-    private func activeRecordAudioSession() -> Bool {
+    fileprivate func activeRecordAudioSession() -> Bool {
         
         var error: NSError?
         do {
@@ -173,18 +173,18 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         return true
     }
     
-    private func randomObtainTemporaryAudioFilePath() -> String {
-        return NSTemporaryDirectory().stringByAppendingString("\(NSUUID().UUIDString).caf")
+    fileprivate func randomObtainTemporaryAudioFilePath() -> String {
+        return NSTemporaryDirectory() + "\(UUID().uuidString).caf"
     }
     
-    private func randomReadingRecordCompletedFilePath() -> String? {
+    fileprivate func randomReadingRecordCompletedFilePath() -> String? {
         let readingRecordDir = SECHelper.readingRecordStoreDirectory()
-        return readingRecordDir?.stringByAppendingString("\(NSUUID().UUIDString).caf")
+        return (readingRecordDir)! + "\(UUID().uuidString).caf"
     }
     
-    private func resumeRecord() {
+    fileprivate func resumeRecord() {
         
-        if recordState == .Recording {
+        if recordState == .recording {
             return
         }
         
@@ -193,16 +193,16 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             return
         }
         
-        if recordState == .Paused {
+        if recordState == .paused {
             audioRecorder?.record()
             
-        } else if recordState == .Stopped {
+        } else if recordState == .stopped {
         
-            let settings = [AVFormatIDKey:NSNumber(unsignedInt: kAudioFormatALaw), AVSampleRateKey:NSNumber(int: 44100), AVNumberOfChannelsKey:NSNumber(int:1)]
+            let settings = [AVFormatIDKey:NSNumber(value: kAudioFormatALaw as UInt32), AVSampleRateKey:NSNumber(value: 44100 as Int32), AVNumberOfChannelsKey:NSNumber(value: 1 as Int32)]
             
             do {
                 let audioFilePath = randomObtainTemporaryAudioFilePath()
-                audioRecorder = try AVAudioRecorder(URL: NSURL(fileURLWithPath: audioFilePath), settings: settings)
+                audioRecorder = try AVAudioRecorder(url: URL(fileURLWithPath: audioFilePath), settings: settings)
                 
                 currentRecordFilePath = audioFilePath
                 
@@ -218,44 +218,44 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             }
         }
         
-        recordState = .Recording
+        recordState = .recording
         resumedRecord()
     }
     
-    private func pauseRercord() {
-        if recordState == .Recording {
+    fileprivate func pauseRercord() {
+        if recordState == .recording {
             audioRecorder?.pause()
             
-            recordState = .Paused
+            recordState = .paused
             pausedRecord()
         }
     }
     
-    private func resumedRecord() {
+    fileprivate func resumedRecord() {
         
-        updateResumeRecordButtonImageForRecordState(.Recording)
+        updateResumeRecordButtonImageForRecordState(.recording)
         
-        if self.mStopRecordButton.enabled == false {
-            self.mStopRecordButton.enabled = true
+        if self.mStopRecordButton.isEnabled == false {
+            self.mStopRecordButton.isEnabled = true
         }
         
         // 恢复计时并转动轮子
-        recordTimming = NSTimer(timeInterval: 0.1, target: self, selector: "firedRecordTimming", userInfo: nil, repeats: true)
-        NSRunLoop.mainRunLoop().addTimer(recordTimming!, forMode: NSRunLoopCommonModes)
+        recordTimming = Timer(timeInterval: 0.1, target: self, selector: #selector(SECNewReadingViewController.firedRecordTimming), userInfo: nil, repeats: true)
+        RunLoop.main.add(recordTimming!, forMode: RunLoopMode.commonModes)
     }
     
-    private func pausedRecord() {
+    fileprivate func pausedRecord() {
         
-        updateResumeRecordButtonImageForRecordState(.Paused)
+        updateResumeRecordButtonImageForRecordState(.paused)
         
         // 停止计时和转动轮子
         recordTimming?.invalidate()
     }
     
-    private func stoppedRecord() {
+    fileprivate func stoppedRecord() {
         
         recordTimming?.invalidate()
-        updateResumeRecordButtonImageForRecordState(.Stopped)
+        updateResumeRecordButtonImageForRecordState(.stopped)
         
         let recordSnippetCount = audioRecordFilePathSnippets.count
         
@@ -274,7 +274,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
                 self.showPublishAlertViewForReadingRecordFilePath(recordCompletedFilePath!)
             } else {
                 // 提示失败
-                SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
+                SVProgressHUD.showError(withStatus: "出故障了, 请联系 App 运营人员")
             }
             
             return
@@ -285,20 +285,20 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         audioCombiner = SECReadingRecordCombiner(sourceAudioFilePaths: audioRecordFilePathSnippets, destinationFilePath: combineAudioFilePath)
         
         // 开始模态等待合成
-        SVProgressHUD.showWithStatus("")
+        SVProgressHUD.show(withStatus: "")
         audioCombiner!.combineWithCompletion({ (success) -> Void in
             
             if success == false {
-                SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
+                SVProgressHUD.showError(withStatus: "出故障了, 请联系 App 运营人员")
                 return
             }
             
             // 删除原来的录音片段
-            let fileMan = NSFileManager.defaultManager()
+            let fileMan = FileManager.default
             for snippetFilePath in self.audioRecordFilePathSnippets {
                 if snippetFilePath != combineAudioFilePath {
                     do {
-                        try fileMan.removeItemAtPath(snippetFilePath)
+                        try fileMan.removeItem(atPath: snippetFilePath)
                     } catch let error as NSError {
                         print("Fail to remove file item:\(snippetFilePath), error:\(error.localizedDescription)")
                     }
@@ -320,7 +320,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
                 self.showPublishAlertViewForReadingRecordFilePath(recordCompletedFilePath!)
             } else {
                 // 提示失败
-                SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
+                SVProgressHUD.showError(withStatus: "出故障了, 请联系 App 运营人员")
             }
         })
     }
@@ -328,18 +328,18 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     /**
      * 弹出马上发布的提示
      */
-    private func showPublishAlertViewForReadingRecordFilePath(filePath: String) {
+    fileprivate func showPublishAlertViewForReadingRecordFilePath(_ filePath: String) {
         
         // 弹出发布提示框
-        let alertVC = UIAlertController(title: nil, message: "您录制了一段读书录音，是否现在发布？", preferredStyle: UIAlertControllerStyle.Alert)
+        let alertVC = UIAlertController(title: nil, message: "您录制了一段读书录音，是否现在发布？", preferredStyle: UIAlertControllerStyle.alert)
         
-        alertVC.addAction(UIAlertAction(title: "否", style: UIAlertActionStyle.Cancel, handler: nil))
+        alertVC.addAction(UIAlertAction(title: "否", style: UIAlertActionStyle.cancel, handler: nil))
         
-        alertVC.addAction(UIAlertAction(title: "去发布", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
-            self.navigationController?.showViewController(SECEditNewReadingViewController.instanceFromSB(filePath), sender: nil)
+        alertVC.addAction(UIAlertAction(title: "去发布", style: UIAlertActionStyle.default, handler: { (action) -> Void in
+            self.navigationController?.show(SECEditNewReadingViewController.instanceFromSB(filePath), sender: nil)
         }))
         
-        self.presentViewController(alertVC, animated: true, completion: nil)
+        self.present(alertVC, animated: true, completion: nil)
     }
     
     /**
@@ -347,13 +347,13 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
      *
      *  @return   是否成功
      */
-    private func moveIntoRecordAudioIntoCompletedRecordFileFromTempFilePath(tmpFilePath: String) -> String? {
+    fileprivate func moveIntoRecordAudioIntoCompletedRecordFileFromTempFilePath(_ tmpFilePath: String) -> String? {
         
         let recordCompletedFilePath = self.randomReadingRecordCompletedFilePath()
         if recordCompletedFilePath != nil {
 
             do {
-                try NSFileManager.defaultManager().moveItemAtPath(tmpFilePath, toPath: recordCompletedFilePath!)
+                try FileManager.default.moveItem(atPath: tmpFilePath, toPath: recordCompletedFilePath!)
             } catch (let error as NSError) {
                 print("Fail move file, error: \(error.localizedDescription)")
                 return nil
@@ -363,12 +363,12 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         return recordCompletedFilePath
     }
     
-    private func cutPanelHidden(hidden: Bool, animated: Bool) {
+    fileprivate func cutPanelHidden(_ hidden: Bool, animated: Bool) {
         
         let blockFunc = { [weak self] (hidden: Bool) -> Void in
             if let strongSelf = self {
                 if hidden {
-                    let viewWidth = CGRectGetWidth(strongSelf.view.bounds)
+                    let viewWidth = strongSelf.view.bounds.width
                     strongSelf.cutPanelLeading?.constant = viewWidth
                     
                     if strongSelf.cutPanelTrailing != nil {
@@ -395,7 +395,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         
         if animated {
             self.view.layoutIfNeeded()
-            UIView.animateWithDuration(0.4, animations: { [weak self] () -> Void in
+            UIView.animate(withDuration: 0.4, animations: { [weak self] () -> Void in
                 if let strongSelf = self {
                     blockFunc(hidden)
                     strongSelf.view.layoutIfNeeded()
@@ -411,9 +411,9 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         }
     }
     
-    @objc private func firedRecordTimming() {
+    @objc fileprivate func firedRecordTimming() {
         
-        if recordState == .Recording {
+        if recordState == .recording {
             
             // 计时
             recordDuration += 0.1
@@ -423,7 +423,7 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             
             // 转动轮子
             let newWheelAngle = wheelsLastTimeAngle + CGFloat((2.0*M_PI)/4.0)
-            let newTransform = CGAffineTransformMakeRotation(newWheelAngle)
+            let newTransform = CGAffineTransform(rotationAngle: newWheelAngle)
             self.mFirstWheel.transform = newTransform
             self.mSecondWheel.transform = newTransform
             
@@ -431,12 +431,12 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             
             // 恢复剪切按钮状态
             if recordDuration > MininumRecordAudioSecondsToScissors {
-                self.mScissorsRecordButton.enabled = true
+                self.mScissorsRecordButton.isEnabled = true
             }
         }
     }
     
-    @objc private func firedPlayTimming() {
+    @objc fileprivate func firedPlayTimming() {
         
         if audioPlayer != nil {
             var selectedRecordRange = selectedWillScissorsScopeRange
@@ -446,8 +446,8 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             
             let audioDuration = audioPlayer!.duration
             
-            let selectScopeAudioDuration = NSTimeInterval(selectedRecordRange!.length) * audioDuration
-            let playerCurrentTimeAtSelectScope = audioPlayer!.currentTime - NSTimeInterval(selectedRecordRange!.location) * audioDuration
+            let selectScopeAudioDuration = TimeInterval(selectedRecordRange!.length) * audioDuration
+            let playerCurrentTimeAtSelectScope = audioPlayer!.currentTime - TimeInterval(selectedRecordRange!.location) * audioDuration
             
             var playProgress = CGFloat((playerCurrentTimeAtSelectScope)/selectScopeAudioDuration)
             if playProgress > 1 {
@@ -457,34 +457,34 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         }
     }
     
-    @objc private func toClosePage() {
+    @objc fileprivate func toClosePage() {
         // 弹出退出确认提示
-        let alert = UIAlertController(title: nil, message: "确定要退出本次读书录音吗?", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "退出", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
-            self.dismissViewControllerAnimated(true, completion: nil)
+        let alert = UIAlertController(title: nil, message: "确定要退出本次读书录音吗?", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "退出", style: UIAlertActionStyle.default, handler: { (action) -> Void in
+            self.dismiss(animated: true, completion: nil)
         }))
-        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
-        presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
-    @objc private func toRecordHistory() {
+    @objc fileprivate func toRecordHistory() {
         
         // 暂停录音
         pauseRercord()
         
         // 暂停播放
         audioPlayer?.pause()
-        playState = .Paused
+        playState = .paused
         
         // 关闭播放定时器
         playTimming?.invalidate()
         
         cutPanel?.isPlaying = false
         
-        self.showViewController(SECAudioFileListViewController.instanceFromSB(), sender: nil)
+        self.show(SECAudioFileListViewController.instanceFromSB(), sender: nil)
     }
     
-    @IBAction func clickedScissorsRecordButton(sender: UIButton) {
+    @IBAction func clickedScissorsRecordButton(_ sender: UIButton) {
         
         if cutPanelHidden {
             
@@ -494,10 +494,10 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
                     
                     // 重置播放器
                     self.audioPlayer?.stop()
-                    self.playState = .Stopped
+                    self.playState = .stopped
                     
                     // 创建新的播放器
-                    try self.audioPlayer = AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: audioFilePath))
+                    try self.audioPlayer = AVAudioPlayer(contentsOf: URL(fileURLWithPath: audioFilePath))
                     self.audioPlayer?.delegate = self
                     
                     self.audioPlayer?.prepareToPlay()
@@ -506,9 +506,9 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
                     
                     print("Fail to init AVAudioPlayer, error:\(error.localizedDescription)")
                     
-                    let alert = UIAlertController(title: nil, message: "出故障了, 请联系 App 运营人员", preferredStyle: UIAlertControllerStyle.Alert)
-                    alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.Default, handler: nil))
-                    self.presentViewController(alert, animated: true, completion: nil)
+                    let alert = UIAlertController(title: nil, message: "出故障了, 请联系 App 运营人员", preferredStyle: UIAlertControllerStyle.alert)
+                    alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.default, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
                     
                     return
                 }
@@ -532,9 +532,9 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             
             // 停止录音
             audioRecorder?.stop()
-            recordState = .Stopped
+            recordState = .stopped
             recordTimming?.invalidate()
-            updateResumeRecordButtonImageForRecordState(.Stopped)
+            updateResumeRecordButtonImageForRecordState(.stopped)
             self.currentRecordFilePath = nil
             
             // 添加到录音片段
@@ -547,20 +547,20 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             audioCombiner = SECReadingRecordCombiner(sourceAudioFilePaths: audioRecordFilePathSnippets, destinationFilePath: combineAudioFilePath)
             
             // 开始模态等待合成
-            SVProgressHUD.showWithStatus("")
+            SVProgressHUD.show(withStatus: "")
             audioCombiner!.combineWithCompletion({ (success) -> Void in
                 
                 if success == false {
-                    SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
+                    SVProgressHUD.showError(withStatus: "出故障了, 请联系 App 运营人员")
                     return
                 }
                 
                 // 删除原来的录音片段
-                let fileMan = NSFileManager.defaultManager()
+                let fileMan = FileManager.default
                 for snippetFilePath in self.audioRecordFilePathSnippets {
                     if snippetFilePath != combineAudioFilePath {
                         do {
-                            try fileMan.removeItemAtPath(snippetFilePath)
+                            try fileMan.removeItem(atPath: snippetFilePath)
                         } catch let error as NSError {
                             print("Fail to remove file item:\(snippetFilePath), error:\(error.localizedDescription)")
                         }
@@ -578,27 +578,27 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         }
     }
     
-    @IBAction func clickedResumeRecordButton(sender: UIButton) {
+    @IBAction func clickedResumeRecordButton(_ sender: UIButton) {
         
         switch recordState {
-        case .Stopped, .Paused:
+        case .stopped, .paused:
             
             resumeRecord()
             
-        case .Recording:
+        case .recording:
             
             pauseRercord()
         }
     }
     
-    @IBAction func clickedStopRecordButton(sender: UIButton) {
+    @IBAction func clickedStopRecordButton(_ sender: UIButton) {
         
-        if recordState != .Stopped {
+        if recordState != .stopped {
             
             // 停止录音
             audioRecorder?.stop()
             
-            recordState = .Stopped
+            recordState = .stopped
             
             // 添加到录音片段
             if currentRecordFilePath != nil {
@@ -614,16 +614,16 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     // MARK: - SECCutPanelViewDelegate
     
-    func clickedBackButtonOnCutPanel(panel: SECCutPanelView) {
+    func clickedBackButtonOnCutPanel(_ panel: SECCutPanelView) {
         
         if cutPanelHidden == false {
             cutPanelHidden(true, animated: true)
         }
         
-        if playState == .Playing {
+        if playState == .playing {
             // 暂停播放
             audioPlayer?.pause()
-            playState = .Paused
+            playState = .paused
             
             // 关闭播放定时器
             playTimming?.invalidate()
@@ -632,12 +632,12 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
         }
     }
     
-    func clickedPlayRecordButtonOnCutPanel(panel: SECCutPanelView) {
+    func clickedPlayRecordButtonOnCutPanel(_ panel: SECCutPanelView) {
         
-        if playState == .Playing {
+        if playState == .playing {
             // 暂停播放
             audioPlayer?.pause()
-            playState = .Paused
+            playState = .paused
             
             // 关闭播放定时器
             playTimming?.invalidate()
@@ -648,29 +648,29 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             
             let selectedWillScissorsScopeRange = self.selectedWillScissorsScopeRange
             if selectedWillScissorsScopeRange != nil && audioPlayer != nil {
-                audioPlayer!.currentTime = NSTimeInterval(selectedWillScissorsScopeRange!.location) * audioPlayer!.duration
+                audioPlayer!.currentTime = TimeInterval(selectedWillScissorsScopeRange!.location) * audioPlayer!.duration
                 audioPlayer!.prepareToPlay()
             }
             
             // 开始播放
             audioPlayer?.play()
-            playState = .Playing
+            playState = .playing
             
             // 开启播放定时器
             playTimming?.invalidate()
-            playTimming = NSTimer(timeInterval: 0.5, target: self, selector: "firedPlayTimming", userInfo: nil, repeats: true)
-            NSRunLoop.mainRunLoop().addTimer(playTimming!, forMode: NSRunLoopCommonModes)
+            playTimming = Timer(timeInterval: 0.5, target: self, selector: #selector(SECNewReadingViewController.firedPlayTimming), userInfo: nil, repeats: true)
+            RunLoop.main.add(playTimming!, forMode: RunLoopMode.commonModes)
             
             cutPanel?.isPlaying = true
         }
     }
     
-    func clickedScissorsButtonOnCutPanel(panel: SECCutPanelView) {
+    func clickedScissorsButtonOnCutPanel(_ panel: SECCutPanelView) {
         
         // 弹出剪切提示
-        let alert = UIAlertController(title: "剪辑", message: "确定剪掉选中的录音吗？", preferredStyle: UIAlertControllerStyle.Alert)
+        let alert = UIAlertController(title: "剪辑", message: "确定剪掉选中的录音吗？", preferredStyle: UIAlertControllerStyle.alert)
         
-        alert.addAction(UIAlertAction(title: "确认", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+        alert.addAction(UIAlertAction(title: "确认", style: UIAlertActionStyle.default, handler: { (action) -> Void in
             
             let selectedRange = self.selectedWillScissorsScopeRange
             if selectedRange == nil {
@@ -694,20 +694,20 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
             
             // 重置播放器
             self.audioPlayer?.stop()
-            self.playState = .Stopped
+            self.playState = .stopped
             
             let destinationCroppedFilePath = self.randomObtainTemporaryAudioFilePath()
             self.audioCropper = SECReadingRecordCropper(sourceRecordFilePath: playAudioFilePath!, cropRange: selectedRange!, destinationCroppedFilePath: destinationCroppedFilePath)
             
             // 开始裁切
-            SVProgressHUD.showWithStatus("")
+            SVProgressHUD.show(withStatus: "")
             self.audioCropper!.cropWithCompletion({ (success) -> Void in
                 
                 // 隐藏裁剪框
                 self.cutPanelHidden(true, animated: true)
                 
                 if success == false {
-                    SVProgressHUD.showErrorWithStatus("出故障了, 请联系 App 运营人员")
+                    SVProgressHUD.showError(withStatus: "出故障了, 请联系 App 运营人员")
                     return
                 }
                 
@@ -721,45 +721,45 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
                 self.selectedWillScissorsScopeRange = nil
                 
                 // 更新录音时间
-                let croppedAudioDuration = self.recordDuration * NSTimeInterval(1.0 - selectedRange!.length)
+                let croppedAudioDuration = self.recordDuration * TimeInterval(1.0 - selectedRange!.length)
                 self.recordDuration = croppedAudioDuration
                 self.mRecordDurationLabel.text = SECHelper.createFormatTextForRecordDuration(croppedAudioDuration)
                 if croppedAudioDuration <= MininumRecordAudioSecondsToScissors {
-                    self.mScissorsRecordButton.enabled = false
+                    self.mScissorsRecordButton.isEnabled = false
                 }
             })
         }))
         
-        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler:nil))
+        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.cancel, handler:nil))
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
-    func willSlideScopeHandleOnCutPanel(panel: SECCutPanelView) {
+    func willSlideScopeHandleOnCutPanel(_ panel: SECCutPanelView) {
         
         panel.isPlaying = false
         panel.playProgress = 0
         
-        if playState == .Playing {
+        if playState == .playing {
             audioPlayer?.pause()
-            playState = .Paused
+            playState = .paused
         }
     }
     
-    func selectedScopeOnCutPanel(panel: SECCutPanelView, selectedScopeRange: SECRecordRange) {
+    func selectedScopeOnCutPanel(_ panel: SECCutPanelView, selectedScopeRange: SECRecordRange) {
         
         self.selectedWillScissorsScopeRange = selectedScopeRange
     }
     
     // MARK: - AVAudioRecorderDelegate
     
-    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
 
     }
     
-    func audioRecorderEncodeErrorDidOccur(recorder: AVAudioRecorder, error: NSError?) {
+    func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
         
-        recordState = .Stopped
+        recordState = .stopped
         
         // 添加到录音片段
         if currentRecordFilePath != nil {
@@ -774,16 +774,16 @@ class SECNewReadingViewController: UIViewController, SECCutPanelViewDelegate, AV
     
     // MARK: - AVAudioPlayerDelegate
     
-    func audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
+    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
         
-        playState = .Stopped
+        playState = .stopped
         cutPanel?.isPlaying = false
         playTimming?.invalidate()
     }
     
-    func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         
-        playState = .Stopped
+        playState = .stopped
         cutPanel?.isPlaying = false
         playTimming?.invalidate()
     }

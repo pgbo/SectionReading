@@ -11,10 +11,10 @@ import AVFoundation
 
 /// 录音音频状态
 enum RecordAudioState {
-    case Normal
-    case Recording
-    case RecordPaused
-    case AudioPlaying
+    case normal
+    case recording
+    case recordPaused
+    case audioPlaying
 }
 
 let LimitMinutesPerRecord = 3 /** 每个录音的限制时长，单位：分钟 */
@@ -23,31 +23,31 @@ let PlayRecordButtonTopSpacing = CGFloat(12)
 
 class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTransitioningDelegate, PlayRecordVCDelegate {
     
-    private (set) var recordButtonView: RecordButtonView?
-    private (set) var recordButtonViewCenterY: NSLayoutConstraint?
+    fileprivate (set) var recordButtonView: RecordButtonView?
+    fileprivate (set) var recordButtonViewCenterY: NSLayoutConstraint?
     
-    private (set) var stopRecordButn: UIButton?
-    private (set) var playRecordButn: UIButton?
+    fileprivate (set) var stopRecordButn: UIButton?
+    fileprivate (set) var playRecordButn: UIButton?
     
-    private (set) var fakeCDPlaySlider: CDPlaySlider?
+    fileprivate (set) var fakeCDPlaySlider: CDPlaySlider?
     
-    private var audioRecorder: AVAudioRecorder?
-    private var recordAudioState = RecordAudioState.Normal
-    private var currentRecordFilePath: String?              /** 当前录音文件路径 */
-    private var lastCombineAudioFilePath: String?           /** 上次音频合并的文件路径 */
+    fileprivate var audioRecorder: AVAudioRecorder?
+    fileprivate var recordAudioState = RecordAudioState.normal
+    fileprivate var currentRecordFilePath: String?              /** 当前录音文件路径 */
+    fileprivate var lastCombineAudioFilePath: String?           /** 上次音频合并的文件路径 */
     
 
-    private var recordProcessDisplayLink: CADisplayLink? /** 进度定时器 */
+    fileprivate var recordProcessDisplayLink: CADisplayLink? /** 进度定时器 */
     
-    lazy private var presentRecordPlayTransition:PresentRecordPlayTransition = PresentRecordPlayTransition()
-    lazy private var dismissRecordPlayTransition:DismissRecordPlayTransition = DismissRecordPlayTransition()
+    lazy fileprivate var presentRecordPlayTransition:PresentRecordPlayTransition = PresentRecordPlayTransition()
+    lazy fileprivate var dismissRecordPlayTransition:DismissRecordPlayTransition = DismissRecordPlayTransition()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserverForName(PlayRecordVCBackButtonClickNotification, object: nil, queue: NSOperationQueue.mainQueue()) { (note) -> Void in
-            if self.presentedViewController != nil && self.presentedViewController!.isKindOfClass(PlayRecordVC) {
-                self.dismissViewControllerAnimated(true, completion: nil)
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: PlayRecordVCBackButtonClickNotification), object: nil, queue: OperationQueue.main) { (note) -> Void in
+            if self.presentedViewController != nil && self.presentedViewController!.isKind(of: PlayRecordVC.self) {
+                self.dismiss(animated: true, completion: nil)
             }
         }
         
@@ -57,103 +57,103 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         
         // 设置 recordButtonView
         
-        recordButtonView = RecordButtonView(frame: CGRectMake(0, 0, 220, 220))
+        recordButtonView = RecordButtonView(frame: CGRect(x: 0, y: 0, width: 220, height: 220))
         self.view.addSubview(recordButtonView!)
         
-        recordButtonView?.iconView?.image = UIImage(named: "RecordMicro")?.imageWithRenderingMode(.AlwaysTemplate)
-        recordButtonView?.iconView?.tintColor = UIColor.whiteColor()
+        recordButtonView?.iconView?.image = UIImage(named: "RecordMicro")?.withRenderingMode(.alwaysTemplate)
+        recordButtonView?.iconView?.tintColor = UIColor.white
         recordButtonView?.titleLabel?.text = "开始录音"
         
-        recordButtonView?.button?.addTarget(self, action: "recordButtonViewButtonClick", forControlEvents: UIControlEvents.TouchUpInside)
+        recordButtonView?.button?.addTarget(self, action: #selector(NewRecordVC.recordButtonViewButtonClick), for: UIControlEvents.touchUpInside)
         
         
         recordButtonView?.translatesAutoresizingMaskIntoConstraints = false
         
-        recordButtonViewCenterY = NSLayoutConstraint(item: recordButtonView!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0)
+        recordButtonViewCenterY = NSLayoutConstraint(item: recordButtonView!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0)
         self.view.addConstraint(recordButtonViewCenterY!)
         
-        self.view.addConstraint(NSLayoutConstraint(item: recordButtonView!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: recordButtonView!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         
-        recordButtonView!.addConstraint(NSLayoutConstraint(item: recordButtonView!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 0, constant: 220))
+        recordButtonView!.addConstraint(NSLayoutConstraint(item: recordButtonView!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 0, constant: 220))
         
-        recordButtonView!.addConstraint(NSLayoutConstraint(item: recordButtonView!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
+        recordButtonView!.addConstraint(NSLayoutConstraint(item: recordButtonView!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
         
         
         // 设置 stopRecordButn
         
-        stopRecordButn = UIButton(type: UIButtonType.Custom)
+        stopRecordButn = UIButton(type: UIButtonType.custom)
         self.view.addSubview(stopRecordButn!)
         
         stopRecordButn?.alpha = 0
-        stopRecordButn?.setTitle("停止录音", forState: UIControlState.Normal)
-        stopRecordButn?.backgroundColor = UIColor.clearColor()
-        stopRecordButn?.addTarget(self, action: "stopRecord", forControlEvents: UIControlEvents.TouchUpInside)
-        stopRecordButtonDisabled(stopRecordButn!.enabled == false)
+        stopRecordButn?.setTitle("停止录音", for: UIControlState())
+        stopRecordButn?.backgroundColor = UIColor.clear
+        stopRecordButn?.addTarget(self, action: #selector(NewRecordVC.stopRecord), for: UIControlEvents.touchUpInside)
+        stopRecordButtonDisabled(stopRecordButn!.isEnabled == false)
         
         stopRecordButn?.translatesAutoresizingMaskIntoConstraints = false
         
-        self.view.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: StopRecordButtonTopSpacing))
+        self.view.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: StopRecordButtonTopSpacing))
         
-        self.view.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         
-        stopRecordButn!.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 100))
+        stopRecordButn!.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: 100))
         
-        stopRecordButn!.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 38))
+        stopRecordButn!.addConstraint(NSLayoutConstraint(item: stopRecordButn!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: 38))
         
         
         // 设置 playRecordButn
         
-        playRecordButn = UIButton(type: UIButtonType.Custom)
+        playRecordButn = UIButton(type: UIButtonType.custom)
         self.view.addSubview(playRecordButn!)
         
         playRecordButn?.alpha = 0
-        playRecordButn?.setTitle("播放", forState: UIControlState.Normal)
-        playRecordButn?.backgroundColor = UIColor.clearColor()
-        playRecordButn?.addTarget(self, action: "playRecord", forControlEvents: UIControlEvents.TouchUpInside)
-        playRecordButn?.setTitleColor(UIColor(red:0x6f/255.0, green: 0xa9/255.0, blue: 0xaf/255.0, alpha: 1), forState: UIControlState.Normal)
+        playRecordButn?.setTitle("播放", for: UIControlState())
+        playRecordButn?.backgroundColor = UIColor.clear
+        playRecordButn?.addTarget(self, action: #selector(NewRecordVC.playRecord), for: UIControlEvents.touchUpInside)
+        playRecordButn?.setTitleColor(UIColor(red:0x6f/255.0, green: 0xa9/255.0, blue: 0xaf/255.0, alpha: 1), for: UIControlState())
         roundActionButton(playRecordButn, color: playRecordButn!.currentTitleColor)
         
         playRecordButn?.translatesAutoresizingMaskIntoConstraints = false
         
-        self.view.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: stopRecordButn!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: PlayRecordButtonTopSpacing))
+        self.view.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: stopRecordButn!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: PlayRecordButtonTopSpacing))
         
-        self.view.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         
-        playRecordButn!.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 100))
+        playRecordButn!.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: 100))
         
-        playRecordButn!.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: 38))
+        playRecordButn!.addConstraint(NSLayoutConstraint(item: playRecordButn!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: 38))
         
         
         // 设置 fakeCDPlaySlider
         
-        fakeCDPlaySlider = CDPlaySlider(frame: CGRectMake(0, 0, 220, 220))
+        fakeCDPlaySlider = CDPlaySlider(frame: CGRect(x: 0, y: 0, width: 220, height: 220))
         self.view.addSubview(fakeCDPlaySlider!)
         
-        fakeCDPlaySlider?.backgroundColor = UIColor.clearColor()
+        fakeCDPlaySlider?.backgroundColor = UIColor.clear
         fakeCDPlaySlider?.alpha = 0
         fakeCDPlaySlider?.translatesAutoresizingMaskIntoConstraints = false
         
         // scopeGradientView
         
-        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Top, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
         
-        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Leading, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.leading, relatedBy: NSLayoutRelation.equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.leading, multiplier: 1, constant: 0))
         
-        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0))
         
-        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: fakeCDPlaySlider!, attribute: NSLayoutAttribute.trailing, relatedBy: NSLayoutRelation.equal, toItem: recordButtonView!, attribute: NSLayoutAttribute.trailing, multiplier: 1, constant: 0))
         
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
     
-    override func viewDidDisappear(animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         stopRecord()
     }
 
@@ -175,15 +175,15 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
 //        }
 //    }
     
-    @objc private func recordButtonViewButtonClick() {
+    @objc fileprivate func recordButtonViewButtonClick() {
         switch recordAudioState {
-        case .Normal:
+        case .normal:
             // 开始录音
             startRecord()
-        case .Recording:
+        case .recording:
             // 暂停录音
             pauseRecord()
-        case .RecordPaused:
+        case .recordPaused:
             // 继续录音
             startRecord()
         default:
@@ -191,7 +191,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         }
     }
     
-    private func activeRecordAudioSession() -> Bool {
+    fileprivate func activeRecordAudioSession() -> Bool {
         
         var error: NSError?
         do {
@@ -218,40 +218,40 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         return true
     }
     
-    private func stopRecordButtonDisabled(disabled: Bool) {
+    fileprivate func stopRecordButtonDisabled(_ disabled: Bool) {
         
         var tintColor: UIColor?
         if disabled {
             tintColor = UIColor(red:0x6f/255.0, green: 0xa9/255.0, blue: 0xaf/255.0, alpha: 0.5)
-            stopRecordButn?.setTitleColor(tintColor!, forState: UIControlState.Disabled)
+            stopRecordButn?.setTitleColor(tintColor!, for: UIControlState.disabled)
         } else {
             tintColor = UIColor(red:0x6f/255.0, green: 0xa9/255.0, blue: 0xaf/255.0, alpha: 1)
-            stopRecordButn?.setTitleColor(tintColor!, forState: UIControlState.Normal)
+            stopRecordButn?.setTitleColor(tintColor!, for: UIControlState())
         }
         
         roundActionButton(stopRecordButn, color: tintColor!)
     }
     
-    private func roundActionButton(button: UIButton?, color: UIColor) {
-        button?.layer.borderColor = color.CGColor
+    fileprivate func roundActionButton(_ button: UIButton?, color: UIColor) {
+        button?.layer.borderColor = color.cgColor
         button?.layer.borderWidth = 1.0
         button?.layer.cornerRadius = 8.0
         button?.layer.masksToBounds = true
     }
     
-    private func stopRecordButtonTintColorWithState(state: UIControlState) -> UIColor {
+    fileprivate func stopRecordButtonTintColorWithState(_ state: UIControlState) -> UIColor {
         switch state {
-        case UIControlState.Highlighted:
+        case UIControlState.highlighted:
             return UIColor(red:0x4f/255.0, green: 0x8c/255.0, blue: 0x93/255.0, alpha: 1)
-        case UIControlState.Disabled:
+        case UIControlState.disabled:
             return UIColor(red:0x6f/255.0, green: 0xa9/255.0, blue: 0xaf/255.0, alpha: 0.5)
         default:
             return UIColor(red:0x6f/255.0, green: 0xa9/255.0, blue: 0xaf/255.0, alpha: 1)
         }
     }
     
-    @objc private func recordProgressing() {
-        if audioRecorder != nil && audioRecorder!.recording {
+    @objc fileprivate func recordProgressing() {
+        if audioRecorder != nil && audioRecorder!.isRecording {
             
             // 改变录音 icon 颜色
             if let iconViewTintColor = recordButtonView?.iconView?.tintColor {
@@ -262,20 +262,20 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
                 } else {
                     alpha -= 0.15
                 }
-                recordButtonView?.iconView?.tintColor = recordButtonView?.iconView?.tintColor.colorWithAlphaComponent(alpha)
+                recordButtonView?.iconView?.tintColor = recordButtonView?.iconView?.tintColor.withAlphaComponent(alpha)
             }
             
             // 改变进度
             
-            let progress = audioRecorder!.currentTime/NSTimeInterval(LimitMinutesPerRecord*60)
+            let progress = audioRecorder!.currentTime/TimeInterval(LimitMinutesPerRecord*60)
             recordButtonView?.progressView?.progress = CGFloat(progress)
             
             recordButtonView?.progressView?.progressLabel?.text = "\(Int(audioRecorder!.currentTime))"
         }
     }
     
-    private func startRecord() {
-        if recordAudioState != .Recording {
+    fileprivate func startRecord() {
+        if recordAudioState != .recording {
             
             if activeRecordAudioSession() == false {
                 print("Fail to activeRecordAudioSession.")
@@ -286,11 +286,11 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
 //                audioRecorder = RAQRecorder()
 //                audioRecorder?.audioFilePath = NSTemporaryDirectory().stringByAppendingString("/\(NSUUID().UUIDString).caf")
 //                
-                let settings = [AVFormatIDKey:NSNumber(unsignedInt: kAudioFormatALaw), AVSampleRateKey:NSNumber(int: 44100), AVNumberOfChannelsKey:NSNumber(int:1)]
+                let settings = [AVFormatIDKey:NSNumber(value: kAudioFormatALaw as UInt32), AVSampleRateKey:NSNumber(value: 44100 as Int32), AVNumberOfChannelsKey:NSNumber(value: 1 as Int32)]
                 
                 do {
                     let audioFilePath = randomObtainTemporaryAudioFilePath()
-                    audioRecorder = try AVAudioRecorder(URL: NSURL(fileURLWithPath: audioFilePath), settings: settings)
+                    audioRecorder = try AVAudioRecorder(url: URL(fileURLWithPath: audioFilePath), settings: settings)
                     
                     currentRecordFilePath = audioFilePath
                     
@@ -298,7 +298,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
                     audioRecorder?.delegate = weakSelf
                     audioRecorder?.prepareToRecord()
                     
-                    audioRecorder?.recordForDuration(NSTimeInterval(LimitMinutesPerRecord * 60))
+                    audioRecorder?.record(forDuration: TimeInterval(LimitMinutesPerRecord * 60))
                     
                 } catch let error as NSError {
                     print("error: \(error)")
@@ -308,27 +308,27 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
                 audioRecorder?.record()
             }
             
-            recordAudioState = .Recording
+            recordAudioState = .recording
             recordStarted()
         }
     }
     
-    private func recordStarted() {
+    fileprivate func recordStarted() {
         // 启动进度定时器
         
         recordProcessDisplayLink?.invalidate()
         
-        recordProcessDisplayLink = CADisplayLink(target: self, selector: "recordProgressing")
+        recordProcessDisplayLink = CADisplayLink(target: self, selector: #selector(NewRecordVC.recordProgressing))
         recordProcessDisplayLink?.frameInterval = 30
-        recordProcessDisplayLink?.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        recordProcessDisplayLink?.add(to: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
         
         if recordButtonViewCenterY != nil && recordButtonViewCenterY!.constant == 0 {
            
             if stopRecordButn != nil {
                 self.view.layoutIfNeeded()
-                UIView.animateWithDuration(0.4, animations: { () -> Void in
+                UIView.animate(withDuration: 0.4, animations: { () -> Void in
                     
-                    self.recordButtonViewCenterY?.constant = -(CGRectGetHeight(self.stopRecordButn!.bounds) + StopRecordButtonTopSpacing)/2
+                    self.recordButtonViewCenterY?.constant = -(self.stopRecordButn!.bounds.height + StopRecordButtonTopSpacing)/2
                     
                     self.stopRecordButn?.alpha = 1.0
                     
@@ -346,26 +346,26 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         }
     }
     
-    private func pauseRecord() {
+    fileprivate func pauseRecord() {
         
-        if recordAudioState == .Recording {
+        if recordAudioState == .recording {
             audioRecorder?.pause()
-            recordAudioState = .RecordPaused
+            recordAudioState = .recordPaused
             recordPaused()
         }
     }
     
-    private func recordPaused() {
+    fileprivate func recordPaused() {
         recordProcessDisplayLink?.invalidate()
-        recordButtonView?.iconView?.tintColor = recordButtonView?.iconView?.tintColor.colorWithAlphaComponent(1)
+        recordButtonView?.iconView?.tintColor = recordButtonView?.iconView?.tintColor.withAlphaComponent(1)
         
         // 显示出播放按钮
         if self.playRecordButn?.alpha == 0 {
             
             self.view.layoutIfNeeded()
-            UIView.animateWithDuration(0.4, animations: { () -> Void in
+            UIView.animate(withDuration: 0.4, animations: { () -> Void in
                 
-                self.recordButtonViewCenterY?.constant = -(CGRectGetHeight(self.stopRecordButn!.bounds) + StopRecordButtonTopSpacing + CGRectGetHeight(self.playRecordButn!.bounds) + PlayRecordButtonTopSpacing)/2
+                self.recordButtonViewCenterY?.constant = -(self.stopRecordButn!.bounds.height + StopRecordButtonTopSpacing + self.playRecordButn!.bounds.height + PlayRecordButtonTopSpacing)/2
                 
                 self.playRecordButn?.alpha = 1.0
                 
@@ -379,25 +379,25 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         }
     }
     
-    @objc private func stopRecord() {
+    @objc fileprivate func stopRecord() {
         
-        if recordAudioState == .Recording || recordAudioState == .RecordPaused {
+        if recordAudioState == .recording || recordAudioState == .recordPaused {
             audioRecorder?.stop()
-            recordAudioState = .Normal
+            recordAudioState = .normal
             recordStopped()
         }
     }
     
-    private func recordStopped() {
+    fileprivate func recordStopped() {
         recordProcessDisplayLink?.invalidate()
         
         self.recordButtonView?.progressView?.progress = 0.0
-        recordButtonView?.iconView?.tintColor = recordButtonView?.iconView?.tintColor.colorWithAlphaComponent(1)
+        recordButtonView?.iconView?.tintColor = recordButtonView?.iconView?.tintColor.withAlphaComponent(1)
         
         if recordButtonViewCenterY != nil && recordButtonViewCenterY!.constant != 0 {
             
             self.view.layoutIfNeeded()
-            UIView.animateWithDuration(0.4, animations: { () -> Void in
+            UIView.animate(withDuration: 0.4, animations: { () -> Void in
                 
                 self.recordButtonViewCenterY?.constant = 0.0
                 
@@ -416,7 +416,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         }
     }
     
-    @objc private func playRecord() {
+    @objc fileprivate func playRecord() {
         
         // 到播放页面
         
@@ -443,7 +443,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
                     }
                     
                     if success == false {
-                        strongSelf!.presentViewController(UIAlertController(title: nil, message: "加载音频失败", preferredStyle: UIAlertControllerStyle.Alert), animated: true, completion: nil)
+                        strongSelf!.present(UIAlertController(title: nil, message: "加载音频失败", preferredStyle: UIAlertControllerStyle.alert), animated: true, completion: nil)
                         return
                     }
                     
@@ -452,10 +452,10 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
                     strongSelf!.audioRecorder = nil
                     
                     // 删除组合前的文件
-                    let fileMan = NSFileManager.defaultManager()
+                    let fileMan = FileManager.default
                     for audioFilePath in audioFiles {
                         do {
-                            try fileMan.removeItemAtPath(audioFilePath)
+                            try fileMan.removeItem(atPath: audioFilePath)
                         } catch let error as NSError {
                             print("remove audio file failed, err: \(error.localizedDescription)")
                         }
@@ -465,22 +465,22 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
                     playRecordVC.delegate = strongSelf
                     
                     playRecordVC.transitioningDelegate = strongSelf
-                    strongSelf!.presentViewController(playRecordVC, animated: true, completion: nil)
+                    strongSelf!.present(playRecordVC, animated: true, completion: nil)
                 })
             }
         }
     }
     
-    private func pauseRecordAudioPlay() {
+    fileprivate func pauseRecordAudioPlay() {
     
     }
     
-    private func stopRecordAudioPlay() {
+    fileprivate func stopRecordAudioPlay() {
         
     }
     
-    private func randomObtainTemporaryAudioFilePath() -> String {
-        return NSTemporaryDirectory().stringByAppendingString("\(NSUUID().UUIDString).caf")
+    fileprivate func randomObtainTemporaryAudioFilePath() -> String {
+        return NSTemporaryDirectory() + "\(UUID().uuidString).caf"
     }
     
     /**
@@ -490,24 +490,24 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
      - parameter targetCombineAufioFile: 组合后的目标存放文件路径
      - parameter completion:             结果 Block
      */
-    private func asychCombineAudioFiles(audioFiles: [String], targetCombineAufioFile: String, completion: ((success: Bool)->Void)?) {
+    fileprivate func asychCombineAudioFiles(_ audioFiles: [String], targetCombineAufioFile: String, completion: ((_ success: Bool)->Void)?) {
         
         // combine
         
         let composition = AVMutableComposition()
-        let compositionAudioTrack = composition.addMutableTrackWithMediaType(AVMediaTypeAudio, preferredTrackID:Int32(kCMPersistentTrackID_Invalid))
+        let compositionAudioTrack = composition.addMutableTrack(withMediaType: AVMediaTypeAudio, preferredTrackID:Int32(kCMPersistentTrackID_Invalid))
         
         var nextClipStartTime = kCMTimeZero
         for audioFile in audioFiles {
-            let asset = AVAsset(URL: NSURL(fileURLWithPath: audioFile))
-            let tracks = asset.tracksWithMediaType(AVMediaTypeAudio)
+            let asset = AVAsset(url: URL(fileURLWithPath: audioFile))
+            let tracks = asset.tracks(withMediaType: AVMediaTypeAudio)
             if tracks.count == 0 {
                 continue
             }
             let duration = asset.duration
             
             do {
-                try compositionAudioTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, duration), ofTrack: tracks.first!, atTime: nextClipStartTime)
+                try compositionAudioTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, duration), of: tracks.first!, at: nextClipStartTime)
                 nextClipStartTime = CMTimeAdd(nextClipStartTime, duration)
             } catch let error as NSError {
                 print("insertTimeRange failed, err: \(error.localizedDescription)")
@@ -516,28 +516,28 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         
         if CMTimeCompare(nextClipStartTime, kCMTimeZero) == 0 {
             print("fail to combineAudioFiles.")
-            completion?(success: false)
+            completion?(false)
             return
         }
         
         // export
         
-        let combindFileURL = NSURL(fileURLWithPath: targetCombineAufioFile)
-        let fileMan = NSFileManager.defaultManager()
-        if fileMan.fileExistsAtPath(targetCombineAufioFile) {
+        let combindFileURL = URL(fileURLWithPath: targetCombineAufioFile)
+        let fileMan = FileManager.default
+        if fileMan.fileExists(atPath: targetCombineAufioFile) {
             // remove it
             do {
-                try fileMan.removeItemAtURL(combindFileURL)
+                try fileMan.removeItem(at: combindFileURL)
             } catch let error as NSError {
                 print("remove exist combine file failed, err: \(error.localizedDescription)")
-                completion?(success: false)
+                completion?(false)
                 return
             }
         }
         
         let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A)
         if exporter == nil {
-            completion?(success: false)
+            completion?(false)
             return
         }
         
@@ -545,26 +545,26 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
         exporter!.outputURL = combindFileURL
         
         // do it
-        exporter!.exportAsynchronouslyWithCompletionHandler({ [weak self] () -> Void in
+        exporter!.exportAsynchronously(completionHandler: { [weak self] () -> Void in
             
             let strongSelf = self
             if strongSelf == nil {
                 return
             }
             
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            DispatchQueue.main.async(execute: { () -> Void in
                 switch exporter!.status {
-                case .Failed:
+                case .failed:
                     print("export failed \(exporter!.error)")
-                    completion?(success: false)
+                    completion?(false)
                     
-                case .Cancelled:
+                case .cancelled:
                     print("export cancelled \(exporter!.error)")
-                    completion?(success: false)
+                    completion?(false)
                     
                 default:
                     print("export complete")
-                    completion?(success: true)
+                    completion?(true)
                 }
             })
         })
@@ -572,25 +572,25 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     
     // MARK: - AVAudioRecorderDelegate
     
-    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         recordStopped()
     }
     
-    func audioRecorderEncodeErrorDidOccur(recorder: AVAudioRecorder, error: NSError?) {
+    func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
         recordStopped()
     }
     
     // MARK: - UIViewControllerTransitioningDelegate
     
-    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        if presented.isKindOfClass(PlayRecordVC) {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if presented.isKind(of: PlayRecordVC.self) {
             return self.presentRecordPlayTransition
         }
         return nil
     }
     
-    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        if dismissed.isKindOfClass(PlayRecordVC) {
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if dismissed.isKind(of: PlayRecordVC.self) {
             return self.dismissRecordPlayTransition
         }
         return nil
@@ -598,7 +598,7 @@ class NewRecordVC: UIViewController, AVAudioRecorderDelegate, UIViewControllerTr
     
     // MARK: - PlayRecordVCDelegate
     
-    func didCutAudio(playVC: PlayRecordVC, newAudioFilePath: String) {
+    func didCutAudio(_ playVC: PlayRecordVC, newAudioFilePath: String) {
         // TODO: 已经剪切完成
     }
 }

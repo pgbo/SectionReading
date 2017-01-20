@@ -28,17 +28,17 @@ class CDPlaySlider: UIControl {
         }
     }
     
-    private var selectScopeDegree: CGFloat = 0                  /** 选择范围的角度, 从顶部最高点顺时针开始计算 */
+    fileprivate var selectScopeDegree: CGFloat = 0                  /** 选择范围的角度, 从顶部最高点顺时针开始计算 */
     {
         didSet {
             
             print("selectScopeDegree:\(selectScopeDegree)")
             
-            let locateDegree = (selectScopeDegree + 270.0) % 360.0
+            let locateDegree = (selectScopeDegree + 270.0).truncatingRemainder(dividingBy: 360.0)
             
             print("locateDegree:\(locateDegree)")
             
-            let newTransform = CGAffineTransformRotate(CGAffineTransformIdentity, ToRadian(locateDegree))
+            let newTransform = CGAffineTransform.identity.rotated(by: ToRadian(locateDegree))
 //
 //            // 更新 ui
             scopeGradientView?.transform = newTransform
@@ -46,14 +46,14 @@ class CDPlaySlider: UIControl {
         }
     }
     
-    private (set) var cdTrackView: MultipleArcTracksView?   /* CD 轨道视图 */
-    private (set) var progressView: RSProgressView?         /* 进度视图 */
-    private var scopeGradientView: ScopeGradientView?       /* 范围选择区域渐变视图 */
+    fileprivate (set) var cdTrackView: MultipleArcTracksView?   /* CD 轨道视图 */
+    fileprivate (set) var progressView: RSProgressView?         /* 进度视图 */
+    fileprivate var scopeGradientView: ScopeGradientView?       /* 范围选择区域渐变视图 */
     
-    private var handleContainer: UIView?                    /* 范围选择手柄容器视图 */
-    private var scopeHandleView: ScopeHandleView?           /* 范围选择手柄 */
+    fileprivate var handleContainer: UIView?                    /* 范围选择手柄容器视图 */
+    fileprivate var scopeHandleView: ScopeHandleView?           /* 范围选择手柄 */
     
-    private var beginTouchPoint: CGPoint?                   /** 开始触碰的点 */
+    fileprivate var beginTouchPoint: CGPoint?                   /** 开始触碰的点 */
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -65,18 +65,18 @@ class CDPlaySlider: UIControl {
         setupCDPlaySlider()
     }
     
-    private func setupCDPlaySlider() {
+    fileprivate func setupCDPlaySlider() {
         
         // 设置 cdTrackView
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.clear
         
         cdTrackView = MultipleArcTracksView()
         self.addSubview(cdTrackView!)
         
         cdTrackView?.translatesAutoresizingMaskIntoConstraints = false
-        cdTrackView?.userInteractionEnabled = false
-        cdTrackView?.backgroundColor = UIColor.clearColor()
-        cdTrackView?.trackColors = [UIColor(red: 0x19/255.0, green: 0x6f/255.0, blue: 0x8c/255.0, alpha: 1), UIColor.clearColor(), UIColor(red: 0x23/255.0, green: 0x96/255.0, blue: 0xBB/255.0, alpha: 1)]
+        cdTrackView?.isUserInteractionEnabled = false
+        cdTrackView?.backgroundColor = UIColor.clear
+        cdTrackView?.trackColors = [UIColor(red: 0x19/255.0, green: 0x6f/255.0, blue: 0x8c/255.0, alpha: 1), UIColor.clear, UIColor(red: 0x23/255.0, green: 0x96/255.0, blue: 0xBB/255.0, alpha: 1)]
         cdTrackView?.trackLineWidths = [30, 2, 68]
         
         // 设置 progressView
@@ -85,8 +85,8 @@ class CDPlaySlider: UIControl {
         self.addSubview(progressView!)
         
         progressView?.translatesAutoresizingMaskIntoConstraints = false
-        progressView?.userInteractionEnabled = false
-        progressView?.backgroundColor = UIColor.clearColor()
+        progressView?.isUserInteractionEnabled = false
+        progressView?.backgroundColor = UIColor.clear
         progressView?.tintColor = UIColor(red: 0x23/255.0, green: 0x96/255.0, blue: 0xBB/255.0, alpha: 1)
         progressView?.progressLineWidth = PlayProgressViewLineWidth
         progressView?.clipsToBounds = false
@@ -98,14 +98,14 @@ class CDPlaySlider: UIControl {
         self.addSubview(handleContainer!)
         
         handleContainer?.translatesAutoresizingMaskIntoConstraints = false
-        handleContainer?.userInteractionEnabled = false
+        handleContainer?.isUserInteractionEnabled = false
         
         scopeHandleView = ScopeHandleView()
         handleContainer?.addSubview(scopeHandleView!)
         
         scopeHandleView?.alpha = 1
         scopeHandleView?.translatesAutoresizingMaskIntoConstraints = false
-        scopeHandleView?.userInteractionEnabled = false
+        scopeHandleView?.isUserInteractionEnabled = false
         scopeHandleView?.handleSize = 20
         scopeHandleView?.handlebarWidth = 2
         scopeHandleView?.handleShadowWidth = 2
@@ -115,14 +115,14 @@ class CDPlaySlider: UIControl {
         
         let size = CDTrackSize + 2*PlayProgressViewInnerSpacing + 2*progressView!.progressLineWidth
         
-        scopeGradientView = ScopeGradientView(frame: CGRectMake(0, 0, size, size))
+        scopeGradientView = ScopeGradientView(frame: CGRect(x: 0, y: 0, width: size, height: size))
         self.insertSubview(scopeGradientView!, belowSubview: handleContainer!)
         
         scopeGradientView?.translatesAutoresizingMaskIntoConstraints = false
         scopeGradientView?.alpha = 1
-        scopeGradientView?.userInteractionEnabled = false
-        scopeGradientView?.backgroundColor = UIColor.clearColor()
-        scopeGradientView?.layer.cornerRadius = CGRectGetMidX(scopeGradientView!.frame)
+        scopeGradientView?.isUserInteractionEnabled = false
+        scopeGradientView?.backgroundColor = UIColor.clear
+        scopeGradientView?.layer.cornerRadius = scopeGradientView!.frame.midX
         scopeGradientView?.layer.masksToBounds = true
         
         
@@ -130,59 +130,59 @@ class CDPlaySlider: UIControl {
         
         // cdTrackView
         
-        self.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         
-        self.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
         
-        cdTrackView!.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 0, constant: CDTrackSize))
+        cdTrackView!.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 0, constant: CDTrackSize))
         
-        cdTrackView!.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: cdTrackView!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
+        cdTrackView!.addConstraint(NSLayoutConstraint(item: cdTrackView!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: cdTrackView!, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
         
         
         // progressView
         
-        self.addConstraint(NSLayoutConstraint(item: progressView!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: progressView!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         
-        self.addConstraint(NSLayoutConstraint(item: progressView!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: progressView!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
         
-        progressView!.addConstraint(NSLayoutConstraint(item: progressView!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 0, constant: CDTrackSize + 2*PlayProgressViewInnerSpacing + 2*progressView!.progressLineWidth))
+        progressView!.addConstraint(NSLayoutConstraint(item: progressView!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 0, constant: CDTrackSize + 2*PlayProgressViewInnerSpacing + 2*progressView!.progressLineWidth))
         
-        progressView!.addConstraint(NSLayoutConstraint(item: progressView!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: progressView!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
+        progressView!.addConstraint(NSLayoutConstraint(item: progressView!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: progressView!, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
         
         
         // scopeGradientView
         
-        self.addConstraint(NSLayoutConstraint(item: scopeGradientView!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: progressView!, attribute: NSLayoutAttribute.Top, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: scopeGradientView!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: progressView!, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
         
-        self.addConstraint(NSLayoutConstraint(item: scopeGradientView!, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: progressView!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: scopeGradientView!, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: progressView!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0))
         
-        self.addConstraint(NSLayoutConstraint(item: scopeGradientView!, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: progressView!, attribute: NSLayoutAttribute.Leading, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: scopeGradientView!, attribute: NSLayoutAttribute.leading, relatedBy: NSLayoutRelation.equal, toItem: progressView!, attribute: NSLayoutAttribute.leading, multiplier: 1, constant: 0))
         
-        self.addConstraint(NSLayoutConstraint(item: scopeGradientView!, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: progressView!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: scopeGradientView!, attribute: NSLayoutAttribute.trailing, relatedBy: NSLayoutRelation.equal, toItem: progressView!, attribute: NSLayoutAttribute.trailing, multiplier: 1, constant: 0))
         
         
         // scopeHandleView
         
-        self.addConstraint(NSLayoutConstraint(item: handleContainer!, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: progressView, attribute: NSLayoutAttribute.Leading, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: handleContainer!, attribute: NSLayoutAttribute.leading, relatedBy: NSLayoutRelation.equal, toItem: progressView, attribute: NSLayoutAttribute.leading, multiplier: 1, constant: 0))
         
-        self.addConstraint(NSLayoutConstraint(item: handleContainer!, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: progressView!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: handleContainer!, attribute: NSLayoutAttribute.trailing, relatedBy: NSLayoutRelation.equal, toItem: progressView!, attribute: NSLayoutAttribute.trailing, multiplier: 1, constant: 0))
         
-        self.addConstraint(NSLayoutConstraint(item: handleContainer!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0))
+        self.addConstraint(NSLayoutConstraint(item: handleContainer!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
         
-        self.addConstraint(NSLayoutConstraint(item: handleContainer!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 0, constant: scopeHandleView!.handleSize + scopeHandleView!.handleShadowWidth*2))
+        self.addConstraint(NSLayoutConstraint(item: handleContainer!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 0, constant: scopeHandleView!.handleSize + scopeHandleView!.handleShadowWidth*2))
         
         
-        handleContainer!.addConstraint(NSLayoutConstraint(item: scopeHandleView!, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: handleContainer!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 0))
+        handleContainer!.addConstraint(NSLayoutConstraint(item: scopeHandleView!, attribute: NSLayoutAttribute.trailing, relatedBy: NSLayoutRelation.equal, toItem: handleContainer!, attribute: NSLayoutAttribute.trailing, multiplier: 1, constant: 0))
         
-        handleContainer!.addConstraint(NSLayoutConstraint(item: scopeHandleView!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: handleContainer!, attribute: NSLayoutAttribute.Width, multiplier: 0.5, constant:0))
+        handleContainer!.addConstraint(NSLayoutConstraint(item: scopeHandleView!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: handleContainer!, attribute: NSLayoutAttribute.width, multiplier: 0.5, constant:0))
         
-        handleContainer!.addConstraint(NSLayoutConstraint(item: scopeHandleView!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: handleContainer!, attribute: NSLayoutAttribute.Top, multiplier: 1, constant: 0))
+        handleContainer!.addConstraint(NSLayoutConstraint(item: scopeHandleView!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: handleContainer!, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
         
-        handleContainer!.addConstraint(NSLayoutConstraint(item: scopeHandleView!, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: handleContainer!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: 0))
+        handleContainer!.addConstraint(NSLayoutConstraint(item: scopeHandleView!, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: handleContainer!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0))
         
     }
     
-    private static func rotateDegreeWithScope(scope: CGFloat) -> CGFloat {
+    fileprivate static func rotateDegreeWithScope(_ scope: CGFloat) -> CGFloat {
         
         var mScope = scope
         if mScope < 0 {
@@ -201,8 +201,8 @@ class CDPlaySlider: UIControl {
      
      - returns: 角度
      */
-    private static func RadiansFromNorth(p1: CGPoint, _ p2: CGPoint) -> CGFloat {
-        var v = CGPointMake(p2.x - p1.x, p2.y - p1.y)
+    fileprivate static func RadiansFromNorth(_ p1: CGPoint, _ p2: CGPoint) -> CGFloat {
+        var v = CGPoint(x: p2.x - p1.x, y: p2.y - p1.y)
         let vmag = sqrt(v.x * v.x + v.y * v.y)
         v.x /= vmag
         v.y /= vmag
@@ -211,10 +211,10 @@ class CDPlaySlider: UIControl {
     }
     
     
-    private func didMovedToPoint(point: CGPoint) {
+    fileprivate func didMovedToPoint(_ point: CGPoint) {
         
         // 计算旋转角度
-        let arcCenter = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds))
+        let arcCenter = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
         print("arcCenter: \(arcCenter), point: \(point  )")
         
         let radians = CDPlaySlider.RadiansFromNorth(point, arcCenter)
@@ -223,50 +223,50 @@ class CDPlaySlider: UIControl {
         
         // 转换圆周, 从顶点为 0 度算起, 顺时针增大角度
         
-        self.selectScopeDegree = (ToDegree(radians) + 270.0) % 360.0
+        self.selectScopeDegree = (ToDegree(radians) + 270.0).truncatingRemainder(dividingBy: 360.0)
         self.selectedScope = self.selectScopeDegree/360.0
     }
     
     // MARK: UIControl Override
     
-    override func beginTrackingWithTouch(touch: UITouch, withEvent event: UIEvent?) -> Bool {
-        super.beginTrackingWithTouch(touch, withEvent: event)
+    override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+        super.beginTracking(touch, with: event)
         
-        beginTouchPoint = touch.locationInView(self)
+        beginTouchPoint = touch.location(in: self)
         didMovedToPoint(beginTouchPoint!)
         
-        UIView.animateWithDuration(0.4, animations: { () -> Void in
+        UIView.animate(withDuration: 0.4, animations: { () -> Void in
             self.scopeHandleView?.alpha = 1
             self.scopeGradientView?.alpha = 1
-            }) { (finished) -> Void in
-        }
+            }, completion: { (finished) -> Void in
+        }) 
         
         return true
     }
     
-    override func continueTrackingWithTouch(touch: UITouch, withEvent event: UIEvent?) -> Bool {
-        super.continueTrackingWithTouch(touch, withEvent: event)
+    override func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+        super.continueTracking(touch, with: event)
         
-        let touchPoint = touch.locationInView(self)
+        let touchPoint = touch.location(in: self)
         
         didMovedToPoint(touchPoint)
         
-        self.sendActionsForControlEvents(UIControlEvents.ValueChanged)
+        self.sendActions(for: UIControlEvents.valueChanged)
         
         return true
     }
     
-    override func endTrackingWithTouch(touch: UITouch?, withEvent event: UIEvent?) {
-        super.endTrackingWithTouch(touch, withEvent: event)
+    override func endTracking(_ touch: UITouch?, with event: UIEvent?) {
+        super.endTracking(touch, with: event)
         
         // 隐藏
         
-        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-        UIView.animateWithDuration(0.4, animations: { () -> Void in
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        UIView.animate(withDuration: 0.4, animations: { () -> Void in
             self.scopeHandleView?.alpha = 0
             self.scopeGradientView?.alpha = 0
-            }) { (finished) -> Void in
-                UIApplication.sharedApplication().endIgnoringInteractionEvents()
-        }
+            }, completion: { (finished) -> Void in
+                UIApplication.shared.endIgnoringInteractionEvents()
+        }) 
     }
 }

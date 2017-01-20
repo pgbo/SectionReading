@@ -10,6 +10,10 @@ import UIKit
 
 class SECHelper: NSObject {
 
+    private static var __once: () = {
+            DefaultCalendar.defaultClendar = Calendar(identifier: Calendar.Identifier.gregorian)
+        }()
+
     /**
      全局设置导航栏
      */
@@ -17,8 +21,8 @@ class SECHelper: NSObject {
         
         let navBarAppearance = UINavigationBar.appearance()
         
-        navBarAppearance.setBackgroundImage(UIImage(named: "NavBar"), forBarMetrics: UIBarMetrics.Default)
-        navBarAppearance.titleTextAttributes = [NSFontAttributeName: UIFont.systemFontOfSize(17), NSForegroundColorAttributeName: UIColor.blackColor()]
+        navBarAppearance.setBackgroundImage(UIImage(named: "NavBar"), for: UIBarMetrics.default)
+        navBarAppearance.titleTextAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 17), NSForegroundColorAttributeName: UIColor.black]
         
         navBarAppearance.tintColor = UIColor(red: 0x53/255.0, green: 0x9d/255.0, blue: 0x9f/255.0, alpha: 1)
     }
@@ -30,9 +34,9 @@ class SECHelper: NSObject {
         
         let barButtonItemAppearance = UIBarButtonItem.appearance()
         
-        barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFontOfSize(14),NSForegroundColorAttributeName: UIColor(red: 0x53/255.0, green: 0x9d/255.0, blue: 0x9f/255.0, alpha: 1)], forState: UIControlState.Normal)
-        barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFontOfSize(14),NSForegroundColorAttributeName: UIColor(red: 0x4D/255.0, green: 0x83/255.0, blue: 0x84/255.0, alpha: 1)], forState: UIControlState.Highlighted)
-        barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFontOfSize(14),NSForegroundColorAttributeName: UIColor(red: 0xA0/255.0, green: 0xB0/255.0, blue: 0xB1/255.0, alpha: 1)], forState: UIControlState.Disabled)
+        barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 14),NSForegroundColorAttributeName: UIColor(red: 0x53/255.0, green: 0x9d/255.0, blue: 0x9f/255.0, alpha: 1)], for: UIControlState())
+        barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 14),NSForegroundColorAttributeName: UIColor(red: 0x4D/255.0, green: 0x83/255.0, blue: 0x84/255.0, alpha: 1)], for: UIControlState.highlighted)
+        barButtonItemAppearance.setTitleTextAttributes([NSFontAttributeName: UIFont.systemFont(ofSize: 14),NSForegroundColorAttributeName: UIColor(red: 0xA0/255.0, green: 0xB0/255.0, blue: 0xB1/255.0, alpha: 1)], for: UIControlState.disabled)
     }
     
     /**
@@ -49,11 +53,11 @@ class SECHelper: NSObject {
      
      - returns: 
      */
-    static func createFormatTextForRecordDuration(duration: NSTimeInterval) -> String {
+    static func createFormatTextForRecordDuration(_ duration: TimeInterval) -> String {
         
         let totalSeconds = Int(duration)
         
-        let remaindPart = Int((duration - NSTimeInterval(totalSeconds))*10)
+        let remaindPart = Int((duration - TimeInterval(totalSeconds))*10)
         let minutePart = totalSeconds/60
         let secondPart = totalSeconds - minutePart*60
         
@@ -90,15 +94,15 @@ class SECHelper: NSObject {
      */
     static func readingRecordStoreDirectory() -> String? {
         
-        let recordStorageDirPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true).first?.stringByAppendingString("/ReadingRecordAudio/")
+        let recordStorageDirPath = (NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true).first)! + "/ReadingRecordAudio/"
 
-        let fileMan = NSFileManager.defaultManager()
+        let fileMan = FileManager.default
 
         var isDirectory: ObjCBool = ObjCBool(true)
-        let existPath = fileMan.fileExistsAtPath(recordStorageDirPath!, isDirectory: &isDirectory)
+        let existPath = fileMan.fileExists(atPath: recordStorageDirPath, isDirectory: &isDirectory)
         if existPath && isDirectory.boolValue == false {
             do {
-                try fileMan.removeItemAtPath(recordStorageDirPath!)
+                try fileMan.removeItem(atPath: recordStorageDirPath)
             } catch let error as NSError {
                 print("Fail to removeItemAtPath(\(recordStorageDirPath)), error: \(error.localizedDescription)")
                 return nil
@@ -107,7 +111,7 @@ class SECHelper: NSObject {
         
         // 创建目录
         do {
-            try fileMan.createDirectoryAtPath(recordStorageDirPath!, withIntermediateDirectories: true, attributes: nil)
+            try fileMan.createDirectory(atPath: recordStorageDirPath, withIntermediateDirectories: true, attributes: nil)
         } catch let error as NSError {
             print("Fail to removeItemAtPath(\(recordStorageDirPath)), error: \(error.localizedDescription)")
             return nil
@@ -116,16 +120,14 @@ class SECHelper: NSObject {
         return recordStorageDirPath
     }
     
-    private struct DefaultCalendar {
-        static var once_token: dispatch_once_t = 0
-        static var defaultClendar: NSCalendar?
+    fileprivate struct DefaultCalendar {
+        static var once_token: Int = 0
+        static var defaultClendar: Calendar?
     }
     
-    static func defaultCalendar() -> NSCalendar {
+    static func defaultCalendar() -> Calendar {
         
-        dispatch_once(&DefaultCalendar.once_token) {
-            DefaultCalendar.defaultClendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
-        }
+        _ = SECHelper.__once
         
         return DefaultCalendar.defaultClendar!
     }

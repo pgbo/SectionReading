@@ -10,15 +10,15 @@ import UIKit
 
 /** Helper Functions **/
 
-func ToRadian(degree: CGFloat) -> CGFloat {
+func ToRadian(_ degree: CGFloat) -> CGFloat {
     return CGFloat(M_PI * Double(degree/180.0))
 }
 
-func ToDegree(radian: CGFloat) -> CGFloat {
+func ToDegree(_ radian: CGFloat) -> CGFloat {
     return CGFloat(Double(radian * 180.0)/M_PI)
 }
 
-func min(x1:CGFloat = 0, x2: CGFloat = 0) -> CGFloat {
+func min(_ x1:CGFloat = 0, x2: CGFloat = 0) -> CGFloat {
     return x1 < x2 ? x1:x2
 }
 
@@ -32,12 +32,12 @@ class RSProgressView: UIView {
                 if progress > 0 {
                     if progressLabel == nil {
                         
-                        let label = UILabel(frame: CGRectMake(0, 0, 24, 24))
+                        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
                         
-                        label.backgroundColor = UIColor.clearColor()
+                        label.backgroundColor = UIColor.clear
                         label.textColor = self.tintColor
-                        label.font = UIFont.systemFontOfSize(10)
-                        label.textAlignment = NSTextAlignment.Center
+                        label.font = UIFont.systemFont(ofSize: 10)
+                        label.textAlignment = NSTextAlignment.center
                         
                         progressLabel = label
                         self.addSubview(progressLabel!)
@@ -46,9 +46,9 @@ class RSProgressView: UIView {
                 
                 // 转动角度
                 
-                let radius = min((CGRectGetWidth(self.bounds) - progressLineWidth)/2, (CGRectGetHeight(self.bounds) - progressLineWidth)/2)
+                let radius = min((self.bounds.width - progressLineWidth)/2, (self.bounds.height - progressLineWidth)/2)
                 
-                let arcCenter = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds))
+                let arcCenter = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
                 
                 
                 let rotateRadian = RSProgressView.rotateRadianWithProgress(progress)
@@ -56,7 +56,7 @@ class RSProgressView: UIView {
                 let labelCenterX = arcCenter.x + (radius + 15.0) * CGFloat(cosf(Float(locateRadian)))
                 let labelCenterY = arcCenter.y + (radius + 15.0) * CGFloat(sinf(Float(locateRadian)))
                 
-                progressLabel?.center = CGPointMake(labelCenterX, labelCenterY)
+                progressLabel?.center = CGPoint(x: labelCenterX, y: labelCenterY)
             }
     }
     
@@ -67,7 +67,7 @@ class RSProgressView: UIView {
         }
     }
     
-    private (set) var progressLabel: UILabel? /** 进度文字视图 */
+    fileprivate (set) var progressLabel: UILabel? /** 进度文字视图 */
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -83,30 +83,30 @@ class RSProgressView: UIView {
         progressLabel?.textColor = self.tintColor
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         
-        let radius = min((CGRectGetWidth(rect) - progressLineWidth)/2, (CGRectGetHeight(rect) - progressLineWidth)/2)
+        let radius = min((rect.width - progressLineWidth)/2, (rect.height - progressLineWidth)/2)
         
         // 居中
         
-        let arcCenter = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect))
+        let arcCenter = CGPoint(x: rect.midX, y: rect.midY)
         
         let arcPath = UIBezierPath(arcCenter:arcCenter,
             radius:radius,
             startAngle:ToRadian(-90.0),
             endAngle:(ToRadian(-90.0) + RSProgressView.rotateRadianWithProgress(progress)),
             clockwise: true)
-        arcPath.lineCapStyle = CGLineCap.Round
+        arcPath.lineCapStyle = CGLineCap.round
         arcPath.lineWidth = progressLineWidth
         tintColor.setStroke()
         arcPath.stroke()
     }
     
-    private func setupProgressView() {
-        tintColor = UIApplication.sharedApplication().keyWindow?.tintColor
+    fileprivate func setupProgressView() {
+        tintColor = UIApplication.shared.keyWindow?.tintColor
     }
     
-    private static func rotateRadianWithProgress(progress: CGFloat) -> CGFloat {
+    fileprivate static func rotateRadianWithProgress(_ progress: CGFloat) -> CGFloat {
         
         var mProgress = progress
         if mProgress < 0 {

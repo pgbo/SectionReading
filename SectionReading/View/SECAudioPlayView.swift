@@ -10,16 +10,16 @@ import UIKit
 
 @objc protocol SECAudioPlayViewDelegate {
     
-    optional func clickedPlayButtonOnAudioPlayView(view: SECAudioPlayView)
+    @objc optional func clickedPlayButtonOnAudioPlayView(_ view: SECAudioPlayView)
     
 }
 
 /// 音频播放视图
 class SECAudioPlayView: UIView {
 
-    @IBOutlet private weak var mPlayButton: UIButton!
-    @IBOutlet private weak var mProgressView: UIProgressView!
-    @IBOutlet private weak var mProgressLabel: UILabel!
+    @IBOutlet fileprivate weak var mPlayButton: UIButton!
+    @IBOutlet fileprivate weak var mProgressView: UIProgressView!
+    @IBOutlet fileprivate weak var mProgressLabel: UILabel!
 
     // 代理
     weak var delegate: SECAudioPlayViewDelegate?
@@ -52,8 +52,8 @@ class SECAudioPlayView: UIView {
                 image = UIImage(named: "AudioPlayButn")
                 imageHL = UIImage(named: "AudioPlayButnHL")
             }
-            self.mPlayButton.setImage(image, forState: UIControlState.Normal)
-            self.mPlayButton.setImage(imageHL, forState: UIControlState.Highlighted)
+            self.mPlayButton.setImage(image, for: UIControlState())
+            self.mPlayButton.setImage(imageHL, for: UIControlState.highlighted)
         }
     }
     
@@ -70,24 +70,24 @@ class SECAudioPlayView: UIView {
     
     
     class func instanceFromNib() -> SECAudioPlayView {
-        return UINib(nibName: "SECAudioPlayView", bundle: nil).instantiateWithOwner(nil, options: nil).first as! SECAudioPlayView
+        return UINib(nibName: "SECAudioPlayView", bundle: nil).instantiate(withOwner: nil, options: nil).first as! SECAudioPlayView
     }
     
     override func awakeFromNib() {
         setupAudioPlayView()
     }
     
-    private func setupAudioPlayView() {
+    fileprivate func setupAudioPlayView() {
         
         self.duration = 0
         self.progress = 0
         self.isPlaying = false
         self.hiddenProgressLabel = false
         
-        self.mPlayButton.addTarget(self, action: "clickedPlayButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.mPlayButton.addTarget(self, action: #selector(SECAudioPlayView.clickedPlayButton(_:)), for: UIControlEvents.touchUpInside)
     }
     
-    @objc private func clickedPlayButton(sender: UIButton) {
+    @objc fileprivate func clickedPlayButton(_ sender: UIButton) {
         delegate?.clickedPlayButtonOnAudioPlayView?(self)
     }
 }

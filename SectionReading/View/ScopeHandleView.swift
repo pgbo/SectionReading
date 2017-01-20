@@ -45,15 +45,15 @@ class ScopeHandleView: UIView {
         setNeedsDisplay()
     }
     
-    private func setupScopeHandleView() {
+    fileprivate func setupScopeHandleView() {
         self.tintColor = UIColor(white: 1, alpha: 0.6)
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.clear
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
     
-        let viewWidth = CGRectGetWidth(rect)
-        let viewMidY = CGRectGetMidY(rect)
+        let viewWidth = rect.width
+        let viewMidY = rect.midY
         let handleCenterX = viewWidth - self.handleSize/2 + self.handleShadowWidth
         
         let ctx = UIGraphicsGetCurrentContext()
@@ -62,24 +62,24 @@ class ScopeHandleView: UIView {
         
         // 画 handle bar
         
-        CGContextSetLineWidth(ctx, self.handlebarWidth)
-        CGContextSetLineCap(ctx, CGLineCap.Round)
-        CGContextMoveToPoint(ctx, 0, viewMidY)
-        CGContextAddLineToPoint(ctx, handleCenterX, viewMidY)
-        CGContextDrawPath(ctx, CGPathDrawingMode.Stroke)
+        ctx?.setLineWidth(self.handlebarWidth)
+        ctx?.setLineCap(CGLineCap.round)
+        ctx?.move(to: CGPoint(x: 0, y: viewMidY))
+        ctx?.addLine(to: CGPoint(x: handleCenterX, y: viewMidY))
+        ctx?.drawPath(using: CGPathDrawingMode.stroke)
         
         // 画 handle
-        CGContextSaveGState(ctx);
+        ctx?.saveGState();
         
-        CGContextBeginPath(ctx);
-        CGContextAddArc(ctx, handleCenterX, viewMidY, self.handleSize/2, 0, CGFloat(M_PI)*2, 1)
-        CGContextDrawPath(ctx, CGPathDrawingMode.Fill)
+        ctx?.beginPath();
+        ctx?.addArc(center: CGPoint(x:handleCenterX, y: viewMidY), radius: self.handleSize/2, startAngle: 0, endAngle: CGFloat(M_PI)*2, clockwise: true)
+        ctx?.drawPath(using: CGPathDrawingMode.fill)
         
         // 画阴影
         if self.handleShadowWidth > 0 {
-            CGContextSetShadowWithColor(ctx, CGSizeMake(0, 0), self.handleShadowWidth*2, self.tintColor.CGColor);
+            ctx?.setShadow(offset: CGSize(width: 0, height: 0), blur: self.handleShadowWidth*2, color: self.tintColor.cgColor);
         }
-        CGContextRestoreGState(ctx);
+        ctx?.restoreGState();
         
     }
 }

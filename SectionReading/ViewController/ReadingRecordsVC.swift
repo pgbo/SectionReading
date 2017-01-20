@@ -13,8 +13,8 @@ let reuseIdentifier = "Cell"
 /// 阅读记录 VC
 class ReadingRecordsVC: UICollectionViewController {
 
-    private var newRecordButtonWindow: UIWindow? /** 创建新纪录按钮所在的窗口 */
-    private var newRecordButton: UIButton? /** 创建新记录按钮 */
+    fileprivate var newRecordButtonWindow: UIWindow? /** 创建新纪录按钮所在的窗口 */
+    fileprivate var newRecordButton: UIButton? /** 创建新记录按钮 */
     
     override init(collectionViewLayout layout: UICollectionViewLayout?) {
         
@@ -35,10 +35,10 @@ class ReadingRecordsVC: UICollectionViewController {
         self.clearsSelectionOnViewWillAppear = false
         
         self.navigationItem.title = "读书记录"
-        self.collectionView?.backgroundColor = UIColor.whiteColor()
+        self.collectionView?.backgroundColor = UIColor.white
         
         // Register cell classes
-        self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        self.collectionView!.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
         setupNewRecordButton()
 
@@ -49,16 +49,16 @@ class ReadingRecordsVC: UICollectionViewController {
         super.didReceiveMemoryWarning()
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         newRecordButton?.alpha = 0
-        newRecordButtonWindow?.hidden = false
+        newRecordButtonWindow?.isHidden = false
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        UIView.animateWithDuration(1, delay: 0, options: UIViewAnimationOptions.TransitionFlipFromBottom, animations: { () -> Void in
+        UIView.animate(withDuration: 1, delay: 0, options: UIViewAnimationOptions.transitionFlipFromBottom, animations: { () -> Void in
             
                 self.newRecordButton?.alpha = 1
             
@@ -67,9 +67,9 @@ class ReadingRecordsVC: UICollectionViewController {
         }
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        newRecordButtonWindow?.hidden = true
+        newRecordButtonWindow?.isHidden = true
     }
 
     /*
@@ -84,18 +84,18 @@ class ReadingRecordsVC: UICollectionViewController {
 
     // MARK: UICollectionViewDataSource
 
-    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 0
     }
 
 
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         return 0
     }
 
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath)
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
     
         return cell
     }
@@ -134,39 +134,39 @@ class ReadingRecordsVC: UICollectionViewController {
     /**
         设置创新新纪录按钮
     */
-    private func setupNewRecordButton() {
+    fileprivate func setupNewRecordButton() {
         if newRecordButton == nil {
             
             let newRecordButnBgImage = UIImage(named: "NewRecordButnBg")
             let newRecordButnBgHLImage = UIImage(named: "NewRecordButnBgHL")
             let imageSize = newRecordButnBgImage!.size.height > newRecordButnBgImage!.size.width ? newRecordButnBgImage!.size.height:newRecordButnBgImage!.size.width
             
-            let screenBounds = UIScreen.mainScreen().bounds
+            let screenBounds = UIScreen.main.bounds
             
-            newRecordButtonWindow = UIWindow(frame: CGRectMake((CGRectGetWidth(screenBounds) - imageSize)/2, CGRectGetHeight(screenBounds) - imageSize - 4, imageSize, imageSize))
+            newRecordButtonWindow = UIWindow(frame: CGRect(x: (screenBounds.width - imageSize)/2, y: screenBounds.height - imageSize - 4, width: imageSize, height: imageSize))
             
-            let mButn = UIButton(type: UIButtonType.Custom)
+            let mButn = UIButton(type: UIButtonType.custom)
             
             mButn.frame = newRecordButtonWindow!.bounds
             
-            mButn.setBackgroundImage(newRecordButnBgImage, forState: UIControlState.Normal)
-            mButn.setBackgroundImage(newRecordButnBgHLImage, forState: UIControlState.Highlighted)
+            mButn.setBackgroundImage(newRecordButnBgImage, for: UIControlState())
+            mButn.setBackgroundImage(newRecordButnBgHLImage, for: UIControlState.highlighted)
             
             mButn.contentEdgeInsets = UIEdgeInsetsMake(0, 0, 8, 0)
             
-            mButn.setTitle("+", forState: UIControlState.Normal)
-            mButn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
-            mButn.titleLabel?.font = UIFont.systemFontOfSize(48)
-            mButn.addTarget(self, action: "addNewRecord", forControlEvents: UIControlEvents.TouchUpInside)
+            mButn.setTitle("+", for: UIControlState())
+            mButn.setTitleColor(UIColor.white, for: UIControlState())
+            mButn.titleLabel?.font = UIFont.systemFont(ofSize: 48)
+            mButn.addTarget(self, action: #selector(ReadingRecordsVC.addNewRecord), for: UIControlEvents.touchUpInside)
             
             newRecordButton = mButn
             newRecordButtonWindow?.addSubview(newRecordButton!)
         }
     }
     
-    @objc private func addNewRecord() {
+    @objc fileprivate func addNewRecord() {
         
-        self.showViewController(NewRecordVC(), sender: nil)
+        self.show(NewRecordVC(), sender: nil)
         
     }
 }

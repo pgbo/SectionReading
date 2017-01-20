@@ -10,15 +10,15 @@ import UIKit
 
 class SECSettingViewController: UITableViewController {
 
-    private var evernoteManager = SECAppDelegate.SELF()!.evernoteManager
-    private var needSycnDownNoteNumber: Int = 0
-    private var needSycnUpNoteNumber: Int = 0
+    fileprivate var evernoteManager = SECAppDelegate.SELF()!.evernoteManager
+    fileprivate var needSycnDownNoteNumber: Int = 0
+    fileprivate var needSycnUpNoteNumber: Int = 0
     
     class func instanceFromSB() -> SECSettingViewController {
-        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewControllerWithIdentifier("SECSettingViewController") as! SECSettingViewController
+        return UIStoryboard(name: "SECStoryboard", bundle: nil).instantiateViewController(withIdentifier: "SECSettingViewController") as! SECSettingViewController
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         fatalError("init(nibName:, bundle:) has not been implemented")
     }
     
@@ -37,51 +37,51 @@ class SECSettingViewController: UITableViewController {
         super.didReceiveMemoryWarning()
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         loadAndShowSyncDownAndUpCount()
     }
     
-    private func loadAndShowSyncDownAndUpCount() {
+    fileprivate func loadAndShowSyncDownAndUpCount() {
     
-        evernoteManager.getNeedSyncDownNoteCount(withSuccess: { [weak self] (count) -> Void in
+        evernoteManager?.getNeedSyncDownNoteCount(withSuccess: { [weak self] (count) -> Void in
             if let strongSelf = self {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     strongSelf.needSycnDownNoteNumber = count
-                    strongSelf.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 2, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+                    strongSelf.tableView.reloadRows(at: [IndexPath(row: 2, section: 0)], with: UITableViewRowAnimation.none)
                 }
             }
             }) { [weak self] () -> Void in
                 if let strongSelf = self {
-                    dispatch_async(dispatch_get_main_queue()) {
+                    DispatchQueue.main.async {
                         strongSelf.needSycnDownNoteNumber = 0
-                        strongSelf.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 2, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+                        strongSelf.tableView.reloadRows(at: [IndexPath(row: 2, section: 0)], with: UITableViewRowAnimation.none)
                     }
                 }
         }
         
         let option = ReadingQueryOption()
-        option.syncStatus = [ReadingSyncStatus.NeedSyncDelete, ReadingSyncStatus.NeedSyncUpload]
+        option.syncStatus = [ReadingSyncStatus.needSyncDelete, ReadingSyncStatus.needSyncUpload]
         if let needSyncup = TReading.count(withOption: option) {
             needSycnUpNoteNumber = needSyncup
         } else {
             needSycnUpNoteNumber = 0
         }
-        self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 2, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+        self.tableView.reloadRows(at: [IndexPath(row: 2, section: 0)], with: UITableViewRowAnimation.none)
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         //  configure cell
         
-        let cellSection = indexPath.section
-        let cellRow = indexPath.row
+        let cellSection = (indexPath as NSIndexPath).section
+        let cellRow = (indexPath as NSIndexPath).row
         
         if cellSection == 0 {
             if cellRow == 0 {
-                if evernoteManager.isAuthenticated() {
+                if (evernoteManager?.isAuthenticated())! {
                     cell.textLabel?.text = "退出 Evernote"
                 } else {
                     cell.textLabel?.text = "登录并同步到 Evernote"
@@ -121,25 +121,25 @@ class SECSettingViewController: UITableViewController {
         return cell
     }
     
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         
         return 20
     }
  
-    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         
         return 0.1
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
         
-        let cellSection = indexPath.section
-        let cellRow = indexPath.row
+        let cellSection = (indexPath as NSIndexPath).section
+        let cellRow = (indexPath as NSIndexPath).row
         
         if cellSection == 0 {
-            let cell = tableView.cellForRowAtIndexPath(indexPath)!
+            let cell = tableView.cellForRow(at: indexPath)!
             if cellRow == 0 {
                 clickEvernoteAuthenticateCell(cell)
             } else if cellRow == 1 {
@@ -156,49 +156,49 @@ class SECSettingViewController: UITableViewController {
         }
     }
     
-    private func doEvernoteAuthenticate() {
+    fileprivate func doEvernoteAuthenticate() {
         
-        evernoteManager.authenticate(withViewController: self, completion: { [weak self] (success) -> Void in
+        evernoteManager?.authenticate(withViewController: self, completion: { [weak self] (success) -> Void in
             if let strongSelf = self {
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     if success {
-                        strongSelf.tableView .reloadRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
-                        strongSelf.evernoteManager.sync(withType: .UP_AND_DOWN, completion: { (successNumber) -> Void in
+                        strongSelf.tableView .reloadRows(at: [IndexPath(row: 0, section: 0)], with: UITableViewRowAnimation.none)
+                        strongSelf.evernoteManager?.sync(withType: .up_AND_DOWN, completion: { (successNumber) -> Void in
                             print("After login evernote, sync count:\(successNumber)")
                         })
                     } else {
-                        let alert = UIAlertController(title: nil, message: "登录失败", preferredStyle: UIAlertControllerStyle.Alert)
-                        alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.Cancel, handler: nil))
-                        strongSelf.presentViewController(alert, animated: true, completion: nil)
+                        let alert = UIAlertController(title: nil, message: "登录失败", preferredStyle: UIAlertControllerStyle.alert)
+                        alert.addAction(UIAlertAction(title: "知道了", style: UIAlertActionStyle.cancel, handler: nil))
+                        strongSelf.present(alert, animated: true, completion: nil)
                     }
                 })
             }
         })
     }
     
-    private func clickEvernoteAuthenticateCell(cell: UITableViewCell) {
+    fileprivate func clickEvernoteAuthenticateCell(_ cell: UITableViewCell) {
         
-        if evernoteManager.isAuthenticated() {
+        if (evernoteManager?.isAuthenticated())! {
             
-            let alert = UIAlertController(title: nil, message: "确认退出 Evernote 账号吗？", preferredStyle: UIAlertControllerStyle.ActionSheet)
-            alert.addAction(UIAlertAction(title: "退出", style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
+            let alert = UIAlertController(title: nil, message: "确认退出 Evernote 账号吗？", preferredStyle: UIAlertControllerStyle.actionSheet)
+            alert.addAction(UIAlertAction(title: "退出", style: UIAlertActionStyle.destructive, handler: { (action) -> Void in
                 
-                self.evernoteManager.unauthenticate()
-                self.tableView .reloadRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+                self.evernoteManager?.unauthenticate()
+                self.tableView .reloadRows(at: [IndexPath(row: 0, section: 0)], with: UITableViewRowAnimation.none)
             }))
-            alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.cancel, handler: nil))
             if let presenter = alert.popoverPresentationController {
                 presenter.sourceView = cell;
                 presenter.sourceRect = cell.bounds;
             }
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
         } else {
             doEvernoteAuthenticate()
         }
     }
     
-    private func clickOnlySyncNoteUnderWIFICell(cell: UITableViewCell) {
+    fileprivate func clickOnlySyncNoteUnderWIFICell(_ cell: UITableViewCell) {
         
         var alertMesaage: String?
         var actionTitle: String?
@@ -212,55 +212,55 @@ class SECSettingViewController: UITableViewController {
             actionTitle = "开启"
         }
         
-        let alert = UIAlertController(title: nil, message: alertMesaage, preferredStyle: UIAlertControllerStyle.ActionSheet)
-        alert.addAction(UIAlertAction(title: actionTitle, style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
+        let alert = UIAlertController(title: nil, message: alertMesaage, preferredStyle: UIAlertControllerStyle.actionSheet)
+        alert.addAction(UIAlertAction(title: actionTitle, style: UIAlertActionStyle.destructive, handler: { (action) -> Void in
             SECAppDelegate.SELF()!.onlySyncNoteUnderWIFI = !onlySyncNoteUnderWIFI
-            self.tableView .reloadRowsAtIndexPaths([NSIndexPath(forRow: 1, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+            self.tableView .reloadRows(at: [IndexPath(row: 1, section: 0)], with: UITableViewRowAnimation.none)
         }))
-        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.cancel, handler: nil))
         
         if let presenter = alert.popoverPresentationController {
             presenter.sourceView = cell;
             presenter.sourceRect = cell.bounds;
         }
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
-    private func clickManualSycnNoteCell(cell: UITableViewCell) {
+    fileprivate func clickManualSycnNoteCell(_ cell: UITableViewCell) {
         
-        if evernoteManager.isAuthenticated() == false {
+        if evernoteManager?.isAuthenticated() == false {
             doEvernoteAuthenticate()
             return
         }
         
-        let alert = UIAlertController(title: nil, message: "确认现在同步吗？", preferredStyle: UIAlertControllerStyle.ActionSheet)
-        alert.addAction(UIAlertAction(title: "立即同步", style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
+        let alert = UIAlertController(title: nil, message: "确认现在同步吗？", preferredStyle: UIAlertControllerStyle.actionSheet)
+        alert.addAction(UIAlertAction(title: "立即同步", style: UIAlertActionStyle.destructive, handler: { (action) -> Void in
             
             // TODO: 进行同步动画或提示
-            self.evernoteManager.sync(withType: .UP_AND_DOWN, completion: { [weak self] (successNumber) -> Void in
+            self.evernoteManager!.sync(withType: .up_AND_DOWN, completion: { [weak self] (successNumber) -> Void in
                 if let strongSelf = self {
-                    dispatch_async(dispatch_get_main_queue()) {
+                    DispatchQueue.main.async {
                         strongSelf.loadAndShowSyncDownAndUpCount()
                     }
                 }
             })
         }))
-        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.cancel, handler: nil))
         
         if let presenter = alert.popoverPresentationController {
             presenter.sourceView = cell;
             presenter.sourceRect = cell.bounds;
         }
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
-    private func clickRateCell() {
+    fileprivate func clickRateCell() {
         
     }
     
-    private func clickContactAuthorCell() {
+    fileprivate func clickContactAuthorCell() {
         
     }
 

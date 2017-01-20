@@ -15,9 +15,9 @@ class CircularButton: UIButton {
         super.layoutSubviews()
         
         let frame = self.frame
-        self.layer.cornerRadius = fmax(CGRectGetWidth(frame), CGRectGetHeight(frame))/2
+        self.layer.cornerRadius = fmax(frame.width, frame.height)/2
         self.layer.shadowOpacity = 0.5
-        self.layer.shadowOffset = CGSizeMake(0, 0)
+        self.layer.shadowOffset = CGSize(width: 0, height: 0)
         self.layer.shadowRadius = 1.0
         self.layer.masksToBounds = true
     }

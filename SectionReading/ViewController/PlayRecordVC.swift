@@ -21,7 +21,7 @@ let PlayRecordVCActionButtonSize = CGFloat(50)
     /**
      已经完成剪切
      */
-    optional func didCutAudio(playVC: PlayRecordVC, newAudioFilePath: String)
+    @objc optional func didCutAudio(_ playVC: PlayRecordVC, newAudioFilePath: String)
 }
 
 /**
@@ -32,9 +32,9 @@ let PlayRecordVCActionButtonSize = CGFloat(50)
  - Paused:  暂停中
  */
 enum PlayRecordVCPlayerState {
-    case Stopped
-    case Playing
-    case Paused
+    case stopped
+    case playing
+    case paused
 }
 
 // 播放录音 VC
@@ -42,27 +42,27 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
 
     weak var delegate: PlayRecordVCDelegate?
     
-    private var recordFilePath: String?
-    private var audioPlayer: AVAudioPlayer?
-    private var playerState: PlayRecordVCPlayerState = .Stopped
+    fileprivate var recordFilePath: String?
+    fileprivate var audioPlayer: AVAudioPlayer?
+    fileprivate var playerState: PlayRecordVCPlayerState = .stopped
     
-    private (set) var playSlider: CDPlaySlider?
-    private (set) var playButn: CircularButton?
-    private (set) var backButn: CircularButton?
-    private (set) var cutButn: CircularButton?
-    private (set) var playSliderCenterYConstraint: NSLayoutConstraint?
+    fileprivate (set) var playSlider: CDPlaySlider?
+    fileprivate (set) var playButn: CircularButton?
+    fileprivate (set) var backButn: CircularButton?
+    fileprivate (set) var cutButn: CircularButton?
+    fileprivate (set) var playSliderCenterYConstraint: NSLayoutConstraint?
     
-    private var playProcessDisplayLink: CADisplayLink? /** 播放进度定时器 */
+    fileprivate var playProcessDisplayLink: CADisplayLink? /** 播放进度定时器 */
 
     convenience init(recordFilePath filePath: String) {
         self.init()
         
         self.recordFilePath = filePath
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "receiveAudioSessionInterrutionNote:", name: AVAudioSessionInterruptionNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(PlayRecordVC.receiveAudioSessionInterrutionNote(_:)), name: NSNotification.Name.AVAudioSessionInterruption, object: nil)
         
         do {
-            audioPlayer = try AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: filePath))
+            audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: filePath))
             audioPlayer?.delegate = self
             
             audioPlayer?.prepareToPlay()
@@ -73,7 +73,7 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: AVAudioSessionInterruptionNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVAudioSessionInterruption, object: nil)
     }
 
     override func viewDidLoad() {
@@ -83,20 +83,20 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
         
         // 设置 recordButtonView
         
-        playSlider = CDPlaySlider(frame: CGRectMake(0, 0, 220, 220))
+        playSlider = CDPlaySlider(frame: CGRect(x: 0, y: 0, width: 220, height: 220))
         self.view.addSubview(playSlider!)
         
-        playSlider?.backgroundColor = UIColor.clearColor()
+        playSlider?.backgroundColor = UIColor.clear
         playSlider?.translatesAutoresizingMaskIntoConstraints = false
         
-        playSliderCenterYConstraint = NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0)
+        playSliderCenterYConstraint = NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0)
         self.view.addConstraint(playSliderCenterYConstraint!)
         
-        self.view.addConstraint(NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         
-        playSlider!.addConstraint(NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 0, constant: 220))
+        playSlider!.addConstraint(NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 0, constant: 220))
         
-        playSlider!.addConstraint(NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: playSlider!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
+        playSlider!.addConstraint(NSLayoutConstraint(item: playSlider!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: playSlider!, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
         
         
         
@@ -104,144 +104,144 @@ class PlayRecordVC: UIViewController, AVAudioPlayerDelegate {
         
         // 设置 playButn
         
-        playButn = CircularButton(type: UIButtonType.Custom)
+        playButn = CircularButton(type: UIButtonType.custom)
         self.view.addSubview(playButn!)
         
         playButn?.translatesAutoresizingMaskIntoConstraints = false
-        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Normal)
-        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
+        playButn?.setImage(UIImage(named: "play"), for: UIControlState())
+        playButn?.setImage(UIImage(named: "play"), for: UIControlState.highlighted)
         playButn?.backgroundColor = actionButnColor
         
-        playButn?.addTarget(self, action: "togglePlayAudio", forControlEvents: UIControlEvents.TouchUpInside)
+        playButn?.addTarget(self, action: #selector(PlayRecordVC.togglePlayAudio), for: UIControlEvents.touchUpInside)
         
-        self.view.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: playSlider!, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: PlayRecordVCPlayRecordButtonTopSpacing))
+        self.view.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: playSlider!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: PlayRecordVCPlayRecordButtonTopSpacing))
         
-        self.view.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         
-        playButn!.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
+        playButn!.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
         
-        playButn!.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
+        playButn!.addConstraint(NSLayoutConstraint(item: playButn!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: playButn!, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
         
         
         // 设置 backButn
         
-        backButn = CircularButton(type: UIButtonType.Custom)
+        backButn = CircularButton(type: UIButtonType.custom)
         self.view.addSubview(backButn!)
         
         backButn?.translatesAutoresizingMaskIntoConstraints = false
-        backButn?.setImage(UIImage(named: "undo"), forState: UIControlState.Normal)
-        backButn?.setImage(UIImage(named: "undo"), forState: UIControlState.Highlighted)
+        backButn?.setImage(UIImage(named: "undo"), for: UIControlState())
+        backButn?.setImage(UIImage(named: "undo"), for: UIControlState.highlighted)
         backButn?.backgroundColor = actionButnColor
         
         
-        backButn?.addTarget(self, action: "backButnClick", forControlEvents: UIControlEvents.TouchUpInside)
+        backButn?.addTarget(self, action: #selector(PlayRecordVC.backButnClick), for: UIControlEvents.touchUpInside)
         
-        self.view.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: playButn!, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
         
-        self.view.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.Trailing, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.Leading, multiplier: 1, constant: -30.0))
+        self.view.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.trailing, relatedBy: NSLayoutRelation.equal, toItem: playButn!, attribute: NSLayoutAttribute.leading, multiplier: 1, constant: -30.0))
         
-        backButn!.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
+        backButn!.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
         
-        backButn!.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: backButn!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
+        backButn!.addConstraint(NSLayoutConstraint(item: backButn!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: backButn!, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
         
         
         
         // 设置 cutButn
         
-        cutButn = CircularButton(type: UIButtonType.Custom)
+        cutButn = CircularButton(type: UIButtonType.custom)
         self.view.addSubview(cutButn!)
         
         cutButn?.translatesAutoresizingMaskIntoConstraints = false
-        cutButn?.setImage(UIImage(named: "cut"), forState: UIControlState.Normal)
-        cutButn?.setImage(UIImage(named: "cut"), forState: UIControlState.Highlighted)
+        cutButn?.setImage(UIImage(named: "cut"), for: UIControlState())
+        cutButn?.setImage(UIImage(named: "cut"), for: UIControlState.highlighted)
         cutButn?.backgroundColor = actionButnColor
         
         
-        self.view.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.CenterY, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.CenterY, multiplier: 1, constant: 0))
+        self.view.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: playButn!, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
         
-        self.view.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.Leading, relatedBy: NSLayoutRelation.Equal, toItem: playButn!, attribute: NSLayoutAttribute.Trailing, multiplier: 1, constant: 30.0))
+        self.view.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.leading, relatedBy: NSLayoutRelation.equal, toItem: playButn!, attribute: NSLayoutAttribute.trailing, multiplier: 1, constant: 30.0))
         
-        cutButn!.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
+        cutButn!.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: PlayRecordVCActionButtonSize))
         
-        cutButn!.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: cutButn!, attribute: NSLayoutAttribute.Width, multiplier: 1, constant: 0))
+        cutButn!.addConstraint(NSLayoutConstraint(item: cutButn!, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: cutButn!, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
 
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
     
-    @objc private func backButnClick() {
-        NSNotificationCenter.defaultCenter().postNotificationName(PlayRecordVCBackButtonClickNotification, object: self)
+    @objc fileprivate func backButnClick() {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: PlayRecordVCBackButtonClickNotification), object: self)
     }
     
-    @objc private func togglePlayAudio() {
+    @objc fileprivate func togglePlayAudio() {
         // 播放音频
-        if playerState == .Playing {
+        if playerState == .playing {
             audioPlayer?.pause()
-            playerState = .Paused
+            playerState = .paused
             pausedPlayer()
         } else {
             audioPlayer?.play()
-            playerState = .Playing
+            playerState = .playing
             playingPlayer()
         }
     }
     
-    private func playingPlayer() {
+    fileprivate func playingPlayer() {
         
         playProcessDisplayLink?.invalidate()
-        playProcessDisplayLink = CADisplayLink(target: self, selector: "playingAudio")
+        playProcessDisplayLink = CADisplayLink(target: self, selector: #selector(PlayRecordVC.playingAudio))
         playProcessDisplayLink?.frameInterval = 30
-        playProcessDisplayLink?.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        playProcessDisplayLink?.add(to: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
         
-        playButn?.setImage(UIImage(named: "pause"), forState: UIControlState.Normal)
-        playButn?.setImage(UIImage(named: "pause"), forState: UIControlState.Highlighted)
+        playButn?.setImage(UIImage(named: "pause"), for: UIControlState())
+        playButn?.setImage(UIImage(named: "pause"), for: UIControlState.highlighted)
     }
     
-    private func pausedPlayer() {
+    fileprivate func pausedPlayer() {
         
         playProcessDisplayLink?.invalidate()
         
-        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Normal)
-        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
+        playButn?.setImage(UIImage(named: "play"), for: UIControlState())
+        playButn?.setImage(UIImage(named: "play"), for: UIControlState.highlighted)
     }
     
-    private func stoppedPlayer() {
+    fileprivate func stoppedPlayer() {
         
         playProcessDisplayLink?.invalidate()
         
-        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Normal)
-        playButn?.setImage(UIImage(named: "play"), forState: UIControlState.Highlighted)
+        playButn?.setImage(UIImage(named: "play"), for: UIControlState())
+        playButn?.setImage(UIImage(named: "play"), for: UIControlState.highlighted)
     }
     
     // MARK: AVAudioPlayerDelegate
     
-    func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
-        playerState = .Stopped
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        playerState = .stopped
         stoppedPlayer()
     }
     
-    func audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
-        playerState = .Stopped
+    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
+        playerState = .stopped
         stoppedPlayer()
     }
     
     // MARK: notification
     
-    @objc private func receiveAudioSessionInterrutionNote(note: NSNotification) {
-        let interruptionType = note.userInfo![AVAudioSessionInterruptionTypeKey]
-        let type = AVAudioSessionInterruptionType(rawValue: (interruptionType as! NSNumber).unsignedIntegerValue)!
-        if type == .Began {
-            playerState = .Paused
+    @objc fileprivate func receiveAudioSessionInterrutionNote(_ note: Notification) {
+        let interruptionType = (note as NSNotification).userInfo![AVAudioSessionInterruptionTypeKey]
+        let type = AVAudioSessionInterruptionType(rawValue: (interruptionType as! NSNumber).uintValue)!
+        if type == .began {
+            playerState = .paused
             pausedPlayer()
         }
     }
     
     // 音频播放中
-    @objc private func playingAudio() {
+    @objc fileprivate func playingAudio() {
         
-        if audioPlayer != nil && audioPlayer!.playing {
+        if audioPlayer != nil && audioPlayer!.isPlaying {
             // 改变进度
             let audioDuration = audioPlayer!.duration
             let currentTime = audioPlayer!.currentTime
